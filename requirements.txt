@@ -1,0 +1,8 @@
+# Python 3.11 ou plus, dans un venv (ex. python3 -m venv .venv && .venv/bin/pip install -r requirements.txt)
+numpy
+scipy
+pillow
+rembg[cpu]==2.0.87
+onnxruntime
+faster-whisper==1.2.1
+requests

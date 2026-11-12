@@ -1,0 +1,14 @@
+{
+  "name": "styleastuce-moteur",
+  "private": true,
+  "description": "Moteur vidéo Style Astuce (Remotion), paramétré par episode.json",
+  "scripts": {"studio": "remotion studio src/index.ts", "typecheck": "tsc --noEmit -p ."},
+  "dependencies": {
+    "@remotion/cli": "4.0.535",
+    "@remotion/renderer": "4.0.535",
+    "remotion": "4.0.535",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {"typescript": "5.6.3", "@types/react": "19.0.0"}
+}
