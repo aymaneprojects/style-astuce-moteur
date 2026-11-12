@@ -22,6 +22,10 @@ moteur/
     musique.py         musique originale générée (120 BPM, sans droits)
   episodes/
     leo-4-tenues-50e/  épisode de référence (reconstruit la vidéo v3)
+    leo-jean-3-tenues/ lundi 16/11 (phase 1 prête)
+    leo-rdv-3-erreurs/ mardi 17/11 (phase 1 prête)
+  lots/                un fichier par lot (dates de publication), MODELE-hebdo.json
+  SUJETS.md            banque de sujets d'avance pour les lots hebdo
       episode.json
       script.txt
       media/           images, rotations, voix (NON versionné)
@@ -67,8 +71,29 @@ Toutes s'écrivent `$PY cli/sa.py <commande> episodes/<id> [options]`.
 | `rendu` | rendu Remotion puis loudnorm deux passes (-13 LUFS, crête -1,5) | `out/<id>/<id>.mp4` |
 | `qa` | planches 1 i/s, masques TikTok et Reels, LUFS, zones, rythme, sync des prix (whisper) | `out/<id>/qa/` |
 | `tout` | prix, voix (sans dépenser si absente : arrêt), mots, silences, vignettes, timeline, audio, rendu, qa | tout ce qui précède |
+| `verifier` | phase 1, sans réseau ni crédit : interdits (tiret cadratin, « look complet », mention IA, appâts), chiffres dans le script, totaux = somme des pièces, chaque prix affiché est dit dans sa section, prix des titres jamais avant d'être dits, date du relevé dite et affichée, durée estimée (cible 65 à 75 s), crédits ElevenLabs estimés, timeline simulée (tous les mots trouvés, cartes de l'intro avant 5 s), médias à générer | `out/<id>/verif.json`, `props-simule.json` |
+| `prompts` | prompts GenerateImage (Léo en tenue, références identité + photos produit téléchargées) et GenerateVideo (rotation 360°) pour chaque tenue | `media/prompts.md`, `media/produits/` |
+| `nouveau` | `sa.py nouveau <id> --depuis <modèle>` : squelette d'épisode copié d'un modèle | `episodes/<id>/` |
+| `lot` | `sa.py lot lots/<nom>.json --etape prix,verifier,prompts` : enchaîne une ou plusieurs étapes sur tous les épisodes d'un lot, continue si un épisode échoue | `out/lots/<nom>/rapport.md` et `.json` |
 
-Options : `--depenser-credits`, `--voix-neuve`, `--cle-fichier <fichier.env>`, `--refaire` (refait détourage et rotations), `--sans-whisper`, `--sans-prix`.
+Options : `--depenser-credits`, `--voix-neuve`, `--cle-fichier <fichier.env>`, `--refaire` (refait détourage et rotations), `--sans-whisper`, `--sans-prix`, `--sans-reseau` (prompts), `--etape` (lot), `--depuis` (nouveau), `--oui-aymane` (lot qui dépense des crédits : obligatoire en plus de `--depenser-credits`, seulement après son accord écrit).
+
+`prix` contrôle aussi le stock (fiche Jules « InStock », au moins une taille Uniqlo dans le coloris) et écrit `episodes/<id>/produits.md` (URL, prix lu, date et heure, stock).
+Attention : sur Jules, le nom du coloris ne correspond pas toujours à la photo. Regarder les photos téléchargées par `prompts` avant d'écrire une couleur dans la voix.
+
+## Lot hebdomadaire (chaque mercredi, 7 vidéos du mercredi au mardi)
+
+1. Choisir 7 sujets dans `SUJETS.md` (banque d'avance), en alternant les formes d'accroche (jamais la même deux jours de suite).
+2. Pour chaque sujet : `$PY cli/sa.py nouveau <id> --depuis leo-jean-3-tenues` (3 tenues) ou `--depuis leo-4-tenues-50e` (4 tenues), puis écrire `script.txt`, `episode.json` (pièces, mots déclencheurs, `desc_en` pour les prompts, `publication.date_prevue`).
+3. Copier `lots/MODELE-hebdo.json` en `lots/<date>_hebdo.json` et lister les 7 épisodes avec leur date.
+4. Phase 1 (gratuite) : `$PY cli/sa.py lot lots/<nom>.json --etape prix,verifier,prompts`. Corriger jusqu'à « ok » partout. Le rapport donne caractères, durée, crédits et nombre d'images et de rotations à générer.
+5. Envoyer à Aymane le tableau du rapport et le chiffrage. Attendre son oui.
+6. Phase 2 (payante) : images et rotations avec `media/prompts.md` (GenerateImage, GenerateVideo), puis `$PY cli/sa.py lot lots/<nom>.json --etape tout --depenser-credits --oui-aymane --cle-fichier <fichier.env>`.
+7. QA de chaque vidéo, envoi à Aymane, programmation Buffer seulement après son oui explicite (organisation Style Astuce uniquement).
+
+Calibrage de la durée : 0,054 s par caractère de script (référence : 1 453 caractères donnent 80,3 s). Crédits : environ 0,44 crédit par caractère en eleven_v4.
+
+Gabarit 3 tenues : la grille de cartes passe en 1 et 3 à gauche, 2 au milieu à droite (positions dans `Episode.tsx`, `CARD_POS_3`).
 
 ## La clé ElevenLabs
 

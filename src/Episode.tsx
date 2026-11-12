@@ -10,6 +10,9 @@ const CX = 524, SAFE_L = 108, SAFE_R = 940, SAFE_W = SAFE_R - SAFE_L;
 const S = 0.47, LEO_W = 1080 * S, LEO_H = 1920 * S, LEO_LEFT = CX - 549 * S, LEO_TOP = 500;
 const CARD_W = 206, CARD_H = 334;
 const CARD_POS: Record<number, [number, number, number]> = {1: [148, 560, -4], 2: [694, 590, 4], 3: [150, 970, 3], 4: [692, 1000, -3]};
+// 3 tenues : la carte 2 descend au milieu à droite pour équilibrer (1 et 3 à gauche) ; 1 ou 2 tenues : positions de la grille 4
+const CARD_POS_3: Record<number, [number, number, number]> = {1: [148, 560, -4], 2: [694, 770, 4], 3: [150, 980, 3]};
+const cardPos = (n: number): [number, number, number] => (L.length === 3 ? CARD_POS_3 : CARD_POS)[n];
 const TAG_W = 310, TAG_L = SAFE_L + 4, TAG_R = SAFE_R - 6 - TAG_W;
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
 const io = Easing.bezier(0.65, 0, 0.35, 1), out = Easing.bezier(0.16, 1, 0.3, 1), inn = Easing.bezier(0.5, 0, 0.75, 0);
@@ -112,7 +115,7 @@ const Mention: React.FC<{f: number}> = ({f}) => {
 
 // ---------- Cartes des 4 tenues ----------
 const Card: React.FC<{f: number; n: number; fps: number}> = ({f, n, fps}) => {
-  const [x, y, r] = CARD_POS[n];
+  const [x, y, r] = cardPos(n);
   const look = LOOKS[n - 1], tl = L[n - 1];
   const bi = lookIdx(f);
   const ri = inRotOf(f);
@@ -168,7 +171,7 @@ const FlyingCard: React.FC<{f: number}> = ({f}) => {
   if (bi < 0) return null;
   const a = L[bi].a; const n = bi + 1;
   if (f < a - 6 || f > a + 14) return null;
-  const [x, y, r] = CARD_POS[n];
+  const [x, y, r] = cardPos(n);
   const p = interpolate(f, [a - 6, a + 8], [0, 1], {...clamp, easing: io});
   const tx = interpolate(p, [0, 1], [x, LEO_LEFT + 292 * S - 20]);
   const ty = interpolate(p, [0, 1], [y, LEO_TOP + 60 * S - 20]);

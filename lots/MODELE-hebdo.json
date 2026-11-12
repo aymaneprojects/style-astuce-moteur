@@ -1,0 +1,13 @@
+{
+  "nom": "AAAA-MM-JJ_hebdo",
+  "note": "Lot hebdo : 7 épisodes, du mercredi au mardi suivant. Créer chaque épisode avec « sa.py nouveau <id> --depuis <modèle> », remplir, puis « sa.py lot lots/<nom>.json --etape prix,verifier,prompts ».",
+  "episodes": [
+    {"id": "id-episode-1", "date": "AAAA-MM-JJ"},
+    {"id": "id-episode-2", "date": "AAAA-MM-JJ"},
+    {"id": "id-episode-3", "date": "AAAA-MM-JJ"},
+    {"id": "id-episode-4", "date": "AAAA-MM-JJ"},
+    {"id": "id-episode-5", "date": "AAAA-MM-JJ"},
+    {"id": "id-episode-6", "date": "AAAA-MM-JJ"},
+    {"id": "id-episode-7", "date": "AAAA-MM-JJ"}
+  ]
+}

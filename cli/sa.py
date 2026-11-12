@@ -2,7 +2,8 @@
 """Moteur Style Astuce : une commande par étape, et « tout » qui enchaîne.
 
 Usage : python3 cli/sa.py <commande> episodes/<id> [options]
-Commandes : prix, voix, mots, silences, timeline, vignettes, audio, rendu, qa, tout
+Commandes : prix, voix, mots, silences, timeline, vignettes, audio, rendu, qa, tout,
+           verifier, prompts, nouveau (épisode) et lot (plusieurs épisodes, voir README)
 Aucune clé n'est écrite ni affichée : la clé ElevenLabs est lue en mémoire (variable ELEVENLABS_API_KEY,
 ou --cle-fichier qui ne lit QUE la ligne ELEVENLABS_API_KEY du fichier indiqué).
 """
@@ -18,7 +19,8 @@ SAFE = dict(TikTok=(60, 940, 150, 1470), Reels=(108, 960, 220, 1420), commune=(1
 UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36'
 
 def log(*a): print('[sa]', *a, flush=True)
-def stop(msg): print('[sa] ERREUR :', msg, file=sys.stderr); sys.exit(1)
+class SAErreur(Exception): pass
+def stop(msg): raise SAErreur(msg)
 def run(cmd, **kw):
     r = subprocess.run(cmd, **kw)
     if r.returncode: stop('commande en échec : ' + ' '.join(map(str, cmd))[:300])
@@ -51,7 +53,7 @@ def cmd_prix(ep, a):
     for t in ep.E['tenues']:
         for pc in t['pieces']:
             url = pc['url']; attendu = prix_num(pc['prix']); barre = prix_num(pc['prix_barre']) if pc.get('prix_barre') else None
-            trouve = base = None; note = ''
+            trouve = base = None; note = ''; note_stock = ''
             try:
                 if 'jules.com' in url:
                     h = lire_url(urllib.request.Request(url, headers={'User-Agent': UA})).decode('utf-8', 'ignore')
@@ -61,6 +63,7 @@ def cmd_prix(ep, a):
                         for x in (d if isinstance(d, list) else [d]):
                             if x.get('@type') == 'Product':
                                 o = x.get('offers'); o = o[0] if isinstance(o, list) else o; trouve = float(o['price'])
+                                if 'InStock' not in str(o.get('availability', 'InStock')): note_stock = 'rupture de stock sur la fiche'
                 elif 'uniqlo.com' in url:
                     pid = re.search(r'/products/(E\d+-\d+)/(\d+)', url); col = re.search(r'colorDisplayCode=(\d+)', url)
                     api = f'https://www.uniqlo.com/fr/api/commerce/v5/fr/products/{pid.group(1)}/price-groups/{pid.group(2)}/l2s?withPrices=true&withStocks=true&httpFailure=true'
@@ -68,21 +71,35 @@ def cmd_prix(ep, a):
                     for l2 in d['l2s']:
                         if not col or l2['color']['displayCode'] == col.group(1):
                             pr = d['prices'].get(l2['l2Id'], {}); base = pr.get('base', {}).get('value')
-                            trouve = (pr.get('promo') or {}).get('value') or base; break
+                            trouve = (pr.get('promo') or {}).get('value') or base
+                            ids = [x['l2Id'] for x in d['l2s'] if x['color']['displayCode'] == l2['color']['displayCode']]; sts = [d.get('stocks', {})[i] for i in ids if i in d.get('stocks', {})]
+                            if sts and not any(v.get('statusCode') != 'STOCK_OUT' and v.get('quantity', 1) > 0 for v in sts): note_stock = 'rupture : aucune taille en stock dans ce coloris'
+                            break
                 else:
                     note = 'enseigne non automatisée : vérifier à la main'
             except Exception as e:
                 note = f'lecture impossible ({type(e).__name__})'
             bon = trouve is not None and abs(trouve - attendu) < 0.005 and (barre is None or (base is not None and abs(base - barre) < 0.005))
             ok &= bon or bool(note)
-            res.append(dict(piece=pc['nom'], enseigne=pc['enseigne'], attendu=attendu, trouve=trouve, prix_de_base=base, ok=bon, note=note, url=url))
-            log(f"{'OK ' if bon else '!! '} {pc['nom']:<28} attendu {attendu:6.2f}  trouvé {trouve}  {('base ' + str(base)) if base else ''} {note}")
+            res.append(dict(piece=pc['nom'], enseigne=pc['enseigne'], attendu=attendu, trouve=trouve, prix_de_base=base, ok=bon, note=note, stock=note_stock or 'ok', url=url))
+            log(f"{'OK ' if bon else '!! '} {pc['nom']:<28} attendu {attendu:6.2f}  trouvé {trouve}  {('base ' + str(base)) if base else ''} {note} {note_stock}")
     stamp = datetime.datetime.now().astimezone().isoformat(timespec='minutes')
     json.dump(dict(verifie_le=stamp, pieces=res), open(ep.out / 'prix.json', 'w'), ensure_ascii=False, indent=1)
     if not all(r['ok'] for r in res if not r['note']): stop('au moins un prix a changé : corriger episode.json (et le script si le prix est dit)')
+    rup = [r['piece'] for r in res if r['stock'] != 'ok']
+    if rup: stop('pièce(s) en rupture, à remplacer : ' + ', '.join(rup))
     nl = [r['piece'] for r in res if r['note']]
     if nl: log('ATTENTION, prix non lus, à vérifier à la main avant envoi :', ', '.join(nl))
-    log('prix vérifiés ->', ep.out / 'prix.json')
+    # produits.md versionné avec l'épisode : URL, prix lu, date et heure du relevé, stock
+    md = [f"# Produits : {ep.E['titre']}\n", f"Relevé automatique `sa.py prix` le {stamp} (heure de Paris). Prix TTC lus sur la fiche, hors chaussures et livraison.\n",
+          '| Tenue | Pièce | Enseigne | Prix épisode | Prix lu | Prix de base | Stock | Fiche |', '|---|---|---|---|---|---|---|---|']
+    k = 0
+    for t in ep.E['tenues']:
+        for pc in t['pieces']:
+            r = res[k]; k += 1
+            md.append(f"| {t['label']} ({t['total']}) | {pc['nom']} | {pc['enseigne']} | {pc['prix']} | {r['trouve'] if r['trouve'] is not None else 'non lu'} | {r['prix_de_base'] or ''} | {r['stock']} | {pc['url']} |")
+    (ep.dir / 'produits.md').write_text('\n'.join(md) + '\n', encoding='utf-8')
+    log('prix vérifiés ->', ep.out / 'prix.json', '+', ep.dir / 'produits.md')
 
 # ------------------------------------------------------------------ voix (ElevenLabs, réglages Benjamin)
 def lire_cle(fichier):
@@ -164,8 +181,8 @@ def cmd_silences(ep, a):
 
 # ------------------------------------------------------------------ timeline (script + words.json -> props.json)
 norm = lambda s: re.sub(r"[.,:;!?«»\"]", '', s.lower()).strip()
-def cmd_timeline(ep, a):
-    E = ep.E; W = json.load(open(ep.voix / 'words.json'))
+def cmd_timeline(ep, a, W=None, sortie=None):
+    E = ep.E; W = W if W is not None else json.load(open(ep.voix / 'words.json'))
     def F(i): return max(0, round(W[i]['s'] * FPS) + SHIFT)
     def idx(word, start=0, stop_=None):
         for i in range(start, stop_ or len(W)):
@@ -236,8 +253,10 @@ def cmd_timeline(ep, a):
     props = dict(fps=FPS, total=math.ceil((W[-1]['e'] + 1.6) * FPS), openLook=E['ouverture'], looks=looks, looksData=data, titles=titles, subs=subs,
                  promise=F(i_prom), mention=F(i_ment), hors=F(idx(M['mot_l2'], i_ment)), mentionL1=M['l1'], mentionL2=M['l2'],
                  end=F(i_fin), reponds=F(ir), nums=nums, intro=intro, audio='mix.wav')
-    json.dump({'data': props}, open(ep.out / 'props.json', 'w'), ensure_ascii=False, indent=1)
-    log(f"timeline : {props['total']} images ({props['total'] / FPS:.1f} s) ->", ep.out / 'props.json')
+    sortie = sortie or ep.out / 'props.json'
+    json.dump({'data': props}, open(sortie, 'w'), ensure_ascii=False, indent=1)
+    log(f"timeline : {props['total']} images ({props['total'] / FPS:.1f} s) ->", sortie)
+    return props
 
 # ------------------------------------------------------------------ images : Léo détouré, vignettes sans peau ni chaussures, rotations
 def peau(im):
@@ -391,6 +410,205 @@ def cmd_qa(ep, a):
     if R.get('sync_prix') and R['sync_prix']['ecart_max_ms'] > 250: pb.append('prix décalé de plus de 250 ms')
     if pb: log('ATTENTION :', ' ; '.join(pb))
 
+# ------------------------------------------------------------------ verifier (phase 1, sans réseau ni crédit)
+S_PAR_CAR = 78.64 / 1453        # calibré sur l'épisode de référence (voix Benjamin, silences ramenés à 0,32 s)
+CREDITS_PAR_CAR = 639 / 1454    # facturé en eleven_v4 sur le script de référence
+DUREE_CIBLE = (65, 75)
+UNITES = 'zéro un deux trois quatre cinq six sept huit neuf dix onze douze treize quatorze quinze seize'.split()
+DIZ = {2: 'vingt', 3: 'trente', 4: 'quarante', 5: 'cinquante', 6: 'soixante'}
+MOIS = 'janvier février mars avril mai juin juillet août septembre octobre novembre décembre'.split()
+def fr_nombre(n):
+    """0..99 en lettres, orthographe à traits d'union (comme dans les scripts)."""
+    if n < 17: return UNITES[n]
+    if n < 20: return 'dix-' + UNITES[n - 10]
+    if n < 70:
+        d, u = divmod(n, 10); return DIZ[d] + ('' if u == 0 else '-et-un' if u == 1 else '-' + UNITES[u])
+    if n < 80: return 'soixante-' + ('et-onze' if n == 71 else fr_nombre(n - 60))
+    return 'quatre-vingt' + ('s' if n == 80 else '-' + fr_nombre(n - 80))
+def fr_variantes(n):
+    v = fr_nombre(n); return {v, v.replace('-et-', ' et '), v.replace('-', ' ')}
+def mots_simules(texte):
+    """Faux words.json : temps proportionnels au nombre de caractères (calibrage de la référence)."""
+    W = []; t = 0.0
+    for w in texte.split():
+        d = (len(w) + 1) * S_PAR_CAR; W.append({'w': w, 's': round(t, 3), 'e': round(t + d - S_PAR_CAR, 3)}); t += d
+    return W
+INTERDITS = [(r'\u2014', 'tiret cadratin'), (r'\u2013', 'tiret demi-cadratin (préférer « - » ou « : »)'), (r'look\s+complet', '« look complet » interdit'),
+             (r'(?-i:\b(IA|AI|AIGC)\b)', 'mention IA (déclarée seulement via l’option de la plateforme)'), (r'intelligence artificielle|g[ée]n[ée]r[ée]e? par', 'mention IA'),
+             (r'garanti|meilleur prix|le moins cher du march', 'promesse non prouvable'), (r'envoie (ça|cette vid[ée]o)|partage (à|a) ', 'appât d’engagement interdit')]
+def textes_visibles(E):
+    out = []
+    def walk(x, chemin):
+        if isinstance(x, dict):
+            for k, v in x.items():
+                if k in ('url', 'image', 'rotation', 'script', 'voix', 'id', 'date_releve', 'publication', 'desc_en') or k.startswith('mot'): continue
+                walk(v, f'{chemin}.{k}')
+        elif isinstance(x, list):
+            for i, v in enumerate(x): walk(v, f'{chemin}[{i}]')
+        elif isinstance(x, str): out.append((chemin, x))
+    walk(E, 'episode'); return out
+def cmd_verifier(ep, a):
+    E = ep.E; txt = ep.script(); err = []; avert = []; R = {'id': ep.id}
+    for chemin, t in [('script', txt)] + textes_visibles(E):
+        for rx, why in INTERDITS:
+            if re.search(rx, t, re.I): err.append(f'{chemin} : {why} -> « {t[:60]} »')
+    if re.search(r'\d', txt): err.append('script : chiffres trouvés, écrire les nombres en lettres pour la voix')
+    # durée, crédits
+    n = len(txt); dur = n * S_PAR_CAR + 1.6
+    R.update(caracteres=n, duree_estimee_s=round(dur, 1), credits_estimes=round(n * CREDITS_PAR_CAR))
+    if not DUREE_CIBLE[0] <= dur <= DUREE_CIBLE[1]: avert.append(f'durée estimée {dur:.1f} s hors cible {DUREE_CIBLE[0]}..{DUREE_CIBLE[1]} s ({n} caractères)')
+    accroche = re.split(r'(?<=[.?!])\s', txt, maxsplit=1)[0]; R['accroche_mots'] = len(accroche.split())
+    if len(accroche.split()) > 15: avert.append(f'accroche de {len(accroche.split())} mots (viser 12 au plus)')
+    # totaux et prix dits
+    paras = [norm(p_) for p_ in re.split(r'\n\s*\n', txt)]
+    for k, t in enumerate(E['tenues'], 1):
+        som = round(sum(prix_num(pc['prix']) for pc in t['pieces']), 2)
+        if abs(som - prix_num(t['total'])) > 0.005: err.append(f'tenue {k} : total {t["total"]} mais somme des pièces {som:.2f}')
+        sec = next((p_ for p_ in paras[1:] if p_.split()[0].rstrip(',') == norm(t['mot']).rstrip(',')), ' '.join(paras))
+        for quoi, val in [(pc['nom'], pc['prix']) for pc in t['pieces']] + [('total', t['total'])] + [(pc['nom'] + ' (barré)', pc['prix_barre']) for pc in t['pieces'] if pc.get('prix_barre')]:
+            e_, c_ = divmod(round(prix_num(val) * 100), 100)
+            ok = any(v in sec for v in fr_variantes(e_)) and (c_ == 0 or any(v in sec for v in fr_variantes(c_)))
+            if not ok: err.append(f'tenue {k} : prix {val} ({quoi}) affiché mais pas dit dans la section « {t["mot"]} »')
+    # prix dans les titres : doivent être dits au plus tard quand le titre apparaît
+    for bloc in ('accroche', 'promesse'):
+        B = E[bloc]; full = ' '.join(B.get(x, '') for x in ('l1', 'pre', 'kw', 'post'))
+        for m in re.finditer(r'(\d+)\s*€', full):
+            mots_ = [norm(w) for w in txt.split()]; cible = fr_variantes(int(m.group(1)))
+            pos = next((i for i, w in enumerate(mots_) if w in cible), None)
+            lim = 0 if bloc == 'accroche' else next((i for i, w in enumerate(mots_) if w == norm(B['mot'])), 0)
+            if pos is None: err.append(f'{bloc} : {m.group(0)} affiché mais jamais dit')
+            elif bloc == 'accroche' and pos * 1.0 > 12: avert.append(f'accroche : {m.group(0)} affiché dès l’image 0 mais dit seulement au mot {pos + 1}')
+            elif bloc == 'promesse' and pos > lim: err.append(f'promesse : {m.group(0)} affiché (mot « {B["mot"]} ») avant d’être dit')
+    # date du relevé dite et affichée
+    d = datetime.date.fromisoformat(E['date_releve'])
+    if f'{d.day:02d}/{d.month:02d}' not in E['mention']['l1']: err.append(f'mention : la date {d:%d/%m} du relevé n’est pas dans « {E["mention"]["l1"]} »')
+    if not any(f'{v} {MOIS[d.month - 1]}' in norm(txt) for v in fr_variantes(d.day) | ({'premier'} if d.day == 1 else set())): err.append(f'script : la date du relevé ({d.day} {MOIS[d.month - 1]}) n’est pas dite')
+    if 'hors chaussures et livraison' not in norm(txt): err.append('script : « hors chaussures et livraison » absent')
+    # timeline simulée (tous les mots déclencheurs trouvés, intro avant 5 s)
+    try:
+        W = mots_simules(txt); props = cmd_timeline(ep, a, W, ep.out / 'props-simule.json')
+        fin_i = props['intro']['fin'] / FPS; last = max(props['intro']['at']) / FPS + props['intro']['duree'] / FPS
+        R['intro_cartes_s'] = [round(x / FPS, 2) for x in props['intro']['at']]
+        if last > 4.5: avert.append(f'intro : dernière carte posée vers {last:.1f} s (estimation), marge faible avant 5 s')
+    except SAErreur as e: err.append(f'timeline simulée : {e}')
+    # médias attendus (à générer en phase 2)
+    manq = []
+    for k, t in enumerate(E['tenues'], 1):
+        for key, quoi in (('image', 'image Léo en tenue'), ('rotation', 'rotation 360°')):
+            if t.get(key) and not ep.p(t[key]).exists(): manq.append(dict(tenue=k, type=quoi, fichier=t[key]))
+    R['medias_manquants'] = manq; R['voix_presente'] = (ep.voix / 'voice-raw.mp3').exists()
+    pr = ep.out / 'prix.json'
+    R['prix_verifies_le'] = json.load(open(pr))['verifie_le'] if pr.exists() else None
+    if not R['prix_verifies_le']: avert.append('prix jamais vérifiés : lancer « prix »')
+    R['erreurs'] = err; R['avertissements'] = avert
+    json.dump(R, open(ep.out / 'verif.json', 'w'), ensure_ascii=False, indent=1)
+    for x in err: log('ERREUR  ', x)
+    for x in avert: log('ATTENTION', x)
+    log(f"{ep.id} : {n} caractères, ~{dur:.0f} s, ~{R['credits_estimes']} crédits ElevenLabs, {sum(1 for m in manq if m['type'].startswith('image'))} images et "
+        f"{sum(1 for m in manq if m['type'].startswith('rotation'))} rotations à générer -> {ep.out / 'verif.json'}")
+    if err: stop(f'{len(err)} erreur(s) de vérification')
+    return R
+
+# ------------------------------------------------------------------ prompts (images Léo + rotations, à passer à GenerateImage / GenerateVideo)
+LEO = MOTEUR.parent / 'leo'
+def bloc_prompt_base():
+    t = (LEO / 'prompts.md').read_text(encoding='utf-8')
+    m = re.search(r'## 1\..*?```\n(.*?)```', t, re.S)
+    return m.group(1).strip() if m else ''
+def cmd_prompts(ep, a):
+    base = bloc_prompt_base(); E = ep.E; (ep.media / 'produits').mkdir(exist_ok=True); L_ = []
+    L_.append(f"# Prompts de génération : {E['titre']}\n\nFichier produit par `sa.py prompts` le {datetime.date.today():%d/%m/%Y}. PAYANT : rien n'est généré sans le oui d'Aymane.\n"
+              "Images : GenerateImage, `aspect_ratio` 9:16, références dans l'ordre indiqué. Rotations : GenerateVideo à partir de l'image validée (clip 6 s, vertical).\n"
+              "Relire chaque image (visage de Léo, couleur et coupe des pièces, aucun logo) avant de lancer sa rotation. Déposer les fichiers aux chemins indiqués, puis `sa.py vignettes` et régler `coupe`.\n")
+    for k, t in enumerate(E['tenues'], 1):
+        refs = [str(LEO / 'identite' / 'maitre-visage.jpg'), str(LEO / 'identite' / 'maitre-corps.jpg')]
+        for j, pc in enumerate(t['pieces'], 1):
+            dst = ep.media / 'produits' / f'{k}-{j}-{pc["zone"]}.jpg'
+            if not dst.exists() and 'jules.com' in pc['url'] and not a.sans_reseau:
+                try:
+                    h = lire_url(urllib.request.Request(pc['url'], headers={'User-Agent': UA})).decode('utf-8', 'ignore')
+                    im = re.search(r'<meta property="og:image" content="([^"]+)"', h)
+                    if im: dst.write_bytes(lire_url(urllib.request.Request(html_unescape(im.group(1)), headers={'User-Agent': UA})))
+                except Exception as e: log('photo produit non téléchargée :', pc['nom'], type(e).__name__)
+            if dst.exists(): refs.append(str(dst))
+        tenue = '; '.join(('top: ' if pc['zone'] == 'haut' else 'bottom: ') + (pc.get('desc_en') or pc['nom']) for pc in t['pieces'])
+        bloc = (f"CHANGE ONLY HIS CLOTHES. Outfit: {tenue}. Plain clean white low-top sneakers without logo. No jewelry, no hat, no glasses. "
+                "The garments must match the product photos in the references: same color, same cut, same fabric look. No logo, no text, no brand label anywhere.")
+        pose = ("Pose: standing straight, full body visible from hair to shoes, facing the camera almost front-on, arms relaxed at his sides, calm neutral expression "
+                "with a very slight closed-mouth smile. Framing: centered, generous empty space above the head and below the shoes.")
+        prompt = base.replace('[TENUE]', bloc).replace('[POSE ET CADRAGE]', pose) if base else bloc + '\n' + pose
+        L_.append(f"\n## Tenue {k} : {t['label']} ({t['total']})\n\n### Image -> `{ep.dir.name}/{t['image']}`\n\nRéférences :\n" + '\n'.join(f'- `{r}`' for r in refs) +
+                  "\n\n(Recadrer toute photo produit qui montre un logo ou un texte avant de la passer.)\n\n```\n" + prompt + "\n```\n")
+        if t.get('rotation'):
+            L_.append(f"### Rotation 360° -> `{ep.dir.name}/{t['rotation']}`\n\nImage de départ : l'image validée ci-dessus.\n\n```\n"
+                      "The same young man, same outfit, same light gray studio, slowly turns a full 360 degrees in place like a fashion mannequin on a turntable, "
+                      "at a constant speed, arms relaxed, feet staying on the same spot, ending facing the camera again. Static camera, no zoom, no cut, "
+                      "full body always in frame with space above the head and below the shoes. No text, no logo.\n```\n")
+    (ep.media / 'prompts.md').write_text(''.join(L_), encoding='utf-8')
+    log('prompts ->', ep.media / 'prompts.md')
+def html_unescape(s):
+    import html; return html.unescape(s)
+
+# ------------------------------------------------------------------ nouveau (squelette d'épisode)
+def cmd_nouveau(a):
+    dst = MOTEUR / 'episodes' / a.episode
+    if dst.exists(): stop(f'{dst} existe déjà')
+    src = MOTEUR / 'episodes' / (a.depuis or 'leo-4-tenues-50e')
+    dst.mkdir(parents=True); (dst / 'media').mkdir()
+    E = json.load(open(src / 'episode.json', encoding='utf-8')); E['id'] = a.episode; E['date_releve'] = f'{datetime.date.today():%Y-%m-%d}'
+    for t in E['tenues']:
+        slug = re.sub(r'[^a-z0-9]+', '-', t['label'].lower()).strip('-'); t['image'] = f'media/{a.episode}-{slug}.jpg'; t['rotation'] = f'media/rotation-{a.episode}-{slug}.mp4'
+    E['publication'] = dict(date_prevue='AAAA-MM-JJ', plateformes=['TikTok', 'Instagram Reels'], forme_accroche='à remplir')
+    json.dump(E, open(dst / 'episode.json', 'w'), ensure_ascii=False, indent=2)
+    shutil.copy(src / 'script.txt', dst / 'script.txt')
+    log(f'épisode créé depuis {src.name} -> {dst} (réécrire script.txt et episode.json, puis « verifier »)')
+
+# ------------------------------------------------------------------ lot (plusieurs épisodes d'un coup)
+ETAPES_LOT = ['verifier', 'prix', 'prompts', 'voix', 'tout', 'qa', 'rendu', 'timeline', 'vignettes']
+def lire_lot(chemin):
+    p = Path(chemin)
+    if p.is_dir(): return dict(nom=p.name, episodes=[dict(id=d.name, dossier=str(d)) for d in sorted(p.iterdir()) if (d / 'episode.json').exists()])
+    L = json.load(open(p, encoding='utf-8'))
+    for e in L['episodes']: e.setdefault('dossier', str(MOTEUR / 'episodes' / e['id']))
+    return L
+def cmd_lot(a):
+    L = lire_lot(a.episode); etapes = a.etape.split(',')
+    for e_ in etapes:
+        if e_ not in ETAPES_LOT: stop(f'étape « {e_} » inconnue pour un lot ({", ".join(ETAPES_LOT)})')
+    if 'voix' in etapes or 'tout' in etapes:
+        if a.depenser_credits and not a.oui_aymane: stop('lot avec crédits : ajouter --oui-aymane (à n’utiliser qu’après son accord écrit)')
+    rows = []
+    for e in L['episodes']:
+        r = dict(id=e['id'], date=e.get('date', ''), statut='ok', detail='')
+        try:
+            ep = Ep(e['dossier'])
+            for e_ in etapes:
+                log(f'==== {e["id"]} : {e_}')
+                res = {'verifier': cmd_verifier, 'prix': cmd_prix, 'prompts': cmd_prompts, 'voix': cmd_voix, 'tout': cmd_tout, 'qa': cmd_qa,
+                       'rendu': cmd_rendu, 'timeline': cmd_timeline, 'vignettes': cmd_vignettes}[e_](ep, a)
+            v = ep.out / 'verif.json'
+            if v.exists():
+                V = json.load(open(v)); r.update({k: V.get(k) for k in ('caracteres', 'duree_estimee_s', 'credits_estimes', 'medias_manquants', 'avertissements', 'prix_verifies_le')})
+            r['titre'] = ep.E['titre']; r['tenues'] = ' / '.join(f"{t['label']} {t['total']}" for t in ep.E['tenues'])
+            mp4 = ep.out / f'{ep.id}.mp4'; r['video'] = str(mp4) if mp4.exists() else ''
+        except SAErreur as x: r['statut'] = 'ERREUR'; r['detail'] = str(x)
+        except Exception as x: r['statut'] = 'ERREUR'; r['detail'] = f'{type(x).__name__}: {x}'
+        rows.append(r)
+    dl = MOTEUR / 'out' / 'lots' / L.get('nom', 'lot'); dl.mkdir(parents=True, exist_ok=True)
+    tot_c = sum(r.get('caracteres') or 0 for r in rows); tot_cr = sum(r.get('credits_estimes') or 0 for r in rows)
+    nimg = sum(1 for r in rows for m in (r.get('medias_manquants') or []) if m['type'].startswith('image'))
+    nrot = sum(1 for r in rows for m in (r.get('medias_manquants') or []) if m['type'].startswith('rotation'))
+    md = [f"# Lot {L.get('nom', '')} ({', '.join(etapes)}), {datetime.datetime.now().astimezone():%d/%m/%Y %H:%M} (heure de Paris)\n",
+          '| Date | Épisode | Statut | Tenues | Caractères | Durée est. | Crédits est. | À générer | Remarques |', '|---|---|---|---|---|---|---|---|---|']
+    for r in rows:
+        mm = r.get('medias_manquants') or []
+        md.append(f"| {r['date']} | {r['id']} | {r['statut']} | {r.get('tenues', '')} | {r.get('caracteres', '')} | {r.get('duree_estimee_s', '')} s | {r.get('credits_estimes', '')} | "
+                  f"{sum(1 for m in mm if m['type'].startswith('image'))} img, {sum(1 for m in mm if m['type'].startswith('rotation'))} rot | {r['detail'] or '; '.join(r.get('avertissements') or [])} |")
+    md.append(f"\nTotal : {tot_c} caractères, environ {tot_cr} crédits ElevenLabs (une génération par épisode, sans nouvel essai), {nimg} images Léo et {nrot} rotations 360° à générer.\n")
+    (dl / 'rapport.md').write_text('\n'.join(md), encoding='utf-8'); json.dump(rows, open(dl / 'rapport.json', 'w'), ensure_ascii=False, indent=1)
+    log('rapport du lot ->', dl / 'rapport.md')
+    if any(r['statut'] != 'ok' for r in rows): stop('au moins un épisode du lot est en erreur (voir le rapport)')
+
 # ------------------------------------------------------------------ tout
 def cmd_tout(ep, a):
     if not a.sans_prix: cmd_prix(ep, a)
@@ -400,14 +618,25 @@ def cmd_tout(ep, a):
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('commande', choices=['prix', 'voix', 'mots', 'silences', 'timeline', 'vignettes', 'audio', 'rendu', 'qa', 'tout'])
-    ap.add_argument('episode')
+    ap.add_argument('commande', choices=['prix', 'voix', 'mots', 'silences', 'timeline', 'vignettes', 'audio', 'rendu', 'qa', 'tout', 'verifier', 'prompts', 'nouveau', 'lot'])
+    ap.add_argument('episode', help='episodes/<id> ; pour « nouveau » : le nouvel id ; pour « lot » : un fichier lots/<nom>.json ou un dossier d’épisodes')
     ap.add_argument('--depenser-credits', action='store_true', help='autorise la génération de voix payante')
+    ap.add_argument('--oui-aymane', action='store_true', help='« lot » : confirme l’accord écrit d’Aymane pour dépenser des crédits sur tout le lot')
     ap.add_argument('--voix-neuve', action='store_true', help='régénère la voix même si elle existe')
     ap.add_argument('--cle-fichier', help='fichier .env où lire UNIQUEMENT ELEVENLABS_API_KEY')
     ap.add_argument('--refaire', action='store_true', help='refait le détourage et les rotations')
     ap.add_argument('--sans-whisper', action='store_true', help='QA sans vérification de sync par transcription')
     ap.add_argument('--sans-prix', action='store_true', help='« tout » sans revérifier les prix')
-    a = ap.parse_args(); ep = Ep(a.episode)
-    {'prix': cmd_prix, 'voix': cmd_voix, 'mots': cmd_mots, 'silences': cmd_silences, 'timeline': cmd_timeline, 'vignettes': cmd_vignettes,
-     'audio': cmd_audio, 'rendu': cmd_rendu, 'qa': cmd_qa, 'tout': cmd_tout}[a.commande](ep, a)
+    ap.add_argument('--sans-reseau', action='store_true', help='« prompts » sans télécharger les photos produit')
+    ap.add_argument('--etape', default='verifier', help='« lot » : étape(s) à enchaîner, séparées par des virgules (' + ', '.join(ETAPES_LOT) + ')')
+    ap.add_argument('--depuis', help='« nouveau » : épisode modèle (défaut leo-4-tenues-50e)')
+    a = ap.parse_args()
+    try:
+        if a.commande == 'nouveau': cmd_nouveau(a)
+        elif a.commande == 'lot': cmd_lot(a)
+        else:
+            ep = Ep(a.episode)
+            {'prix': cmd_prix, 'voix': cmd_voix, 'mots': cmd_mots, 'silences': cmd_silences, 'timeline': cmd_timeline, 'vignettes': cmd_vignettes,
+             'audio': cmd_audio, 'rendu': cmd_rendu, 'qa': cmd_qa, 'tout': cmd_tout, 'verifier': cmd_verifier, 'prompts': cmd_prompts}[a.commande](ep, a)
+    except SAErreur as e:
+        print('[sa] ERREUR :', e, file=sys.stderr); sys.exit(1)

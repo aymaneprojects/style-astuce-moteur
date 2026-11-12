@@ -1,0 +1,27 @@
+# Banque de sujets Style Astuce (pour les lots hebdo)
+
+Mise à jour : 13/11/2026 vers 00h20 (heure de Paris). Prix lus sur les fiches ou les pages catégorie Jules et l'API produit Uniqlo à cette heure, hors chaussures et livraison.
+Ce sont des CANDIDATS : relire chaque fiche avec `sa.py prix` le jour du lot, vérifier la couleur sur la photo produit (les noms de coloris Jules sont parfois faux), stock compris.
+Règles : jamais « look complet », jamais un prix affiché avant d'être dit, alterner les formes d'accroche (jamais la même deux jours de suite), pas de sujet entretien d'embauche (autre marque).
+
+Déjà utilisés : « 4 tenues à moins de 50 € » (référence, forme « nombre + objet »), « Même jean, 3 tenues » (16/11, « même X, pas le même Y »), « Premier rendez-vous, 3 erreurs » (17/11, « N choses que je ne ferais jamais »).
+
+| # | Sujet | Forme d'accroche | Accroche proposée (image 0 + voix) | Tenues candidates (prix du 13/11) | Totaux |
+|---|---|---|---|---|---|
+| 1 | 3 tenues à moins de 40 € | Nombre d'abord | « Quarante euros. Trois tenues. Aucune faute de goût. » | Sweat col rond vert 15,00 + chino large gris 15,00 ; tee col V blanc 9,99 + jean straight 29,99 ; tee col rond noir 9,99 + jean slim brut 29,99 | 30,00 / 39,98 / 39,98 |
+| 2 | Capsule : 5 pièces, 4 tenues | Défi | « Cinq pièces, cent euros. Je te fais quatre tenues avec. » | Jean straight brut 29,99, chino large écru 15,00, tee blanc 9,99, chemise oxford 29,99, pull col roulé noir 20,00 (capsule 104,97, chaque tenue = 2 pièces) | 39,98 / 59,98 / 24,99 / 35,00 |
+| 3 | Une chemise blanche, 4 façons | Même X, pas le même Y | « Une chemise blanche à vingt-six euros. Quatre styles. » | Chemise slim blanche 25,99 + jean straight brut 29,99 / chino large gris 15,00 / chino large écru 15,00 / jogging straight noir 25,99 | 55,98 / 40,99 / 40,99 / 51,98 |
+| 4 | Hiver petit budget : 3 tenues chaudes sous 50 € | Sensation du quotidien en question | « T'as froid, mais tu veux pas ressembler à un sac de couchage ? » | Pull col roulé noir 20,00 + jean straight brut 29,99 ; sweat molleton bleu foncé 29,99 + chino large gris 15,00 ; HEATTECH manches longues Uniqlo 14,90 sous chemise (à cadrer) + chino large écru 15,00 | 49,99 / 44,99 / à composer |
+| 5 | 3 détails qui font « pas cher » | Arrête de faire X | « Arrête de porter ton jean trop long. Ça fait cheap, même à cent euros. » | Jean slim brut 29,99 + tee col rond blanc 9,99 ; chemise slim blanche 25,99 + jean straight 29,99 ; polo manches longues marine 29,99 + chino large écru 15,00 | 39,98 / 55,98 / 44,99 |
+| 6 | Tout en noir : classe ou triste ? | A ou B ? | « Tout en noir : classe ou triste ? Ça tient à un détail. » | Tee col rond noir 9,99 + jogging straight noir 25,99 ; chemise slim noire 25,99 + jean straight brut 29,99 ; pull col roulé noir 20,00 + chino large gris 15,00 | 35,98 / 55,98 / 35,00 |
+| 7 | Paraître plus grand : 3 tenues | Mythe ? Faux. | « Il faut être grand pour bien porter un pantalon large ? Faux. » | Col roulé blanc 15,00 + chino large écru 15,00 (ton sur ton) ; tee noir 9,99 + jogging straight noir 25,99 ; chemise slim blanche rentrée 25,99 + chino large gris 15,00 | 30,00 / 35,98 / 40,99 |
+| 8 | Repas de famille des fêtes à moins de 50 € (début décembre) | Danger concret pour quelqu'un qu'on aime | « Le repas chez ta belle-famille approche. Voilà quoi mettre pour moins de cinquante euros. » | Pull de Noël jacquard 29,99 + chino large écru 15,00 ; pull col rond noir 29,99 + chino large gris 15,00 ; chemise slim blanche 25,99 + chino large gris 15,00 | 44,99 / 44,99 / 40,99 |
+| 9 | Jules ou Uniqlo : devine le moins cher | Devine lequel | « Ces deux tee-shirts blancs : un coûte deux fois plus cher. Devine lequel. » | Tee col rond blanc Jules 9,99 vs T-shirt 100 % coton Supima Uniqlo 19,90 ; jean straight Jules 29,99 vs pantalon Easy Stretch 7/8 denim Uniqlo 29,90 (tenues de 2 pièces comparées) | 39,98 / 49,80 |
+| 10 | Duo Léo et Inès : tenues assorties pour un rendez-vous | Même X, pas le même Y (variante duo) | « Même budget, même rendez-vous : lui et elle à moins de cinquante euros chacun. » | Léo : chemise slim blanche 25,99 + chino large gris 15,00. Inès : pièces femme à relever (Uniqlo, Jules ne fait que l'homme) | 40,99 / à relever |
+| 11 | Le sweat à capuche, en version adulte | Arrête de faire X (à ne pas mettre le lendemain du n°5) | « Garde ton sweat. Change juste ce que tu mets avec. » | Sweat col rond molleton bleu foncé 29,99 + chino large écru 15,00 ; sweat col rond vert 15,00 + jean straight brut 29,99 ; jogging large Uniqlo 29,90 + tee blanc 9,99 | 44,99 / 44,99 / 39,89 |
+| 12 | Black Friday : 3 tenues avec les vraies promos (semaine du 23/11) | Nombre d'abord | « Moins quarante pour cent ? J'ai vérifié les vrais prix avant toi. » | Prix barrés à relire le jour même (`prix_barre` dans `episode.json`, dit dans la voix « au lieu de ») | à relever |
+
+Notes :
+- Les prix ronds Jules (15,00, 20,00, 25,00 €) sont les prix affichés sans prix barré au 13/11, possiblement des démarques : à relire juste avant la voix.
+- Coloris à confirmer sur photo avant usage : gilet cardigan col polo « Gris foncé » (photo noire), chino tapered flanelle « Gris moyen » (photo très foncée), tee col tunisien « Bleu clair » (photo marine), pull col roulé « Bleu moyen » (photo marine). Écartés des épisodes du 16 et du 17 pour cette raison.
+- Uniqlo : plusieurs chinos en promo (14,90 et 19,90 €) n'ont plus aucune taille en stock au 13/11, ne pas les utiliser.

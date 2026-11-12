@@ -1,0 +1,8 @@
+{
+  "nom": "2026-11-16_17",
+  "note": "Rattrapage avant le premier lot hebdo : Buffer a déjà 13, 14 et 15/11. Lots suivants : un fichier par semaine, du mercredi au mardi suivant (préparé le mercredi à 13h).",
+  "episodes": [
+    {"id": "leo-jean-3-tenues", "date": "2026-11-16"},
+    {"id": "leo-rdv-3-erreurs", "date": "2026-11-17"}
+  ]
+}
