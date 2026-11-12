@@ -40,6 +40,12 @@ class Ep:
 
 # ------------------------------------------------------------------ prix
 def prix_num(s): return float(s.replace('€', '').replace(',', '.').strip())
+def lire_url(req, essais=4):
+    for k in range(essais):
+        try: return urllib.request.urlopen(req, timeout=30).read()
+        except Exception:
+            if k == essais - 1: raise
+            time.sleep(2 * (k + 1))
 def cmd_prix(ep, a):
     res = []; ok = True
     for t in ep.E['tenues']:
@@ -48,7 +54,7 @@ def cmd_prix(ep, a):
             trouve = base = None; note = ''
             try:
                 if 'jules.com' in url:
-                    h = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': UA}), timeout=30).read().decode('utf-8', 'ignore')
+                    h = lire_url(urllib.request.Request(url, headers={'User-Agent': UA})).decode('utf-8', 'ignore')
                     for m in re.finditer(r'<script[^>]*application/ld\+json[^>]*>(.*?)</script>', h, re.S):
                         try: d = json.loads(m.group(1))
                         except Exception: continue
@@ -58,7 +64,7 @@ def cmd_prix(ep, a):
                 elif 'uniqlo.com' in url:
                     pid = re.search(r'/products/(E\d+-\d+)/(\d+)', url); col = re.search(r'colorDisplayCode=(\d+)', url)
                     api = f'https://www.uniqlo.com/fr/api/commerce/v5/fr/products/{pid.group(1)}/price-groups/{pid.group(2)}/l2s?withPrices=true&withStocks=true&httpFailure=true'
-                    d = json.load(urllib.request.urlopen(urllib.request.Request(api, headers={'User-Agent': UA, 'x-fr-clientid': 'uq.fr.web-spa'}), timeout=30))['result']
+                    d = json.loads(lire_url(urllib.request.Request(api, headers={'User-Agent': UA, 'x-fr-clientid': 'uq.fr.web-spa'})))['result']
                     for l2 in d['l2s']:
                         if not col or l2['color']['displayCode'] == col.group(1):
                             pr = d['prices'].get(l2['l2Id'], {}); base = pr.get('base', {}).get('value')
@@ -74,6 +80,8 @@ def cmd_prix(ep, a):
     stamp = datetime.datetime.now().astimezone().isoformat(timespec='minutes')
     json.dump(dict(verifie_le=stamp, pieces=res), open(ep.out / 'prix.json', 'w'), ensure_ascii=False, indent=1)
     if not all(r['ok'] for r in res if not r['note']): stop('au moins un prix a changé : corriger episode.json (et le script si le prix est dit)')
+    nl = [r['piece'] for r in res if r['note']]
+    if nl: log('ATTENTION, prix non lus, à vérifier à la main avant envoi :', ', '.join(nl))
     log('prix vérifiés ->', ep.out / 'prix.json')
 
 # ------------------------------------------------------------------ voix (ElevenLabs, réglages Benjamin)
@@ -207,9 +215,27 @@ def cmd_timeline(ep, a):
     nums = []; c = ir
     for w_ in Fn['mots_numeros'][:nT]: c = idx(w_, c); nums.append(F(c))
     subs.sort(key=lambda x: x[0])
+    # intro : les cartes des tenues entrent une par une sur des mots de l'intro, toutes posées avant intro.fin_s (5 s par défaut)
+    I = E.get('intro', {}); duree = int(I.get('duree_images', 12)); fin = min(round(float(I.get('fin_s', 5)) * FPS), looks[0]['a'] - 6)
+    mots = I.get('mots_cartes')
+    if mots:
+        ats = [None] * nT
+        for key, w_ in mots.items():
+            n_ = int(key)
+            if not 1 <= n_ <= nT: stop(f'intro : tenue {key} inexistante')
+            ats[n_ - 1] = F(idx(w_, 0, starts[0]))
+        if None in ats: stop('intro : il faut un mot pour chaque tenue dans intro.mots_cartes')
+    else:  # par défaut : la tenue de l'accroche d'abord, puis les autres réparties régulièrement
+        ordre = [E['ouverture']] + [n_ for n_ in range(1, nT + 1) if n_ != E['ouverture']]
+        ats = [0] * nT; span = fin - duree - 18
+        for j, n_ in enumerate(ordre): ats[n_ - 1] = 6 + round(j * (span - 6) / max(1, nT - 1))
+    late = [k + 1 for k, t_ in enumerate(ats) if t_ + duree > fin]
+    if late: stop(f'intro : carte(s) {late} posée(s) après {fin / FPS:.2f} s, choisir des mots plus tôt')
+    intro = dict(at=ats, duree=duree, fin=fin, numeros=bool(I.get('numeros', True)))
+    log('intro : cartes ' + ', '.join(f"{k + 1}@{t_ / FPS:.2f}s" for k, t_ in enumerate(ats)) + f' ; posées avant {fin / FPS:.2f} s')
     props = dict(fps=FPS, total=math.ceil((W[-1]['e'] + 1.6) * FPS), openLook=E['ouverture'], looks=looks, looksData=data, titles=titles, subs=subs,
                  promise=F(i_prom), mention=F(i_ment), hors=F(idx(M['mot_l2'], i_ment)), mentionL1=M['l1'], mentionL2=M['l2'],
-                 end=F(i_fin), reponds=F(ir), nums=nums, audio='mix.wav')
+                 end=F(i_fin), reponds=F(ir), nums=nums, intro=intro, audio='mix.wav')
     json.dump({'data': props}, open(ep.out / 'props.json', 'w'), ensure_ascii=False, indent=1)
     log(f"timeline : {props['total']} images ({props['total'] / FPS:.1f} s) ->", ep.out / 'props.json')
 

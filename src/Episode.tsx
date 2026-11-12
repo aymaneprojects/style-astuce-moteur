@@ -135,8 +135,12 @@ const Card: React.FC<{f: number; n: number; fps: number}> = ({f, n, fps}) => {
   
   // le total n'apparaît sur la carte qu'une fois prononcé
   const totP = spring({frame: f - tl.total, fps, config: {damping: 11, stiffness: 200}});
+  // intro : chaque carte entre une par une sur son mot (glissé de bas en haut + fondu, aucun zoom), toutes posées avant T.intro.fin
+  const ia = T.intro ? T.intro.at[n - 1] : -1;
+  const ip = ia >= 0 ? interpolate(f, [ia, ia + T.intro.duree], [0, 1], {...clamp, easing: out}) : 1;
+  const numOp = T.intro && T.intro.numeros ? Math.min(ip, interpolate(f, [T.intro.fin - 12, T.intro.fin], [1, 0], clamp)) : 0;
   return (
-    <div style={{position: 'absolute', left: x, top: y, width: CARD_W, height: CARD_H, rotate: `${r}deg`, opacity: op * flyOp,
+    <div style={{position: 'absolute', left: x, top: y, width: CARD_W, height: CARD_H, rotate: `${r}deg`, opacity: op * flyOp * ip, translate: `0 ${(1 - ip) * 40}px`,
       background: '#fff', borderRadius: 30, padding: 8, outline: `5px solid ${border}`, boxShadow: '0 18px 40px rgba(120,70,40,.18),0 3px 8px rgba(120,70,40,.10)'}}>
       <div style={{width: CARD_W - 16, height: 254, borderRadius: 22, overflow: 'hidden', background: 'linear-gradient(180deg,#FBF4EC 0%,#F2DFCD 100%)', position: 'relative'}}>
         <Img src={staticFile(`leo/cut-${look.key}.png`)} style={{position: 'absolute', width: 1080 * 0.155, left: (CARD_W - 16) / 2 - 549 * 0.155, top: -2}} />
@@ -145,6 +149,10 @@ const Card: React.FC<{f: number; n: number; fps: number}> = ({f, n, fps}) => {
       {f >= tl.total ? (
         <div style={{position: 'absolute', left: '50%', bottom: -22, translate: '-50% 0', scale: String(totP), background: ORANGE, color: '#fff', borderRadius: 999,
           padding: '4px 16px', fontFamily: 'Inter', fontWeight: 800, fontSize: 30, whiteSpace: 'nowrap'}}>{look.total}</div>
+      ) : null}
+      {numOp > 0 ? (
+        <div style={{position: 'absolute', left: -2, top: -16, width: 58, height: 58, borderRadius: 29, background: ORANGE, color: '#fff',
+          fontFamily: 'Fraunces', fontWeight: 700, fontSize: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: numOp}}>{n}</div>
       ) : null}
       {f >= T.end ? (
         <div style={{position: 'absolute', left: -2, top: -16, width: 58, height: 58, borderRadius: 29, background: ORANGE, color: '#fff',

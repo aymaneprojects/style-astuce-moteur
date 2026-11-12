@@ -82,7 +82,7 @@ Options : `--depenser-credits`, `--voix-neuve`, `--cle-fichier <fichier.env>`, `
 - Zone utile commune TikTok et Reels : x 108..940, y 220..1420. La QA compte tout bord net hors zone.
 - Aucun zoom, aucune pulsation, aucun rebond lié à la parole. Léo reste stable et ne bouge qu'aux changements de tenue et aux rotations.
 - Le rythme vient d'éléments informatifs (étiquettes, prix, vignettes, soulignements, titres) : au moins un événement par seconde.
-- Ouverture sur la tenue finale portée (`ouverture`).
+- Ouverture sur la tenue finale portée (`ouverture`), puis les cartes des tenues entrent une par une sur la voix, toutes posées avant 5 s.
 - Aucune mention en bas de l'écran.
 - Polices Fraunces (titres) et Inter (texte). Palette Momwise (crème, encre, orange), sans réutiliser d'image ni de code Momwise.
 - Prix : datés, hors chaussures et livraison, jamais « look complet », jamais un chiffre affiché qui n'est pas dit dans la voix.
@@ -98,6 +98,7 @@ id, titre, date_releve, script ("script.txt"), ouverture (numéro de la tenue de
 voix        { voice_id, voice_name, model_id, language_code, stability, similarity_boost, output_format }
 accroche    { l1, pre, kw, post, mot_surligne }           titre « l1 / pre + kw surligné + post »
 promesse    { mot, l1, pre, kw, post, mot_surligne, sous_titre { texte, surligne, mot } }
+intro       { mots_cartes { "<n° tenue>": mot }, fin_s (5), duree_images (12), numeros (true) }
 tenues[]    { label, total, mot, mot_label, image, rotation,
               coupe { ourlet_y, chaussures_y, peau_cotes_seulement?, haut_marge_bas? },
               sous_titre { texte, surligne, mot },
@@ -111,6 +112,10 @@ fin         { mot, titre {...}, sous_titre { mot, texte, surligne, mot_surligne 
 ```
 
 `coupe` : `ourlet_y` est la ligne (en px de la photo) qui sépare le haut du bas, `chaussures_y` celle où commencent les chaussures (exclues des vignettes). Régler en regardant `planche-vignettes.png`, puis relancer `vignettes --refaire`.
+
+## Intro standard (0 à 5 s)
+
+Léo est en tenue d'ouverture au centre dès la première image, avec l'accroche. Les cartes des tenues entrent une par une autour de lui (glissé de 40 px vers le haut et fondu, 12 images, aucun zoom), chacune sur un mot de l'intro donné dans `intro.mots_cartes`, avec leur numéro (qui s'efface juste avant 5 s). La commande `timeline` refuse un mot qui ferait arriver une carte après `fin_s` (et jamais après le début de la tenue 1). Sans bloc `intro`, la tenue d'ouverture entre d'abord puis les autres sont réparties régulièrement. Après 5 s la vidéo suit le déroulé normal. Les totaux ne sont pas montrés dans l'intro : un prix n'apparaît que quand il est dit.
 
 ## Test de référence
 
