@@ -136,6 +136,8 @@ mention     { mot, l1, l2, mot_l2 }                       date du relevé et « 
 fin         { mot, titre {...}, sous_titre { mot, texte, surligne, mot_surligne }, mots_numeros[] }
 ```
 
+`coupe.ourlet_y` accepte `"auto"` : la commande `vignettes` détecte la rupture de couleur haut / bas et affiche la valeur trouvée (la recopier ensuite pour la figer). `coupe.bas_marge_haut` (48 par défaut) fait démarrer la vignette du bas plus bas : la mettre sous la ceinture ou sous le bout des doigts si une main ou une ceinture reste visible. Le bas n'utilise plus la détection de peau globale (un chino écru ou beige y ressemble) : les mains sont retirées par chromaticité, puis le trou est comblé par symétrie, sans jamais sortir du contour de la jambe.
+
 `coupe` : `ourlet_y` est la ligne (en px de la photo) qui sépare le haut du bas, `chaussures_y` celle où commencent les chaussures (exclues des vignettes). Régler en regardant `planche-vignettes.png`, puis relancer `vignettes --refaire`.
 
 ## Intro standard (0 à 5 s)

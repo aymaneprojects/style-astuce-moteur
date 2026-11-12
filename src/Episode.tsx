@@ -92,7 +92,11 @@ const Subtitle: React.FC<{f: number}> = ({f}) => {
         {(() => {
           const sub = T.subs[idx]; const hi = sub[2] ? [sub[2], sub[3]] as [string, number] : undefined;
           if (!hi || n < txt0.length) return <>{txt0.slice(0, n)}<span style={{opacity: 0}}>{txt0.slice(n)}</span></>;
-          const i = txt0.lastIndexOf(hi[0]); const on = interpolate(f, [hi[1], hi[1] + 6], [0, 1], clamp);
+          let i = txt0.lastIndexOf(hi[0]);
+          if (i < 0) i = txt0.toLowerCase().lastIndexOf(hi[0].toLowerCase());
+          if (i < 0) return <>{txt0}</>;   // surlignage introuvable : texte simple (sa.py verifier le signale)
+          hi[0] = txt0.slice(i, i + hi[0].length);
+          const on = interpolate(f, [hi[1], hi[1] + 6], [0, 1], clamp);
           return <>{txt0.slice(0, i)}<span style={{background: `rgba(217,102,43,${on})`, color: on > 0.5 ? '#fff' : INK, borderRadius: 12, padding: '0 6px', margin: '0 -6px'}}>{hi[0]}</span>{txt0.slice(i + hi[0].length)}</>;
         })()}
       </span>

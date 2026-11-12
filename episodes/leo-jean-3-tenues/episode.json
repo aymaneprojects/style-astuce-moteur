@@ -53,8 +53,8 @@
       "image": "media/leo-jean-1-basique.jpg",
       "rotation": "media/rotation-leo-jean-1-basique.mp4",
       "coupe": {
-        "ourlet_y": 890,
-        "chaussures_y": 1590
+        "ourlet_y": 962,
+        "chaussures_y": 1640
       },
       "sous_titre": {
         "texte": "Tee blanc + jean brut",
@@ -117,8 +117,9 @@
       "image": "media/leo-jean-2-smart.jpg",
       "rotation": "media/rotation-leo-jean-2-smart.mp4",
       "coupe": {
-        "ourlet_y": 890,
-        "chaussures_y": 1590
+        "ourlet_y": 839,
+        "chaussures_y": 1640,
+        "bas_marge_haut": 250
       },
       "sous_titre": {
         "texte": "Oxford + même jean",
@@ -181,8 +182,8 @@
       "image": "media/leo-jean-3-hiver.jpg",
       "rotation": "media/rotation-leo-jean-3-hiver.mp4",
       "coupe": {
-        "ourlet_y": 890,
-        "chaussures_y": 1590
+        "ourlet_y": 964,
+        "chaussures_y": 1640
       },
       "sous_titre": {
         "texte": "Col roulé + même jean",

@@ -53,13 +53,13 @@
       "image": "media/leo-rdv-1-cafe.jpg",
       "rotation": "media/rotation-leo-rdv-1-cafe.mp4",
       "coupe": {
-        "ourlet_y": 890,
-        "chaussures_y": 1590
+        "ourlet_y": 963,
+        "chaussures_y": 1640
       },
       "sous_titre": {
         "texte": "Erreur : le sweat à capuche",
         "surligne": "sweat à capuche",
-        "mot": "sweat"
+        "mot": "capuche"
       },
       "pieces": [
         {
@@ -97,11 +97,25 @@
           {
             "mot": "Ça",
             "texte": "Plus adulte qu'une capuche",
-            "surligne": "plus adulte",
+            "surligne": "Plus adulte",
             "mot_surligne": "adulte"
           }
         ]
-      }
+      },
+      "sous_titres": [
+        {
+          "mot": "Garde",
+          "texte": "Garde le confort",
+          "surligne": "confort",
+          "mot_surligne": "confort"
+        },
+        {
+          "mot": "enlève",
+          "texte": "Enlève la capuche",
+          "surligne": "la capuche",
+          "mot_surligne": "capuche"
+        }
+      ]
     },
     {
       "label": "Resto",
@@ -111,8 +125,9 @@
       "image": "media/leo-rdv-2-resto.jpg",
       "rotation": "media/rotation-leo-rdv-2-resto.mp4",
       "coupe": {
-        "ourlet_y": 890,
-        "chaussures_y": 1590
+        "ourlet_y": 804,
+        "chaussures_y": 1640,
+        "bas_marge_haut": 290
       },
       "sous_titre": {
         "texte": "Erreur : la chemise trop grande",
@@ -155,7 +170,7 @@
           {
             "mot": "et",
             "texte": "Un seul bouton ouvert",
-            "surligne": "un seul",
+            "surligne": "Un seul",
             "mot_surligne": "seul"
           }
         ]
@@ -169,13 +184,14 @@
       "image": "media/leo-rdv-3-balade.jpg",
       "rotation": "media/rotation-leo-rdv-3-balade.mp4",
       "coupe": {
-        "ourlet_y": 890,
-        "chaussures_y": 1590
+        "ourlet_y": 953,
+        "chaussures_y": 1640,
+        "bas_marge_haut": 140
       },
       "sous_titre": {
         "texte": "Erreur : le tout noir",
         "surligne": "tout noir",
-        "mot": "noir"
+        "mot": "chic"
       },
       "pieces": [
         {

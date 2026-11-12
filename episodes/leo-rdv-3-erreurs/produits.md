@@ -1,6 +1,6 @@
 # Produits : Premier rendez-vous : 3 erreurs, 3 tenues à moins de 50 € (Léo)
 
-Relevé automatique `sa.py prix` le 2026-11-13T00:24+01:00 (heure de Paris). Prix TTC lus sur la fiche, hors chaussures et livraison.
+Relevé automatique `sa.py prix` le 2026-11-13T00:40+01:00 (heure de Paris). Prix TTC lus sur la fiche, hors chaussures et livraison.
 
 | Tenue | Pièce | Enseigne | Prix épisode | Prix lu | Prix de base | Stock | Fiche |
 |---|---|---|---|---|---|---|---|

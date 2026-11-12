@@ -218,6 +218,8 @@ def cmd_timeline(ep, a, W=None, sortie=None):
         else: lk['rotSrc'] = None
         looks.append(lk); data.append(dict(key=str(k + 1), label=t['label'], total=t['total'], pieces=pd))
         sl = t['sous_titre']; subs.append([a_, sl['texte'], sl.get('surligne'), F(idx(sl['mot'], s0)) if sl.get('surligne') else None])
+        for s_ in t.get('sous_titres', []):   # pastilles en plus avant les pièces (rythme : un événement par seconde au moins)
+            im_ = idx(s_['mot'], s0); subs.append([F(im_), s_['texte'], s_.get('surligne'), F(idx(s_['mot_surligne'], im_)) if s_.get('surligne') else None])
         titles.append(dict(at=a_, l1=t.get('titre_l1', f'Tenue {k + 1}'), pre='', kw=t['label'], post='', hl=F(idx(t.get('mot_label', t['label']), s0))))
         tt = ast['titre']; titles.append(dict(at=lk['rot0'] + 6, **{x: tt[x] for x in ('l1', 'pre', 'kw', 'post')}, hl=F(idx(tt['mot_surligne'], ia))))
         subs.append([F(ia) + 6, '', None, None])
@@ -262,6 +264,33 @@ def cmd_timeline(ep, a, W=None, sortie=None):
 def peau(im):
     r, g, b = im[..., 0], im[..., 1], im[..., 2]; mx = np.maximum(np.maximum(r, g), b); mn = np.minimum(np.minimum(r, g), b)
     return (r > 95) & (g > 40) & (b > 20) & (mx - mn > 15) & (r > g + 12) & (r > b) & (r - b > 30)
+def chroma_rb(rgb):
+    return (rgb[..., 0] - rgb[..., 2]) / (rgb.sum(-1) + 1) * 3
+def sans_mains(c):
+    """Retire les mains posées contre le pantalon : pixels nettement plus « rouge-orangé » que la couleur médiane du tissu,
+    dans la moitié haute du bas. Fonctionne aussi pour un tissu beige ou écru (la peau reste bien plus saturée)."""
+    m0 = c[..., 3] > 40
+    if m0.sum() < 100: return c
+    H_, W_ = m0.shape; ys, xs = np.where(m0); cx = (xs.min() + xs.max()) / 2; hw = (xs.max() - xs.min()) / 2
+    X = np.arange(W_)[None, :]; Y = np.arange(H_)[:, None]
+    core = m0 & (np.abs(X - cx) < 0.3 * hw) & (Y > 0.1 * H_) & (Y < 0.6 * H_)
+    med = np.median(chroma_rb(c[..., :3])[core]) if core.any() else 0
+    main = m0 & (chroma_rb(c[..., :3]) - med > 0.2) & (c[..., 0] > c[..., 1]) & (Y < 0.5 * H_)
+    from scipy import ndimage
+    main = ndimage.binary_dilation(ndimage.binary_opening(main, iterations=2), iterations=7) & (Y < 0.55 * H_)
+    c[..., 3] = np.where(main, 0, c[..., 3]); return c
+def ourlet_auto(im, y0=700, y1=1200):
+    """Ligne de séparation haut / bas : rupture de couleur la plus nette sur une bande centrale (x 455..625)."""
+    band = im[y0:y1, 455:625]; a = band[..., 3] > 200
+    rows = np.array([band[i][a[i], :3].mean(0) if a[i].sum() > 20 else [np.nan] * 3 for i in range(len(band))])
+    ok = ~np.isnan(rows[:, 0]); best, by = -1, (y0 + y1) // 2
+    for i in range(30, len(rows) - 30):
+        if not ok[i]: continue
+        up = rows[max(0, i - 40):i][ok[max(0, i - 40):i]]; dn = rows[i:i + 40][ok[i:i + 40]]
+        if len(up) < 10 or len(dn) < 10: continue
+        d = np.linalg.norm(np.median(up, 0) - np.median(dn, 0))
+        if d > best: best, by = d, y0 + i
+    return int(by)
 def cmd_vignettes(ep, a):
     from PIL import Image, ImageFilter
     from scipy import ndimage
@@ -275,24 +304,32 @@ def cmd_vignettes(ep, a):
                 from rembg import remove, new_session; sess = new_session('isnet-general-use')
             im = Image.open(ep.p(t['image'])).convert('RGB').resize((1080, 1920), Image.LANCZOS).filter(ImageFilter.UnsharpMask(radius=1.6, percent=70, threshold=2))
             remove(im, session=sess).save(cut_p)
-        C = t.get('coupe', {}); HEM = C.get('ourlet_y', 890); SHOE = C.get('chaussures_y', 1590)
-        im = np.array(Image.open(cut_p).convert('RGBA')).astype(float); sk = peau(im)
+        C = t.get('coupe', {}); SHOE = C.get('chaussures_y', 1590)
+        im = np.array(Image.open(cut_p).convert('RGBA')).astype(float); brut = im.copy()
+        HEM = C.get('ourlet_y', 890)
+        if HEM == 'auto': HEM = ourlet_auto(brut); log(f'tenue {k} : ourlet détecté à y={HEM} (mettre cette valeur dans coupe.ourlet_y pour la figer)')
+        sk = peau(im)
         if C.get('peau_cotes_seulement'):
             lim = np.zeros_like(sk); lim[:HEM + 5, :] = True; lim[:, :385] = True; lim[:, 690:] = True; sk &= lim
         al = Image.fromarray(np.where(sk, 0, im[..., 3]).astype(np.uint8)).filter(ImageFilter.MinFilter(5)).filter(ImageFilter.MaxFilter(5))
         im[..., 3] = np.minimum(np.array(al), im[..., 3]); o = Image.fromarray(im.astype(np.uint8))
-        for name, (y0, y1) in {'haut': (270, HEM - C.get('haut_marge_bas', 4)), 'bas': (HEM + 48, SHOE)}.items():
+        for name, (y0, y1) in {'haut': (270, HEM - C.get('haut_marge_bas', 4)), 'bas': (HEM + C.get('bas_marge_haut', 48), SHOE)}.items():
             c = np.array(o.crop((0, y0, 1080, y1))).astype(float)
+            if name == 'bas': c = sans_mains(brut[y0:y1].copy())   # bas : pas de détection de peau globale (un chino écru y ressemble), mains retirées par chromaticité
             m = c[..., 3] > 40; m = ndimage.binary_opening(m, iterations=(9 if name == 'haut' else 4)); lab, n = ndimage.label(m)
-            if n: m = lab == (np.argmax(ndimage.sum(m, lab, range(1, n + 1))) + 1)
+            if n:
+                sz = ndimage.sum(m, lab, range(1, n + 1))
+                m = np.isin(lab, np.where(sz >= (0.25 * sz.max() if name == 'bas' else sz.max()))[0] + 1)   # bas : les deux jambes si elles sont séparées
             if name == 'bas':
-                row = m[int((y1 - y0) * 0.45)]; xs = np.where(row)[0]; m[:, :xs.min() + 2] = False; m[:, xs.max() - 2:] = False
+                row = m[int((y1 - y0) * 0.45)]; xs = np.where(row)[0]; bx0, bx1 = xs.min() + 2, xs.max() - 2; m[:, :bx0] = False; m[:, bx1:] = False
             c[..., 3] = np.where(m, c[..., 3], 0)
             ys, xs = np.where(m); cx = int(round((xs.min() + xs.max()) / 2)); Wd = c.shape[1]
             mir = c[:, np.clip(2 * cx - np.arange(Wd), 0, Wd - 1)]; hole = (c[..., 3] < 40) & (mir[..., 3] > 200)
             if name == 'bas':
                 zone = np.zeros_like(hole); zone[:int(c.shape[0] * 0.36)] = True
-                zone &= (np.abs(np.arange(Wd) - cx)[None, :] > 0.62 * (xs.max() - xs.min()) / 2); hole &= zone; c[hole] = mir[hole]
+                zone &= (np.abs(np.arange(Wd) - cx)[None, :] > 0.62 * (xs.max() - xs.min()) / 2)
+                zone[:, :bx0] = False; zone[:, bx1:] = False   # jamais de remplissage hors du contour de la jambe (évite les bosses)
+                hole &= zone; c[hole] = mir[hole]
             c = Image.fromarray(c.astype(np.uint8)); c.crop(c.getchannel('A').point(lambda v: 255 if v > 40 else 0).getbbox()).save(ep.pub / 'produits' / f'{name}-{k}.png')
         if t.get('rotation'):
             src = ep.p(t['rotation']); dst = ep.pub / f'rot-{k}.mp4'
@@ -453,6 +490,15 @@ def cmd_verifier(ep, a):
         for rx, why in INTERDITS:
             if re.search(rx, t, re.I): err.append(f'{chemin} : {why} -> « {t[:60]} »')
     if re.search(r'\d', txt): err.append('script : chiffres trouvés, écrire les nombres en lettres pour la voix')
+    # chaque surlignage doit exister tel quel dans son texte (sinon le texte se duplique à l'écran)
+    def surl(x, chemin):
+        if isinstance(x, dict):
+            if x.get('surligne') and x.get('texte') is not None and x['surligne'] not in x['texte']:
+                err.append(f'{chemin} : surligne « {x["surligne"]} » absent de « {x["texte"]} » (respecter majuscules et accents)')
+            for k_, v in x.items(): surl(v, f'{chemin}.{k_}')
+        elif isinstance(x, list):
+            for i_, v in enumerate(x): surl(v, f'{chemin}[{i_}]')
+    surl(E, 'episode')
     # durée, crédits
     n = len(txt); dur = n * S_PAR_CAR + 1.6
     R.update(caracteres=n, duree_estimee_s=round(dur, 1), credits_estimes=round(n * CREDITS_PAR_CAR))
