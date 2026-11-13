@@ -162,6 +162,10 @@ Petit cartouche « SA Style Astuce » en Fraunces (SA orange #D9662B sur crème)
 
 Depuis le 13/11 (demande d'Aymane), aucune étiquette « 360° » n'est affichée sur la rotation ; la rotation elle-même reste. Pour la réactiver sur un épisode : `"pastille_360": true` dans `episode.json`.
 
+## Vignettes produit : segmentation des vêtements (défaut)
+
+`sa.py vignettes` découpe maintenant le haut et le bas grâce au modèle `u2net_cloth_seg` (rembg, téléchargé une fois dans `~/.rembg`), carte mise en cache dans `public/leo/vet-<n>.png`. L'ancienne détection de peau par couleur mangeait les hauts beige, camel, rose ou rouge et gardait les cheveux longs d'Inès. Règles ajoutées : la classe « robe » (ensemble d'une seule couleur) est coupée à l'ourlet détecté ; un bas de haut classé « pantalon » revient au haut s'il est au-dessus de l'ourlet et que les deux couleurs diffèrent ; les mèches sombres reliées au bord supérieur du haut sont retirées (sauf sur un haut noir). Pour revenir à l'ancienne méthode sur une tenue : `"coupe": {"segmentation": "peau"}`.
+
 ## Mannequins et voix
 
 `"mannequin": "leo"` (défaut) ou `"ines"` dans `episode.json` : `prompts` prend alors les références et le prompt de base dans `/workspace/styleastuce/<mannequin>/` (identite/maitre-visage.jpg, identite/maitre-corps.jpg, prompts.md) et accorde le texte (his/her, young man/young woman). `"chaussures_en"` (épisode ou tenue) remplace les baskets blanches par défaut dans le prompt (ex. bottines par temps de pluie). La voix vient du bloc `voix` : Benjamin `F9KUTOne5xOKqAbIU7yg` pour Léo, Koraly - Promo Video `rbFGGoDXFHtVghjHuS3E` pour Inès. `prompts` télécharge aussi la photo produit Uniqlo du coloris (`colorDisplayCode`).

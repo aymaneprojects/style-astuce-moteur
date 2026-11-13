@@ -1,6 +1,6 @@
 # Produits : Le sweat, version adulte (Léo)
 
-Relevé automatique `sa.py prix` le 2026-11-13T03:22+01:00 (heure de Paris). Prix TTC lus sur la fiche, hors chaussures et livraison.
+Relevé automatique `sa.py prix` le 2026-11-13T04:20+01:00 (heure de Paris). Prix TTC lus sur la fiche, hors chaussures et livraison.
 
 | Tenue | Pièce | Enseigne | Prix épisode | Prix lu | Prix de base | Stock | Fiche |
 |---|---|---|---|---|---|---|---|

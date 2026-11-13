@@ -294,6 +294,18 @@ def ourlet_auto(im, y0=700, y1=1200):
         d = np.linalg.norm(np.median(up, 0) - np.median(dn, 0))
         if d > best: best, by = d, y0 + i
     return int(by)
+_SEG = {}
+def seg_vetements(src, cache):
+    """Carte des vêtements (0 fond/peau/cheveux, 1 haut, 2 bas, 3 robe) par u2net_cloth_seg, à 1080x1920, mise en cache.
+    Remplace la détection de peau par couleur, qui mangeait les hauts beige, camel, rose ou rouge et gardait les cheveux longs."""
+    from PIL import Image
+    if cache.exists(): return np.array(Image.open(cache))
+    if 'cloth' not in _SEG:
+        from rembg import new_session; _SEG['cloth'] = new_session('u2net_cloth_seg')
+    s = _SEG['cloth']; im = Image.open(src).convert('RGB').resize((1080, 1920), Image.LANCZOS)
+    o = s.inner_session.run(None, s.normalize(im, (0.485, 0.456, 0.406), (0.229, 0.224, 0.225), (768, 768)))
+    pm = Image.fromarray(np.argmax(o[0], axis=1)[0].astype(np.uint8)).resize((1080, 1920), Image.NEAREST); pm.save(cache)
+    return np.array(pm)
 def cmd_vignettes(ep, a):
     from PIL import Image, ImageFilter
     from scipy import ndimage
@@ -311,14 +323,47 @@ def cmd_vignettes(ep, a):
         im = np.array(Image.open(cut_p).convert('RGBA')).astype(float); brut = im.copy()
         HEM = C.get('ourlet_y', 890)
         if HEM == 'auto': HEM = ourlet_auto(brut); log(f'tenue {k} : ourlet détecté à y={HEM} (mettre cette valeur dans coupe.ourlet_y pour la figer)')
+        # segmentation : « vetements » (défaut) = carte u2net_cloth_seg ; « peau » = ancienne méthode par couleur de peau
+        seg = seg_vetements(ep.p(t['image']), ep.pub / 'leo' / f'vet-{k}.png') if C.get('segmentation', 'vetements') == 'vetements' else None
         sk = peau(im)
         if C.get('peau_cotes_seulement'):
             lim = np.zeros_like(sk); lim[:HEM + 5, :] = True; lim[:, :385] = True; lim[:, 690:] = True; sk &= lim
         al = Image.fromarray(np.where(sk, 0, im[..., 3]).astype(np.uint8)).filter(ImageFilter.MinFilter(5)).filter(ImageFilter.MaxFilter(5))
         im[..., 3] = np.minimum(np.array(al), im[..., 3]); o = Image.fromarray(im.astype(np.uint8))
-        for name, (y0, y1) in {'haut': (270, HEM - C.get('haut_marge_bas', 4)), 'bas': (HEM + C.get('bas_marge_haut', 48), SHOE)}.items():
-            c = np.array(o.crop((0, y0, 1080, y1))).astype(float)
-            if name == 'bas': c = sans_mains(brut[y0:y1].copy())   # bas : pas de détection de peau globale (un chino écru y ressemble), mains retirées par chromaticité
+        zones = {'haut': (270, HEM - C.get('haut_marge_bas', 4)), 'bas': (HEM + C.get('bas_marge_haut', 48), SHOE)}
+        if seg is not None:
+            # bas d'un haut sombre parfois classé « pantalon » : au-dessus de la rupture de couleur (ourlet), il revient au haut
+            Yg = np.arange(1920)[:, None]; seg = seg.copy()
+            seg[(seg == 3) & (Yg < HEM)] = 1; seg[seg == 3] = 2   # « robe » (souvent un ensemble d'une seule couleur) : coupé à l'ourlet détecté
+            m1, m2 = (seg == 1) & (brut[..., 3] > 200), (seg == 2) & (brut[..., 3] > 200)
+            if m1.sum() > 20000 and m2.sum() > 20000 and np.linalg.norm(np.median(brut[m1][:, :3], 0) - np.median(brut[m2][:, :3], 0)) > 40:
+                seg[(seg == 2) & (Yg < HEM - 6) & (brut[..., 3] > 40)] = 1   # seulement si haut et bas ont des couleurs distinctes (ourlet fiable)
+            for name, lab in (('haut', 1), ('bas', 2)):
+                rows = np.where((seg == lab).sum(1) > 30)[0]
+                if len(rows) > 50: zones[name] = (int(rows.min()), int(rows.max()) + 1)
+        for name, (y0, y1) in zones.items():
+            if seg is not None:
+                lab = 1 if name == 'haut' else 2; msk = ndimage.binary_erosion(seg[y0:y1] == lab, iterations=2)
+                c = brut[y0:y1].copy(); c[..., 3] = np.where(msk, c[..., 3], 0)
+                if name == 'bas': c = sans_mains(c)
+                else:   # mèches de cheveux longs posées sur les épaules : sombres, brun-roux, loin de la couleur du tissu, dans le haut du vêtement
+                    H_ = c.shape[0]; rgb = c[..., :3]; ys_, xs_ = np.where(msk)
+                    core = msk.copy(); core[:int(0.3 * H_)] = False; core[int(0.8 * H_):] = False
+                    if core.sum() > 500 and len(xs_):
+                        med = np.median(rgb[core], 0); lum = rgb.mean(-1)
+                        if med.mean() > 70:   # sur un haut noir, les mèches ne se distinguent pas : on ne touche à rien
+                            nc = rgb / (rgb.sum(-1, keepdims=True) + 1); nm = med / (med.sum() + 1)
+                            hair = (np.linalg.norm(nc - nm, axis=-1) > 0.09) & (np.linalg.norm(rgb - med, axis=-1) > 55) & (lum < 130) & (rgb[..., 0] > rgb[..., 2] + 6) & msk
+                            hair[int(0.22 * H_):] = False
+                            hair = ndimage.binary_dilation(ndimage.binary_opening(hair, iterations=1), iterations=2)
+                            lb, nb = ndimage.label(hair)   # seulement les mèches qui descendent du haut du vêtement (reliées au bord supérieur)
+                            if nb:
+                                top = set(np.unique(lb[:max(3, int(0.04 * H_))])) - {0}
+                                hair = np.isin(lb, list(top))
+                                c[..., 3] = np.where(ndimage.binary_dilation(hair, iterations=3) & msk, 0, c[..., 3])
+            else:
+                c = np.array(o.crop((0, y0, 1080, y1))).astype(float)
+                if name == 'bas': c = sans_mains(brut[y0:y1].copy())   # bas : pas de détection de peau globale (un chino écru y ressemble), mains retirées par chromaticité
             m = c[..., 3] > 40; m = ndimage.binary_opening(m, iterations=(9 if name == 'haut' else 4)); lab, n = ndimage.label(m)
             if n:
                 sz = ndimage.sum(m, lab, range(1, n + 1))
@@ -662,7 +707,10 @@ def cmd_prompts(ep, a):
             if not dst.exists() and 'uniqlo.com' in pc['url'] and not a.sans_reseau:
                 try:
                     pid = re.search(r'/products/E(\d+)-', pc['url']).group(1); col = (re.search(r'colorDisplayCode=(\d+)', pc['url']) or [None, '09'])[1]
-                    dst.write_bytes(lire_url(urllib.request.Request(f'https://image.uniqlo.com/UQ/ST3/eu/imagesgoods/{pid}/item/eugoods_{col}_{pid}_3x4.jpg', headers={'User-Agent': UA})))
+                    pe = re.search(r'/products/(E\d+-\d+)/(\d+)', pc['url'])
+                    det = json.loads(lire_url(urllib.request.Request(f'https://www.uniqlo.com/fr/api/commerce/v5/fr/products/{pe.group(1)}/price-groups/{pe.group(2)}/details?httpFailure=true', headers={'User-Agent': UA, 'x-fr-clientid': 'uq.fr.web-spa'})))['result']
+                    u_ = ((det.get('images') or {}).get('main') or {}).get(col, {}).get('image') or f'https://image.uniqlo.com/UQ/ST3/eu/imagesgoods/{pid}/item/eugoods_{col}_{pid}_3x4.jpg'
+                    dst.write_bytes(lire_url(urllib.request.Request(u_, headers={'User-Agent': UA})))
                 except Exception as e: log('photo produit Uniqlo non téléchargée :', pc['nom'], type(e).__name__)
             if dst.exists(): refs.append(str(dst))
         tenue = '; '.join(('top: ' if pc['zone'] == 'haut' else 'bottom: ') + (pc.get('desc_en') or pc['nom']) for pc in t['pieces'])
