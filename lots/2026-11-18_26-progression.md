@@ -1,6 +1,6 @@
 # Progression du lot 2026-11-18_26
 
-Mise à jour : 13/11/2026 05:40 (heure de Paris)
+Mise à jour : 13/11/2026 05:58 (heure de Paris)
 
 Accord d’Aymane (13/11, 03:01) : 18 vidéos du 18 au 26/11, 12 000 crédits ElevenLabs au maximum, ne PAS programmer sur Buffer.
 
