@@ -2,6 +2,7 @@
   "id": "leo-jean-3-tenues",
   "titre": "1 jean, 3 tenues (Léo)",
   "date_releve": "2026-11-13",
+  "logo": {"actif": true, "variante": "creme", "opacite": 0.8, "largeur": 164},
   "script": "script.txt",
   "voix": {
     "fournisseur": "elevenlabs",

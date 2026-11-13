@@ -147,3 +147,13 @@ Léo est en tenue d'ouverture au centre dès la première image, avec l'accroche
 ## Test de référence
 
 `$PY cli/sa.py tout episodes/leo-4-tenues-50e` reconstruit la vidéo v3 de la maquette en réutilisant la voix existante (aucun crédit) : 80,3 s, mêmes mots, même audio, SSIM image 0,999 avec `maquette-v1/video-leo-v3.mp4`. Les médias de cet épisode ne sont pas versionnés : ils viennent de `/workspace/styleastuce/maquette-v1/`.
+
+## Logo anti-vol (standard, actif par défaut)
+
+Petit cartouche « SA Style Astuce » en Fraunces (SA orange #D9662B sur crème), fixe pendant toute la vidéo, sans animation, dans le coin bas droit de la zone commune TikTok + Reels (boîte x 770..934, y 1346..1412 pour 164 px de large). Réglage dans `episode.json` :
+
+```json
+"logo": {"actif": true, "variante": "creme", "opacite": 0.8, "largeur": 164}
+```
+
+`variante` : `creme` (défaut) ou `blanc` (blanc avec ombre douce) ; `opacite` 0.5..1 ; `largeur` 120..200 px. La QA (`qa.json` → `logo`) vérifie qu'aucun bord net n'entre dans un anneau de 10 à 22 px autour du logo (donc qu'il ne masque ni Léo, ni les cartes, ni les prix, ni les sous-titres).

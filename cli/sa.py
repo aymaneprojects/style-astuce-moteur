@@ -254,7 +254,7 @@ def cmd_timeline(ep, a, W=None, sortie=None):
     log('intro : cartes ' + ', '.join(f"{k + 1}@{t_ / FPS:.2f}s" for k, t_ in enumerate(ats)) + f' ; posées avant {fin / FPS:.2f} s')
     props = dict(fps=FPS, total=math.ceil((W[-1]['e'] + 1.6) * FPS), openLook=E['ouverture'], looks=looks, looksData=data, titles=titles, subs=subs,
                  promise=F(i_prom), mention=F(i_ment), hors=F(idx(M['mot_l2'], i_ment)), mentionL1=M['l1'], mentionL2=M['l2'],
-                 end=F(i_fin), reponds=F(ir), nums=nums, intro=intro, audio='mix.wav')
+                 end=F(i_fin), reponds=F(ir), nums=nums, intro=intro, audio='mix.wav', logo=logo_props(E))
     sortie = sortie or ep.out / 'props.json'
     json.dump({'data': props}, open(sortie, 'w'), ensure_ascii=False, indent=1)
     log(f"timeline : {props['total']} images ({props['total'] / FPS:.1f} s) ->", sortie)
@@ -421,6 +421,16 @@ def cmd_qa(ep, a):
             msk = np.ones_like(e); msk[y0:y1, x0:x1] = False; n = int((e & msk).sum())
             if n > 40: bad.append(round(i / 10, 1))
         R['zones'][nom] = dict(images_hors_zone=len(bad), instants=bad[:20])
+    # logo anti-vol : aucun bord net (> 28, les ombres douces ne comptent pas) ne doit entrer dans un anneau de 10 à 22 px autour de lui (sinon il masque ou touche un élément)
+    lg = json.load(open(ep.out / 'props.json'))['data'].get('logo') or {}
+    if lg.get('actif'):
+        w = lg['largeur']; h = round(w * 0.4); lx1, ly1 = 940 - 6, 1412; lx0, ly0 = lx1 - w, ly1 - h
+        ring = np.zeros((1919, 1079), bool); ring[ly0 - 22:ly1 + 22, lx0 - 22:lx1 + 22] = True; ring[ly0 - 10:ly1 + 10, lx0 - 10:lx1 + 10] = False
+        hit = []
+        for i, f in enumerate(fr):
+            f = f.astype(np.int16); e = np.maximum(np.abs(np.diff(f, axis=1))[:-1, :], np.abs(np.diff(f, axis=0))[:, :-1]) > 28
+            if int((e & ring).sum()) > 20: hit.append(round(i / 10, 1))
+        R['logo'] = dict(boite=[lx0, ly0, lx1, ly1], images_en_contact=len(hit), instants=hit[:20])
     # événements informatifs (bloc de 60 px qui change) et passages figés
     sm = fr[:, ::4, ::4].astype(float); d = np.abs(np.diff(sm, axis=0)); B = 15
     blk = d[:, :480 // B * B, :270 // B * B].reshape(len(d), 480 // B, B, 270 // B, B).mean(axis=(2, 4)).max(axis=(1, 2))
@@ -439,11 +449,12 @@ def cmd_qa(ep, a):
                 t = l[key] / FPS; near = min(ws, key=lambda x: abs(x[1] - t)); S.append(dict(tenue=k + 1, quoi=key, affiche_s=round(t, 2), entendu=near[0], ecart_ms=round((near[1] - t) * 1000)))
         R['sync_prix'] = dict(detail=S, ecart_max_ms=max(abs(x['ecart_ms']) for x in S))
     json.dump(R, open(q / 'qa.json', 'w'), ensure_ascii=False, indent=1)
-    log(f"QA : {R['format']['duree_s']:.1f} s, {R['lufs']} LUFS, crête {R['crete_dbfs']} dBFS, zones {[(k, v['images_hors_zone']) for k, v in R['zones'].items()]}, "
+    log(f"QA : {R['format']['duree_s']:.1f} s, {R['lufs']} LUFS, crête {R['crete_dbfs']} dBFS, zones {[(k, v['images_hors_zone']) for k, v in R['zones'].items()]}, logo {R.get('logo', {}).get('images_en_contact')}, "
         f"rythme {R['rythme']}, sync prix max {R.get('sync_prix', {}).get('ecart_max_ms')} ms -> {q}")
     pb = []
     if not -14 <= R['lufs'] <= -12: pb.append('niveau hors -14..-12 LUFS')
     if any(v['images_hors_zone'] for v in R['zones'].values()): pb.append('contenu hors zone sûre')
+    if R.get('logo', {}).get('images_en_contact'): pb.append('un élément touche le logo')
     if R.get('sync_prix') and R['sync_prix']['ecart_max_ms'] > 250: pb.append('prix décalé de plus de 250 ms')
     if pb: log('ATTENTION :', ' ; '.join(pb))
 
@@ -484,6 +495,18 @@ def textes_visibles(E):
             for i, v in enumerate(x): walk(v, f'{chemin}[{i}]')
         elif isinstance(x, str): out.append((chemin, x))
     walk(E, 'episode'); return out
+LOGO_DEFAUT = dict(actif=True, variante='creme', opacite=0.8, largeur=164)
+
+
+def logo_props(E):
+    """Logo anti-vol en bas à droite, dans la zone commune (on par défaut). episode.json : "logo": {"actif", "variante" creme|blanc, "opacite", "largeur"}."""
+    lg = {**LOGO_DEFAUT, **(E.get('logo') or {})}
+    if lg['variante'] not in ('creme', 'blanc'): stop(f"logo.variante inconnue : {lg['variante']}")
+    if not 0.5 <= float(lg['opacite']) <= 1: stop('logo.opacite hors 0.5..1')
+    if not 120 <= int(lg['largeur']) <= 200: stop('logo.largeur hors 120..200 px')
+    return dict(actif=bool(lg['actif']), variante=lg['variante'], opacite=float(lg['opacite']), largeur=int(lg['largeur']))
+
+
 def cmd_verifier(ep, a):
     E = ep.E; txt = ep.script(); err = []; avert = []; R = {'id': ep.id}
     for chemin, t in [('script', txt)] + textes_visibles(E):

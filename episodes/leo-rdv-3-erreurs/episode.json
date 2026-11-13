@@ -2,6 +2,7 @@
   "id": "leo-rdv-3-erreurs",
   "titre": "Premier rendez-vous : 3 erreurs, 3 tenues à moins de 50 € (Léo)",
   "date_releve": "2026-11-13",
+  "logo": {"actif": true, "variante": "creme", "opacite": 0.8, "largeur": 164},
   "script": "script.txt",
   "voix": {
     "fournisseur": "elevenlabs",

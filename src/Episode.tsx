@@ -4,7 +4,7 @@ import {AbsoluteFill, Img, OffthreadVideo, Audio, Sequence, staticFile, useCurre
 // Moteur Style Astuce. Toutes les données viennent des props (props.json construit par « sa.py timeline »).
 // RÈGLES FIGÉES : zone commune TikTok + Reels x 108..940, y 220..1420 ; aucun zoom, aucune pulsation ni rebond liés à la parole ou au rythme ;
 // Léo ne bouge qu'aux changements de tenue (vignette qui se pose + balayage) et aux rotations ; ouverture sur la tenue finale portée ;
-// aucune mention fixe en bas ; polices Fraunces + Inter ; palette Momwise (crème, pêche, encre, orange).
+// aucune mention fixe en bas hormis le petit logo anti-vol (coin bas droit de la zone commune) ; polices Fraunces + Inter ; palette Momwise (crème, pêche, encre, orange).
 const CREAM = '#F6EFE6', PEACH = '#F3DCC8', INK = '#1F1A17', ORANGE = '#D9662B';
 const CX = 524, SAFE_L = 108, SAFE_R = 940, SAFE_W = SAFE_R - SAFE_L;
 const S = 0.47, LEO_W = 1080 * S, LEO_H = 1920 * S, LEO_LEFT = CX - 549 * S, LEO_TOP = 500;
@@ -113,6 +113,22 @@ const Mention: React.FC<{f: number}> = ({f}) => {
     <div style={{position: 'absolute', left: CX - 330, width: 660, top: 1190, background: INK, color: '#fff', borderRadius: 28, padding: '16px 24px',
       textAlign: 'center', fontFamily: 'Inter', fontWeight: 700, fontSize: 36, lineHeight: 1.2, opacity: p * q, translate: `0 ${(1 - p) * 30}px`}}>
       {T.mentionL1}<br /><span style={{fontWeight: 500, opacity: interpolate(f, [T.hors - 2, T.hors + 6], [0, 1], clamp)}}>{T.mentionL2}</span>
+    </div>
+  );
+};
+
+// logo anti-vol : fixe toute la durée, coin bas droit de la zone commune (bord droit 934, bas 1412), aucune animation
+const Logo: React.FC = () => {
+  const lg = T.logo;
+  if (!lg || !lg.actif) return null;
+  const w = lg.largeur, blanc = lg.variante === 'blanc';
+  return (
+    <div style={{position: 'absolute', left: SAFE_R - 6 - w, top: 1412 - Math.round(w * 0.4), width: w, height: Math.round(w * 0.4), opacity: lg.opacite,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: Math.round(w * 0.05), borderRadius: Math.round(w * 0.2),
+      background: blanc ? 'transparent' : 'rgba(246,239,230,0.92)', border: blanc ? 'none' : `2px solid rgba(217,102,43,0.55)`,
+      boxShadow: blanc ? 'none' : '0 4px 14px rgba(120,70,40,.12)', filter: blanc ? 'drop-shadow(0 2px 6px rgba(0,0,0,.45))' : 'none'}}>
+      <span style={{fontFamily: 'Fraunces', fontStyle: 'italic', fontWeight: 700, fontSize: Math.round(w * 0.24), lineHeight: 1, color: blanc ? '#fff' : ORANGE, letterSpacing: '-0.04em'}}>SA</span>
+      <span style={{fontFamily: 'Fraunces', fontWeight: 600, fontSize: Math.round(w * 0.105), lineHeight: 1.0, color: blanc ? '#fff' : INK}}>Style<br />Astuce</span>
     </div>
   );
 };
@@ -323,6 +339,7 @@ export const Episode: React.FC<{data: any}> = ({data}) => {
       <Titles f={f} />
       <Subtitle f={f} />
       <Mention f={f} />
+      <Logo />
       <Audio src={staticFile(T.audio)} />
     </AbsoluteFill>
   );
