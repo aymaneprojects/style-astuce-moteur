@@ -510,7 +510,7 @@ def cmd_qa(ep, a):
             if fi >= l['a'] + 12: cur = k + 1
         if bi < 0: return cur
         a_ = LS[bi]['a']; wipe = min(1, max(0, (fi - a_ - 4) / 14))
-        if 0 < wipe < 1: return None   # balayage en cours : contrôlé par la règle de bascule (voir Episode.tsx)
+        if fi < a_ + 18: return None   # carte de bascule puis balayage (a-6 .. a+18) : la carte passe devant les pieds, rien à mesurer
         return bi + 1 if wipe >= 1 else (P['openLook'] if bi == 0 else bi)
     from PIL import Image as _Im
     ref = {}   # par tenue et chaussure : la chaussure attendue (détourage réduit à l'échelle) pour reconnaître une chaussure masquée
@@ -556,6 +556,8 @@ def cmd_qa(ep, a):
         NB = set(UNITES + list(DIZ.values()) + 'dix-sept dix-huit dix-neuf cent cents quatre-vingt quatre-vingts euro euros'.split())
         def est_nombre(m_):
             m_ = ''.join(ch for ch in m_.lower() if ch.isalnum() or ch in '-, ')
+            m_ = m_.lstrip('-, ')
+            if m_[:1].isalpha() and any(ch.isdigit() for ch in m_): return False   # « uniclo2990 » : mot fusionné qui commence par des lettres, son début n'est pas le prix (« 20EUR » reste un prix)
             return any(ch.isdigit() for ch in m_) or any(p in NB for p in m_.replace('-', ' ').split())
         wn = [x for x in ws if est_nombre(x[0])]
         T = json.load(open(ep.out / 'props.json'))['data']; S = []
@@ -580,7 +582,7 @@ def cmd_qa(ep, a):
     pb = []
     if not -14 <= R['lufs'] <= -12: pb.append('niveau hors -14..-12 LUFS')
     if any(v['images_hors_zone'] for v in R['zones'].values()): pb.append('contenu hors zone sûre')
-    if R.get('ombre_contact', {}).get('ecart_max_px', 0) > 4: pb.append(f"Léo flotte : {R['ombre_contact']['ecart_max_px']} px entre semelles et ombre")
+    if R.get('ombre_contact', {}).get('ecart_max_px', 0) > 4: pb.append(f"{'Inès' if ep.E.get('mannequin') == 'ines' else 'Léo'} flotte : {R['ombre_contact']['ecart_max_px']} px entre semelles et ombre")
     if R.get('logo', {}).get('images_en_contact'): pb.append('un élément touche le logo')
     # whisper date les mots à environ 300 ms près : seuil 400 ms ; l'alignement ElevenLabs, lui, est exact : seuil 150 ms
     if R.get('sync_prix') and (R['sync_prix']['ecart_max_ms'] or 0) > 400: pb.append('prix décalé de plus de 400 ms (whisper)')

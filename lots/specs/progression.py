@@ -7,7 +7,7 @@ usage_api = sys.argv[1] if len(sys.argv) > 1 else 'non relu'
 notes = {}
 if os.path.exists(f'lots/{NOM}-notes.json'):
     notes = json.load(open(f'lots/{NOM}-notes.json'))
-L = []; tot = 0; nimg = nrot = 0
+L = []; SY = []; tot = 0; nimg = nrot = 0
 def oui(b): return 'oui' if b else 'non'
 for x in sorted(lot['episodes'], key=lambda x: (x['date'], x['id'][:3] != 'leo')):
     e = x['id']; ep = f'episodes/{e}'; o = f'out/{e}'
@@ -40,8 +40,11 @@ for x in sorted(lot['episodes'], key=lambda x: (x['date'], x['id'][:3] != 'leo')
         if mx > 400: pb.append(f'sync whisper {mx} ms')
         if (sp.get('alignement_ecart_max_ms') or 0) > 150: pb.append(f"sync alignement {sp['alignement_ecart_max_ms']} ms")
         if 'alignement_ecart_max_ms' not in sp: pb.append('QA ancienne version')
+        if sp.get('non_entendus'): pb.append(f"{sp['non_entendus']} prix non entendus par whisper")
+        if json.load(open(f'{o}/props.json'))['data'].get('pastille360'): pb.append('étiquette 360° affichée')
         qa = 'oui' if not pb else 'ÉCHEC : ' + ', '.join(pb)
     dur = f"{q['format']['duree_s']:.1f} s" if qa != 'non' else ''
+    SY.append(f"| {x['date']} | {e} | {ej['titre']} | {ej.get('publication', {}).get('meteo', '')} | {' / '.join(t['label'] + ' ' + t['total'] for t in ej['tenues'])} | {dur} | {mp4 if rendu else ''} | {qa} |")
     tot_t = ' / '.join(f"{t['label']} {t['total']}" for t in ej['tenues'])
     L.append(f"| {x['date']} | {e} | {'Léo' if ej.get('mannequin','leo')=='leo' else 'Inès'} | {prix} | {ver} | {oui(cr>0)} ({cr}) | {img}/{n} | {rot}/{n} | {oui(rendu)} | {qa} | {notes.get(e,'')} |")
 H = [f"# Progression du lot {NOM}", '', f"Mise à jour : {time.strftime('%d/%m/%Y %H:%M')} (heure de Paris)", '',
@@ -51,7 +54,8 @@ H = [f"# Progression du lot {NOM}", '', f"Mise à jour : {time.strftime('%d/%m/%
 F = ['', f"Crédits ElevenLabs d’après les fichiers tts-essai*.json : {tot} sur 12 000.",
      f"Usage ElevenLabs relu par l’API (character-stats) : {usage_api}.",
      f"Images de mannequin présentes : {nimg} ; rotations 360° présentes : {nrot}."]
-txt = '\n'.join(H + L + F) + '\n'
+SYH = ['', '## Synthèse', '', '| Date | Épisode | Titre | Météo prévue | Tenues (total hors chaussures et livraison) | Durée | Vidéo | QA |', '|---|---|---|---|---|---|---|---|']
+txt = '\n'.join(H + L + F + SYH + SY) + '\n'
 os.makedirs(f'out/lots/{NOM}', exist_ok=True)
 open(f'out/lots/{NOM}/progression.md', 'w').write(txt)
 open(f'lots/{NOM}-progression.md', 'w').write(txt)

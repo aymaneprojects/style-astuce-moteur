@@ -174,4 +174,12 @@ Depuis le 13/11 (demande d'Aymane), aucune étiquette « 360° » n'est affiché
 
 `sa.py timeline` lit le détourage de chaque tenue (`public/leo/cut-<n>.png`) et enregistre dans `props.json` → `looks[k].pieds` le bas des semelles (dernière ligne opaque) et, pour chaque chaussure, son propre bas et sa largeur. `Episode.tsx` (`ContactShadow`) cale dessus une ombre courte et dense sous chaque chaussure, qui remonte de 4 px derrière la semelle, plus une ombre ambiante légère sur la ligne de sol. Pendant un balayage de tenue, l'ombre suit la tenue dont les pieds sont visibles ; pendant une rotation 360°, elle s'efface avec Léo (la vidéo de rotation a son propre sol).
 
-QA : `qa.json` → `ombre_contact` mesure, image par image (10 i/s, hors balayages et rotations), le nombre de lignes claires entre la semelle et l'ombre. Échec au-delà de 4 px (« Léo flotte »).
+QA : `qa.json` → `ombre_contact` mesure, image par image (10 i/s, hors bascules de tenue de a-6 à a+18 et hors rotations), le nombre de lignes claires entre la semelle et l'ombre. Échec au-delà de 4 px (« Léo flotte »). Une chaussure recouverte par une carte (écart moyen de plus de 30 niveaux avec le détourage) n'est pas mesurée (`chaussures_masquees`).
+
+## Détourage : chaussures blanches sur fond clair
+
+`isnet-general-use` rend parfois les baskets blanches à moitié transparentes (chaussures « fantômes », Léo semble flotter). `vignettes` le détecte (bas de la silhouette surtout semi-transparent) et refait alors le détourage avec `birefnet-general-lite` (environ 6 Go de mémoire, téléchargé une fois). Pour imposer un modèle sur une tenue : `"coupe": {"detourage": "birefnet-general-lite"}`. Pour refaire un seul détourage : supprimer `out/<id>/public/leo/cut-<n>.png` puis relancer `vignettes`.
+
+## Synchronisation des prix (QA)
+
+`qa.json` → `sync_prix` : pour chaque prix affiché, l'écart avec le début du nombre dit, mesuré deux fois. Par l'alignement ElevenLabs de la voix montée (`words.json`, exact) : échec au-delà de 150 ms (le prix arrive normalement environ 100 ms avant le mot). Par whisper sur la vidéo finale (dates à environ 300 ms près) : échec au-delà de 400 ms ; seuls les mots-nombres comptent, un mot fusionné du type « uniclo2990 » est ignoré, et un prix introuvable à moins de 2 s est signalé (`non_entendus`).
