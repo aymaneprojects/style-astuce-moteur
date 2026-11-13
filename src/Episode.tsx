@@ -207,6 +207,29 @@ const FlyingCard: React.FC<{f: number}> = ({f}) => {
   );
 };
 
+// ombre de contact calée sur le bas des semelles détecté dans le détourage (props looks[k].pieds, px de l'image 1080x1920) :
+// une ombre dense et courte sous chaque chaussure, qui remonte de 4 px derrière la semelle (aucun espace visible), plus une
+// ombre ambiante large et légère centrée sur la ligne de sol. Repli sur l'ancienne position si pieds absents.
+const ContactShadow: React.FC<{k: number; op: number}> = ({k, op}) => {
+  const p = L[k - 1]?.pieds;
+  if (!p) return <div style={{position: 'absolute', left: CX - 170, top: LEO_TOP + 1830 * S, width: 340, height: 44, borderRadius: '50%', opacity: op,
+    background: 'radial-gradient(ellipse at center, rgba(90,55,30,.28) 0%, rgba(90,55,30,0) 70%)'}} />;
+  const sx = (x: number) => LEO_LEFT + x * S, sy = (y: number) => LEO_TOP + (y + 1) * S;
+  const x0 = Math.min(...p.chaussures.map((c: any) => c.x0)), x1 = Math.max(...p.chaussures.map((c: any) => c.x1));
+  const w = (x1 - x0) * S * 1.18, gy = sy(p.y);
+  return (
+    <div style={{opacity: op}}>
+      <div style={{position: 'absolute', left: sx((x0 + x1) / 2) - w / 2, top: gy - 9, width: w, height: 22, borderRadius: '50%',
+        background: 'radial-gradient(ellipse at center, rgba(80,48,26,.30) 0%, rgba(80,48,26,.16) 45%, rgba(80,48,26,0) 72%)'}} />
+      {p.chaussures.map((c: any, i: number) => {
+        const cw = (c.x1 - c.x0) * S * 1.12, cy = sy(c.y);
+        return <div key={i} style={{position: 'absolute', left: sx((c.x0 + c.x1) / 2) - cw / 2, top: cy - 5, width: cw, height: 11, borderRadius: '50%',
+          background: 'radial-gradient(ellipse at center, rgba(52,30,16,.62) 0%, rgba(52,30,16,.42) 50%, rgba(52,30,16,0) 100%)', filter: 'blur(1.2px)'}} />;
+      })}
+    </div>
+  );
+};
+
 const Leo: React.FC<{f: number}> = ({f}) => {
   const bi = lookIdx(f);
   let cur = T.openLook; L.forEach((l, k) => { if (f >= l.a + 12) cur = k + 1; });
@@ -218,10 +241,13 @@ const Leo: React.FC<{f: number}> = ({f}) => {
   const ri = inRotOf(f);
   const leoOp = ri >= 0 ? interpolate(f, [L[ri].rot0, L[ri].rot0 + 8, L[ri].rot1 - 6, L[ri].rot1], [1, 0, 0, 1], clamp) : 1;
   const st: React.CSSProperties = {position: 'absolute', left: LEO_LEFT, top: LEO_TOP, width: LEO_W, height: LEO_H};
+  // l'ombre suit la tenue dont les pieds sont visibles : pendant le balayage, l'ancienne tenue garde ses pieds jusqu'à ce que le
+  // balayage atteigne les semelles de la nouvelle
+  const pn = L[Number(newKey) - 1]?.pieds;
+  const shadowKey = bi >= 0 && wipe < 1 && (!pn || wipe < (pn.y - 30) / 1920) ? oldKey : newKey;
   return (
     <>
-      <div style={{position: 'absolute', left: CX - 170, top: LEO_TOP + 1830 * S, width: 340, height: 44, borderRadius: '50%', opacity: leoOp,
-        background: 'radial-gradient(ellipse at center, rgba(90,55,30,.28) 0%, rgba(90,55,30,0) 70%)'}} />
+      <ContactShadow k={Number(shadowKey)} op={leoOp} />
       <div style={{...st, opacity: leoOp}}>
         <Img src={staticFile(`leo/cut-${oldKey}.png`)} style={{width: '100%', height: '100%', position: 'absolute', clipPath: `inset(${wipe * 100}% 0 0 0)`, opacity: wipe >= 1 ? 0 : 1}} />
         <Img src={staticFile(`leo/cut-${newKey}.png`)} style={{width: '100%', height: '100%', position: 'absolute', clipPath: `inset(0 0 ${(1 - wipe) * 100}% 0)`}} />

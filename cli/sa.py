@@ -216,6 +216,7 @@ def cmd_timeline(ep, a, W=None, sortie=None):
             lk['rotSrc'] = f'rot-{k + 1}.mp4'; info = json.load(open(ep.pub / f'rot-{k + 1}.json')) if (ep.pub / f'rot-{k + 1}.json').exists() else {'frames': 181, 'ar': 1920 / 1080}
             lk['rotFrames'] = info['frames']; lk['rotAR'] = info['ar']
         else: lk['rotSrc'] = None
+        lk['pieds'] = pieds_detoure(ep.pub / 'leo' / f'cut-{k + 1}.png')
         looks.append(lk); data.append(dict(key=str(k + 1), label=t['label'], total=t['total'], pieces=pd))
         sl = t['sous_titre']; subs.append([a_, sl['texte'], sl.get('surligne'), F(idx(sl['mot'], s0)) if sl.get('surligne') else None])
         for s_ in t.get('sous_titres', []):   # pastilles en plus avant les pièces (rythme : un événement par seconde au moins)
@@ -431,6 +432,33 @@ def cmd_qa(ep, a):
             f = f.astype(np.int16); e = np.maximum(np.abs(np.diff(f, axis=1))[:-1, :], np.abs(np.diff(f, axis=0))[:, :-1]) > 28
             if int((e & ring).sum()) > 20: hit.append(round(i / 10, 1))
         R['logo'] = dict(boite=[lx0, ly0, lx1, ly1], images_en_contact=len(hit), instants=hit[:20])
+    # ombre de contact : sous chaque semelle (ligne connue par le détourage), les 6 premières lignes doivent déjà être
+    # dans l'ombre (plus sombres que le fond de la même ligne pris à x 960..1000). Écart = lignes claires avant l'ombre.
+    P = json.load(open(ep.out / 'props.json'))['data']; LS = P['looks']; Sc = 0.47; LT = 500; LL = 524 - 549 * Sc
+    gaps, worst = [], (0, None)
+    def cle_vue(fi):  # même logique que Leo() dans Episode.tsx (tenue dont les pieds sont visibles), None si Léo masqué
+        bi = next((k for k, l in enumerate(LS) if fi >= l['a'] - 6 and fi < l['b']), -1)
+        if any(l.get('rotSrc') and l['rot0'] - 2 <= fi < l['rot1'] + 2 for l in LS): return None
+        cur = P['openLook']
+        for k, l in enumerate(LS):
+            if fi >= l['a'] + 12: cur = k + 1
+        if bi < 0: return cur
+        a_ = LS[bi]['a']; wipe = min(1, max(0, (fi - a_ - 4) / 14))
+        if 0 < wipe < 1: return None   # balayage en cours : contrôlé par la règle de bascule (voir Episode.tsx)
+        return bi + 1 if wipe >= 1 else (P['openLook'] if bi == 0 else bi)
+    for i, f in enumerate(fr):
+        fi = round(i * FPS / 10); k = cle_vue(fi)
+        if k is None or k > len(LS) or not LS[k - 1].get('pieds'): continue
+        f = f.astype(np.int16); fond = f[:, 960:1000].mean(1)
+        for c in LS[k - 1]['pieds']['chaussures']:
+            ys = int(round(LT + (c['y'] + 1) * Sc)); x0 = int(LL + c['x0'] * Sc) + 6; x1 = int(LL + c['x1'] * Sc) - 6
+            if x1 <= x0: continue
+            g = 0
+            while g < 20 and fond[ys + g] - f[ys + g, x0:x1].mean() < 10: g += 1
+            gaps.append(g)
+            if g > worst[0]: worst = (g, round(i / 10, 1))
+    R['ombre_contact'] = dict(ecart_max_px=worst[0], instant_s=worst[1], mesures=len(gaps), seuil_px=4,
+                              au_dela_seuil=int(sum(1 for g in gaps if g > 4)))
     # événements informatifs (bloc de 60 px qui change) et passages figés
     sm = fr[:, ::4, ::4].astype(float); d = np.abs(np.diff(sm, axis=0)); B = 15
     blk = d[:, :480 // B * B, :270 // B * B].reshape(len(d), 480 // B, B, 270 // B, B).mean(axis=(2, 4)).max(axis=(1, 2))
@@ -449,11 +477,12 @@ def cmd_qa(ep, a):
                 t = l[key] / FPS; near = min(ws, key=lambda x: abs(x[1] - t)); S.append(dict(tenue=k + 1, quoi=key, affiche_s=round(t, 2), entendu=near[0], ecart_ms=round((near[1] - t) * 1000)))
         R['sync_prix'] = dict(detail=S, ecart_max_ms=max(abs(x['ecart_ms']) for x in S))
     json.dump(R, open(q / 'qa.json', 'w'), ensure_ascii=False, indent=1)
-    log(f"QA : {R['format']['duree_s']:.1f} s, {R['lufs']} LUFS, crête {R['crete_dbfs']} dBFS, zones {[(k, v['images_hors_zone']) for k, v in R['zones'].items()]}, logo {R.get('logo', {}).get('images_en_contact')}, "
+    log(f"QA : {R['format']['duree_s']:.1f} s, {R['lufs']} LUFS, crête {R['crete_dbfs']} dBFS, zones {[(k, v['images_hors_zone']) for k, v in R['zones'].items()]}, logo {R.get('logo', {}).get('images_en_contact')}, ombre {R.get('ombre_contact', {}).get('ecart_max_px')} px, "
         f"rythme {R['rythme']}, sync prix max {R.get('sync_prix', {}).get('ecart_max_ms')} ms -> {q}")
     pb = []
     if not -14 <= R['lufs'] <= -12: pb.append('niveau hors -14..-12 LUFS')
     if any(v['images_hors_zone'] for v in R['zones'].values()): pb.append('contenu hors zone sûre')
+    if R.get('ombre_contact', {}).get('ecart_max_px', 0) > 4: pb.append(f"Léo flotte : {R['ombre_contact']['ecart_max_px']} px entre semelles et ombre")
     if R.get('logo', {}).get('images_en_contact'): pb.append('un élément touche le logo')
     if R.get('sync_prix') and R['sync_prix']['ecart_max_ms'] > 250: pb.append('prix décalé de plus de 250 ms')
     if pb: log('ATTENTION :', ' ; '.join(pb))
@@ -495,6 +524,29 @@ def textes_visibles(E):
             for i, v in enumerate(x): walk(v, f'{chemin}[{i}]')
         elif isinstance(x, str): out.append((chemin, x))
     walk(E, 'episode'); return out
+def pieds_detoure(png):
+    """Bas des semelles = dernière ligne opaque du détourage (px de l'image 1080x1920) et étendue de chaque chaussure
+    sur les 28 px du bas. Sert à caler l'ombre de contact juste sous les semelles (aucun espace visible)."""
+    from PIL import Image
+    a = np.asarray(Image.open(png).convert('RGBA'))[:, :, 3] > 128
+    rows = np.where(a.sum(1) > 3)[0]
+    if not len(rows): stop(f'détourage vide : {png}')
+    y = int(rows.max()); cols = np.where(a[y - 59:y + 1].any(0))[0]
+    runs, st = [], cols[0]
+    for c0, c1 in zip(cols[:-1], cols[1:]):
+        if c1 - c0 > 12: runs.append([int(st), int(c0)]); st = c1
+    runs.append([int(st), int(cols[-1])])
+    runs = [r for r in runs if r[1] - r[0] >= 20] or [[int(cols[0]), int(cols[-1])]]
+    # chaque chaussure : son propre bas de semelle (pied de trois quarts plus haut) et sa largeur sur ses 24 px du bas
+    sh = []
+    for r in runs:
+        yb = int(np.where(a[y - 80:y + 1, r[0]:r[1] + 1].any(1))[0].max() + y - 80)
+        lo, hi = max(0, r[0] - 60), min(a.shape[1], r[1] + 61)
+        cc = np.where(a[yb - 23:yb + 1, lo:hi].any(0))[0] + lo
+        sh.append(dict(x0=int(cc.min()), x1=int(cc.max()), y=yb))
+    return dict(y=y, chaussures=sh)
+
+
 LOGO_DEFAUT = dict(actif=True, variante='creme', opacite=0.8, largeur=164)
 
 

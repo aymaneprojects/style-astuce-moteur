@@ -157,3 +157,9 @@ Petit cartouche « SA Style Astuce » en Fraunces (SA orange #D9662B sur crème)
 ```
 
 `variante` : `creme` (défaut) ou `blanc` (blanc avec ombre douce) ; `opacite` 0.5..1 ; `largeur` 120..200 px. La QA (`qa.json` → `logo`) vérifie qu'aucun bord net n'entre dans un anneau de 10 à 22 px autour du logo (donc qu'il ne masque ni Léo, ni les cartes, ni les prix, ni les sous-titres).
+
+## Ombre de contact (pieds posés au sol)
+
+`sa.py timeline` lit le détourage de chaque tenue (`public/leo/cut-<n>.png`) et enregistre dans `props.json` → `looks[k].pieds` le bas des semelles (dernière ligne opaque) et, pour chaque chaussure, son propre bas et sa largeur. `Episode.tsx` (`ContactShadow`) cale dessus une ombre courte et dense sous chaque chaussure, qui remonte de 4 px derrière la semelle, plus une ombre ambiante légère sur la ligne de sol. Pendant un balayage de tenue, l'ombre suit la tenue dont les pieds sont visibles ; pendant une rotation 360°, elle s'efface avec Léo (la vidéo de rotation a son propre sol).
+
+QA : `qa.json` → `ombre_contact` mesure, image par image (10 i/s, hors balayages et rotations), le nombre de lignes claires entre la semelle et l'ombre. Échec au-delà de 4 px (« Léo flotte »).
