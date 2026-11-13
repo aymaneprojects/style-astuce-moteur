@@ -1,0 +1,279 @@
+{
+  "id": "leo-pull-noel-3-facons",
+  "titre": "Même pull de Noël, 3 tenues (Léo)",
+  "date_releve": "2026-11-13",
+  "logo": {
+    "actif": true,
+    "variante": "creme",
+    "opacite": 0.8,
+    "largeur": 164
+  },
+  "script": "script.txt",
+  "voix": {
+    "fournisseur": "elevenlabs",
+    "voice_name": "Benjamin",
+    "voice_id": "F9KUTOne5xOKqAbIU7yg",
+    "model_id": "eleven_v4",
+    "language_code": "fr",
+    "stability": 0.45,
+    "similarity_boost": 0.75,
+    "output_format": "mp3_44100_128"
+  },
+  "ouverture": 1,
+  "accroche": {
+    "l1": "Même pull de Noël,",
+    "pre": "",
+    "kw": "zéro ringard",
+    "post": "",
+    "mot_surligne": "ringard"
+  },
+  "promesse": {
+    "mot": "Trois",
+    "l1": "1 pull",
+    "pre": "",
+    "kw": "3 façons",
+    "post": "",
+    "mot_surligne": "façons",
+    "sous_titre": {
+      "texte": "Du bureau au réveillon",
+      "surligne": "réveillon",
+      "mot": "hiver"
+    }
+  },
+  "intro": {
+    "mots_cartes": {
+      "1": "pull",
+      "2": "Noël",
+      "3": "ringard"
+    },
+    "fin_s": 5,
+    "duree_images": 12,
+    "numeros": true
+  },
+  "tenues": [
+    {
+      "label": "Sobre",
+      "total": "44,99 €",
+      "mot": "Un",
+      "mot_label": "Sobre",
+      "image": "media/leo-pull-noel-3-facons-1-sobre.jpg",
+      "rotation": "media/rotation-leo-pull-noel-3-facons-1-sobre.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Jacquard + chino écru",
+        "surligne": "chino écru",
+        "mot": "Sobre"
+      },
+      "pieces": [
+        {
+          "nom": "Pull de Noël jacquard",
+          "enseigne": "Jules",
+          "prix": "29,99 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100949111863.html",
+          "mot": "Pull",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "navy blue Christmas jacquard knit sweater with white, green and red Nordic snowflake and fir tree pattern, crew neck"
+        },
+        {
+          "nom": "Chino large écru",
+          "enseigne": "Jules",
+          "prix": "15,00 €",
+          "zone": "bas",
+          "url": "https://www.jules.com/fr-fr/p/100648210100.html",
+          "mot": "Chino",
+          "mot_prix": "quinze",
+          "desc_en": "ecru off-white wide-leg chino trousers, relaxed fit, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "L'astuce",
+        "titre": {
+          "l1": "Motif chargé ?",
+          "pre": "",
+          "kw": "Le reste uni",
+          "post": "",
+          "mot_surligne": "uni"
+        },
+        "sous_titres": [
+          {
+            "mot": "chino",
+            "texte": "Le chino reprend le blanc",
+            "surligne": "blanc",
+            "mot_surligne": "blanc"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Bureau",
+      "total": "44,99 €",
+      "mot": "Deux",
+      "mot_label": "Bureau",
+      "image": "media/leo-pull-noel-3-facons-2-bureau.jpg",
+      "rotation": "media/rotation-leo-pull-noel-3-facons-2-bureau.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Même pull + chino gris",
+        "surligne": "chino gris",
+        "mot": "Bureau"
+      },
+      "pieces": [
+        {
+          "nom": "Pull de Noël jacquard",
+          "enseigne": "Jules",
+          "prix": "29,99 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100949111863.html",
+          "mot": "pull",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "navy blue Christmas jacquard knit sweater with white, green and red Nordic snowflake and fir tree pattern, crew neck"
+        },
+        {
+          "nom": "Chino large gris foncé",
+          "enseigne": "Jules",
+          "prix": "15,00 €",
+          "zone": "bas",
+          "url": "https://www.jules.com/fr-fr/p/100648218817.html",
+          "mot": "Chino",
+          "mot_prix": "quinze",
+          "desc_en": "dark charcoal gray wide-leg chino trousers, relaxed fit, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "La",
+        "titre": {
+          "l1": "Le gris foncé",
+          "pre": "",
+          "kw": "calme le motif",
+          "post": "",
+          "mot_surligne": "calme"
+        },
+        "sous_titres": [
+          {
+            "mot": "travail",
+            "texte": "Validé au travail",
+            "surligne": "travail",
+            "mot_surligne": "travail"
+          },
+          {
+            "mot": "déguisé",
+            "texte": "Pas déguisé",
+            "surligne": "déguisé",
+            "mot_surligne": "déguisé"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Week-end",
+      "total": "49,99 €",
+      "mot": "Trois",
+      "mot_label": "Week-end",
+      "image": "media/leo-pull-noel-3-facons-3-week-end.jpg",
+      "rotation": "media/rotation-leo-pull-noel-3-facons-3-week-end.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Même pull + jean loose",
+        "surligne": "jean loose",
+        "mot": "Week-end"
+      },
+      "pieces": [
+        {
+          "nom": "Pull de Noël jacquard",
+          "enseigne": "Jules",
+          "prix": "29,99 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100949111863.html",
+          "mot": "pull",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "navy blue Christmas jacquard knit sweater with white, green and red Nordic snowflake and fir tree pattern, crew neck"
+        },
+        {
+          "nom": "Jean loose à plis",
+          "enseigne": "Jules",
+          "prix": "20,00 €",
+          "zone": "bas",
+          "url": "https://www.jules.com/fr-fr/p/100666211234.html",
+          "mot": "Jean",
+          "mot_prix": "vingt",
+          "desc_en": "medium blue wash loose-fit pleated jeans, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "Le",
+        "titre": {
+          "l1": "Jean clair",
+          "pre": "",
+          "kw": "= décontracté",
+          "post": "",
+          "mot_surligne": "décontracté"
+        },
+        "sous_titres": [
+          {
+            "mot": "marché",
+            "texte": "Le marché de Noël",
+            "surligne": "marché",
+            "mot_surligne": "marché"
+          },
+          {
+            "mot": "gèle",
+            "texte": "Même quand il gèle",
+            "surligne": "gèle",
+            "mot_surligne": "gèle"
+          }
+        ]
+      }
+    }
+  ],
+  "mention": {
+    "mot": "Prix",
+    "l1": "Prix relevés le 13/11",
+    "l2": "hors chaussures et livraison",
+    "mot_l2": "hors"
+  },
+  "fin": {
+    "mot": "Alors",
+    "titre": {
+      "l1": "Laquelle",
+      "pre": "tu ",
+      "kw": "mets",
+      "post": " ?",
+      "mot_surligne": "mets"
+    },
+    "sous_titre": {
+      "mot": "Réponds",
+      "texte": "Réponds 1, 2 ou 3 en commentaire",
+      "surligne": "commentaire",
+      "mot_surligne": "commentaire"
+    },
+    "mots_numeros": [
+      "un",
+      "deux",
+      "trois"
+    ]
+  },
+  "publication": {
+    "date_prevue": "2026-11-26",
+    "plateformes": [
+      "TikTok",
+      "Instagram Reels"
+    ],
+    "forme_accroche": "Même X, pas le même Y",
+    "meteo": "Jeu 26/11 : froid, gelées le matin au nord, 0 à 7 °C"
+  },
+  "mannequin": "leo",
+  "chaussures_en": "Plain dark brown leather lace-up ankle boots without logo"
+}

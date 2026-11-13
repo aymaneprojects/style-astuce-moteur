@@ -1,0 +1,266 @@
+{
+  "id": "leo-capsule-4-pieces",
+  "titre": "Défi : 4 pièces, 3 tenues (Léo)",
+  "date_releve": "2026-11-13",
+  "logo": {
+    "actif": true,
+    "variante": "creme",
+    "opacite": 0.8,
+    "largeur": 164
+  },
+  "script": "script.txt",
+  "voix": {
+    "fournisseur": "elevenlabs",
+    "voice_name": "Benjamin",
+    "voice_id": "F9KUTOne5xOKqAbIU7yg",
+    "model_id": "eleven_v4",
+    "language_code": "fr",
+    "stability": 0.45,
+    "similarity_boost": 0.75,
+    "output_format": "mp3_44100_128"
+  },
+  "ouverture": 1,
+  "accroche": {
+    "l1": "4 pièces,",
+    "pre": "",
+    "kw": "3 tenues",
+    "post": "",
+    "mot_surligne": "tenues"
+  },
+  "promesse": {
+    "mot": "Je",
+    "l1": "Le défi",
+    "pre": "",
+    "kw": "sans racheter",
+    "post": "",
+    "mot_surligne": "racheter",
+    "sous_titre": {
+      "texte": "Col roulé, zip, jean, chino",
+      "surligne": "jean",
+      "mot": "tenues"
+    }
+  },
+  "intro": {
+    "mots_cartes": {
+      "1": "Quatre",
+      "2": "pièces",
+      "3": "euros"
+    },
+    "fin_s": 5,
+    "duree_images": 12,
+    "numeros": true
+  },
+  "tenues": [
+    {
+      "label": "Chaud",
+      "total": "49,99 €",
+      "mot": "Un",
+      "mot_label": "Chaud",
+      "image": "media/leo-capsule-4-pieces-1-chaud.jpg",
+      "rotation": "media/rotation-leo-capsule-4-pieces-1-chaud.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Col roulé + jean",
+        "surligne": "jean",
+        "mot": "Chaud"
+      },
+      "pieces": [
+        {
+          "nom": "Pull col roulé écru",
+          "enseigne": "Jules",
+          "prix": "29,99 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100868510117.html",
+          "mot": "Pull",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "ecru off-white fine-knit turtleneck sweater, regular fit"
+        },
+        {
+          "nom": "Jean loose à plis",
+          "enseigne": "Jules",
+          "prix": "20,00 €",
+          "zone": "bas",
+          "url": "https://www.jules.com/fr-fr/p/100666211234.html",
+          "mot": "Jean",
+          "mot_prix": "vingt",
+          "desc_en": "medium blue wash loose-fit pleated jeans, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "L'astuce",
+        "titre": {
+          "l1": "Écru en haut,",
+          "pre": "",
+          "kw": "bleu",
+          "post": " en bas",
+          "mot_surligne": "bleu"
+        },
+        "sous_titres": [
+          {
+            "mot": "base",
+            "texte": "La base de la capsule",
+            "surligne": "base",
+            "mot_surligne": "base"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Détente",
+      "total": "35,00 €",
+      "mot": "Deux",
+      "mot_label": "Détente",
+      "image": "media/leo-capsule-4-pieces-2-detente.jpg",
+      "rotation": "media/rotation-leo-capsule-4-pieces-2-detente.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Zip + chino",
+        "surligne": "chino",
+        "mot": "Détente"
+      },
+      "pieces": [
+        {
+          "nom": "Sweat zippé beige",
+          "enseigne": "Jules",
+          "prix": "20,00 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100717610446.html",
+          "mot": "Sweat",
+          "mot_prix": "vingt",
+          "desc_en": "beige sand quarter-zip high-neck sweatshirt, plain, regular fit"
+        },
+        {
+          "nom": "Chino large gris foncé",
+          "enseigne": "Jules",
+          "prix": "15,00 €",
+          "zone": "bas",
+          "url": "https://www.jules.com/fr-fr/p/100648218817.html",
+          "mot": "Chino",
+          "mot_prix": "quinze",
+          "desc_en": "dark charcoal gray wide-leg chino trousers, relaxed fit, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "La",
+        "titre": {
+          "l1": "Tout va",
+          "pre": "",
+          "kw": "ensemble",
+          "post": "",
+          "mot_surligne": "ensemble"
+        },
+        "sous_titres": [
+          {
+            "mot": "réfléchir",
+            "texte": "Zéro réflexion le matin",
+            "surligne": "matin",
+            "mot_surligne": "matin"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Mix",
+      "total": "40,00 €",
+      "mot": "Trois",
+      "mot_label": "Mix",
+      "image": "media/leo-capsule-4-pieces-3-mix.jpg",
+      "rotation": "media/rotation-leo-capsule-4-pieces-3-mix.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Zip + jean",
+        "surligne": "jean",
+        "mot": "Mix"
+      },
+      "pieces": [
+        {
+          "nom": "Sweat zippé beige",
+          "enseigne": "Jules",
+          "prix": "20,00 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100717610446.html",
+          "mot": "zip",
+          "mot_prix": "vingt",
+          "desc_en": "beige sand quarter-zip high-neck sweatshirt, plain, regular fit"
+        },
+        {
+          "nom": "Jean loose à plis",
+          "enseigne": "Jules",
+          "prix": "20,00 €",
+          "zone": "bas",
+          "url": "https://www.jules.com/fr-fr/p/100666211234.html",
+          "mot": "jean",
+          "mot_prix": "vingt",
+          "desc_en": "medium blue wash loose-fit pleated jeans, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "Le",
+        "titre": {
+          "l1": "Tu croises,",
+          "pre": "",
+          "kw": "tu doubles",
+          "post": "",
+          "mot_surligne": "doubles"
+        },
+        "sous_titres": [
+          {
+            "mot": "reste",
+            "texte": "Et une option bonus",
+            "surligne": "bonus",
+            "mot_surligne": "quatrième"
+          }
+        ]
+      }
+    }
+  ],
+  "mention": {
+    "mot": "Prix",
+    "l1": "Prix relevés le 13/11",
+    "l2": "hors chaussures et livraison",
+    "mot_l2": "hors"
+  },
+  "fin": {
+    "mot": "Alors",
+    "titre": {
+      "l1": "Laquelle",
+      "pre": "tu ",
+      "kw": "portes",
+      "post": " ?",
+      "mot_surligne": "portes"
+    },
+    "sous_titre": {
+      "mot": "Réponds",
+      "texte": "Réponds 1, 2 ou 3 en commentaire",
+      "surligne": "commentaire",
+      "mot_surligne": "commentaire"
+    },
+    "mots_numeros": [
+      "un",
+      "deux",
+      "trois"
+    ]
+  },
+  "publication": {
+    "date_prevue": "2026-11-25",
+    "plateformes": [
+      "TikTok",
+      "Instagram Reels"
+    ],
+    "forme_accroche": "Défi",
+    "meteo": "Mer 25/11 : froid et sec, 2 à 7 °C"
+  },
+  "mannequin": "leo"
+}

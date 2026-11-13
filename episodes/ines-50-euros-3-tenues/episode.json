@@ -1,0 +1,285 @@
+{
+  "id": "ines-50-euros-3-tenues",
+  "titre": "Moins de 50 € : 3 tenues (Inès)",
+  "date_releve": "2026-11-13",
+  "logo": {
+    "actif": true,
+    "variante": "creme",
+    "opacite": 0.8,
+    "largeur": 164
+  },
+  "script": "script.txt",
+  "voix": {
+    "fournisseur": "elevenlabs",
+    "voice_name": "Koraly - Promo Video",
+    "voice_id": "rbFGGoDXFHtVghjHuS3E",
+    "model_id": "eleven_v4",
+    "language_code": "fr",
+    "stability": 0.45,
+    "similarity_boost": 0.75,
+    "output_format": "mp3_44100_128"
+  },
+  "ouverture": 3,
+  "accroche": {
+    "l1": "Moins de 50 €",
+    "pre": "",
+    "kw": "3 tenues",
+    "post": "",
+    "mot_surligne": "tenues"
+  },
+  "promesse": {
+    "mot": "Et",
+    "l1": "Zéro souci",
+    "pre": "",
+    "kw": "sous la pluie",
+    "post": "",
+    "mot_surligne": "averses",
+    "sous_titre": {
+      "texte": "Bas qui ne traîne pas",
+      "surligne": "traîne",
+      "mot": "semaine"
+    }
+  },
+  "intro": {
+    "mots_cartes": {
+      "1": "Cinquante",
+      "2": "Trois",
+      "3": "tenues"
+    },
+    "fin_s": 5,
+    "duree_images": 12,
+    "numeros": true
+  },
+  "tenues": [
+    {
+      "label": "Doux",
+      "total": "49,80 €",
+      "mot": "Un",
+      "mot_label": "Doux",
+      "image": "media/ines-50-euros-3-tenues-1-doux.jpg",
+      "rotation": "media/rotation-ines-50-euros-3-tenues-1-doux.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Col V + maille noire",
+        "surligne": "maille noire",
+        "mot": "Doux"
+      },
+      "pieces": [
+        {
+          "nom": "Pull col V gris",
+          "enseigne": "Uniqlo",
+          "prix": "29,90 €",
+          "zone": "haut",
+          "url": "https://www.uniqlo.com/fr/fr/products/E486320-000/00?colorDisplayCode=03",
+          "mot": "Pull",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "soft light heather gray fine-knit V-neck sweater, relaxed regular fit"
+        },
+        {
+          "nom": "Pantalon maille côtelée noir",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E486092-000/00?colorDisplayCode=09",
+          "mot": "Pantalon",
+          "mot_prix": "dix-neuf",
+          "desc_en": "black ribbed knit straight-leg pull-on trousers, full length, soft drape"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "L'astuce",
+        "titre": {
+          "l1": "La maille",
+          "pre": "",
+          "kw": "sèche vite",
+          "post": "",
+          "mot_surligne": "sèche"
+        },
+        "sous_titres": [
+          {
+            "mot": "gouttes",
+            "texte": "Les gouttes ne marquent pas",
+            "surligne": "gouttes",
+            "mot_surligne": "gouttes"
+          },
+          {
+            "mot": "confortable",
+            "texte": "Confortable toute la journée",
+            "surligne": "Confortable",
+            "mot_surligne": "confortable"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Chic",
+      "total": "44,80 €",
+      "mot": "Deux",
+      "mot_label": "Chic",
+      "image": "media/ines-50-euros-3-tenues-2-chic.jpg",
+      "rotation": "media/rotation-ines-50-euros-3-tenues-2-chic.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Oxford + chino nude",
+        "surligne": "chino nude",
+        "mot": "Chic"
+      },
+      "pieces": [
+        {
+          "nom": "Chemise Oxford blanche",
+          "enseigne": "Uniqlo",
+          "prix": "24,90 €",
+          "zone": "haut",
+          "url": "https://www.uniqlo.com/fr/fr/products/E484928-000/00?colorDisplayCode=00",
+          "mot": "Chemise",
+          "mot_prix": "vingt-quatre",
+          "desc_en": "white cotton oxford shirt, boxy cropped fit, long sleeves, buttoned"
+        },
+        {
+          "nom": "Chino large nude",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E492171-000/00?colorDisplayCode=30",
+          "mot": "Chino",
+          "mot_prix": "dix-neuf",
+          "desc_en": "nude beige wide-leg chino trousers, high waist, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "La",
+        "titre": {
+          "l1": "Coupe carrée,",
+          "pre": "",
+          "kw": "pas besoin de rentrer",
+          "post": "",
+          "mot_surligne": "rentrer"
+        },
+        "sous_titres": [
+          {
+            "mot": "chino",
+            "texte": "Taille haute",
+            "surligne": "Taille haute",
+            "mot_surligne": "haute"
+          },
+          {
+            "mot": "jambes",
+            "texte": "Des jambes interminables",
+            "surligne": "interminables",
+            "mot_surligne": "interminables"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Cosy",
+      "total": "49,80 €",
+      "mot": "Trois",
+      "mot_label": "Cosy",
+      "image": "media/ines-50-euros-3-tenues-3-cosy.jpg",
+      "rotation": "media/rotation-ines-50-euros-3-tenues-3-cosy.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Torsadé rouge + maille grise",
+        "surligne": "maille grise",
+        "mot": "Cosy"
+      },
+      "pieces": [
+        {
+          "nom": "Pull torsadé rouge",
+          "enseigne": "Uniqlo",
+          "prix": "29,90 €",
+          "zone": "haut",
+          "url": "https://www.uniqlo.com/fr/fr/products/E488243-000/00?colorDisplayCode=14",
+          "mot": "Pull",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "red cable-knit crew-neck sweater, regular fit"
+        },
+        {
+          "nom": "Pantalon maille côtelée gris",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E486092-000/00?colorDisplayCode=06",
+          "mot": "Pantalon",
+          "mot_prix": "dix-neuf",
+          "desc_en": "mid gray ribbed knit straight-leg pull-on trousers, full length, soft drape"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "Le",
+        "titre": {
+          "l1": "Une seule",
+          "pre": "",
+          "kw": "couleur vive",
+          "post": "",
+          "mot_surligne": "vive"
+        },
+        "sous_titres": [
+          {
+            "mot": "rouge",
+            "texte": "Le rouge réveille",
+            "surligne": "réveille",
+            "mot_surligne": "réveille"
+          },
+          {
+            "mot": "calme",
+            "texte": "Le gris calme",
+            "surligne": "calme",
+            "mot_surligne": "calme"
+          }
+        ]
+      }
+    }
+  ],
+  "mention": {
+    "mot": "Prix",
+    "l1": "Prix relevés le 13/11",
+    "l2": "hors chaussures et livraison",
+    "mot_l2": "hors"
+  },
+  "fin": {
+    "mot": "Alors",
+    "titre": {
+      "l1": "Laquelle",
+      "pre": "tu ",
+      "kw": "mets",
+      "post": " ?",
+      "mot_surligne": "mets"
+    },
+    "sous_titre": {
+      "mot": "Réponds",
+      "texte": "Réponds 1, 2 ou 3 en commentaire",
+      "surligne": "commentaire",
+      "mot_surligne": "commentaire"
+    },
+    "mots_numeros": [
+      "un",
+      "deux",
+      "trois"
+    ]
+  },
+  "publication": {
+    "date_prevue": "2026-11-18",
+    "plateformes": [
+      "TikTok",
+      "Instagram Reels"
+    ],
+    "forme_accroche": "Nombre d'abord",
+    "meteo": "Mer 18/11 : doux (10 à 15 °C), averses et vent"
+  },
+  "mannequin": "ines",
+  "chaussures_en": "Plain black leather ankle boots without logo"
+}

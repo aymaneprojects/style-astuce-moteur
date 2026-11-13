@@ -1,0 +1,273 @@
+{
+  "id": "ines-froid-au-bureau",
+  "titre": "Froid au bureau : 3 tenues (Inès)",
+  "date_releve": "2026-11-13",
+  "logo": {
+    "actif": true,
+    "variante": "creme",
+    "opacite": 0.8,
+    "largeur": 164
+  },
+  "script": "script.txt",
+  "voix": {
+    "fournisseur": "elevenlabs",
+    "voice_name": "Koraly - Promo Video",
+    "voice_id": "rbFGGoDXFHtVghjHuS3E",
+    "model_id": "eleven_v4",
+    "language_code": "fr",
+    "stability": 0.45,
+    "similarity_boost": 0.75,
+    "output_format": "mp3_44100_128"
+  },
+  "ouverture": 1,
+  "accroche": {
+    "l1": "T'as froid",
+    "pre": "",
+    "kw": "au bureau ?",
+    "post": "",
+    "mot_surligne": "bureau"
+  },
+  "promesse": {
+    "mot": "Trois",
+    "l1": "3 tenues",
+    "pre": "",
+    "kw": "chaudes et classes",
+    "post": "",
+    "mot_surligne": "chaudes",
+    "sous_titre": {
+      "texte": "Pour toute la semaine",
+      "surligne": "semaine",
+      "mot": "semaine"
+    }
+  },
+  "intro": {
+    "mots_cartes": {
+      "1": "froid",
+      "2": "bureau",
+      "3": "classe"
+    },
+    "fin_s": 5,
+    "duree_images": 12,
+    "numeros": true
+  },
+  "tenues": [
+    {
+      "label": "Classique",
+      "total": "49,80 €",
+      "mot": "Un",
+      "mot_label": "Classique",
+      "image": "media/ines-froid-au-bureau-1-classique.jpg",
+      "rotation": "media/rotation-ines-froid-au-bureau-1-classique.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Col V gris + chino nude",
+        "surligne": "chino nude",
+        "mot": "Classique"
+      },
+      "pieces": [
+        {
+          "nom": "Pull col V gris",
+          "enseigne": "Uniqlo",
+          "prix": "29,90 €",
+          "zone": "haut",
+          "url": "https://www.uniqlo.com/fr/fr/products/E486320-000/00?colorDisplayCode=03",
+          "mot": "Pull",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "soft light heather gray fine-knit V-neck sweater, relaxed regular fit"
+        },
+        {
+          "nom": "Chino large nude",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E492171-000/00?colorDisplayCode=30",
+          "mot": "Chino",
+          "mot_prix": "dix-neuf",
+          "desc_en": "nude beige wide-leg chino trousers, high waist, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "L'astuce",
+        "titre": {
+          "l1": "Une couche",
+          "pre": "",
+          "kw": "en plus",
+          "post": "",
+          "mot_surligne": "couche"
+        },
+        "sous_titres": [
+          {
+            "mot": "gagnes",
+            "texte": "Sans grossir",
+            "surligne": "grossir",
+            "mot_surligne": "grossir"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Chaud",
+      "total": "44,80 €",
+      "mot": "Deux",
+      "mot_label": "Chaud",
+      "image": "media/ines-froid-au-bureau-2-chaud.jpg",
+      "rotation": "media/rotation-ines-froid-au-bureau-2-chaud.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Col roulé + maille noire",
+        "surligne": "maille noire",
+        "mot": "Chaud"
+      },
+      "pieces": [
+        {
+          "nom": "Col roulé chaud beige",
+          "enseigne": "Uniqlo",
+          "prix": "24,90 €",
+          "zone": "haut",
+          "url": "https://www.uniqlo.com/fr/fr/products/E471601-000/00?colorDisplayCode=31",
+          "mot": "Col",
+          "mot_prix": "vingt-quatre",
+          "desc_en": "beige fitted fine-knit turtleneck top, long sleeves"
+        },
+        {
+          "nom": "Pantalon maille côtelée noir",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E486092-000/00?colorDisplayCode=09",
+          "mot": "Pantalon",
+          "mot_prix": "dix-neuf",
+          "desc_en": "black ribbed knit straight-leg pull-on trousers, full length, soft drape"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "La",
+        "titre": {
+          "l1": "Le cou",
+          "pre": "",
+          "kw": "au chaud",
+          "post": "",
+          "mot_surligne": "chaud"
+        },
+        "sous_titres": [
+          {
+            "mot": "réunion",
+            "texte": "Validé en réunion",
+            "surligne": "réunion",
+            "mot_surligne": "réunion"
+          },
+          {
+            "mot": "jogging",
+            "texte": "Un jogging invisible",
+            "surligne": "invisible",
+            "mot_surligne": "voit"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Doux",
+      "total": "49,80 €",
+      "mot": "Trois",
+      "mot_label": "Doux",
+      "image": "media/ines-froid-au-bureau-3-doux.jpg",
+      "rotation": "media/rotation-ines-froid-au-bureau-3-doux.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Polaire + flanelle",
+        "surligne": "flanelle",
+        "mot": "Doux"
+      },
+      "pieces": [
+        {
+          "nom": "Tee polaire bleu",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "haut",
+          "url": "https://www.uniqlo.com/fr/fr/products/E470143-000/00?colorDisplayCode=61",
+          "mot": "Tee",
+          "mot_prix": "dix-neuf",
+          "desc_en": "light blue soft fleece long-sleeve crew-neck top, regular fit"
+        },
+        {
+          "nom": "Pantalon flanelle beige",
+          "enseigne": "Uniqlo",
+          "prix": "29,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E486316-000/00?colorDisplayCode=31",
+          "mot": "Pantalon",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "beige flannel easy pull-on trousers, straight leg, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "Le",
+        "titre": {
+          "l1": "La flanelle",
+          "pre": "",
+          "kw": "tient chaud",
+          "post": "",
+          "mot_surligne": "laine"
+        },
+        "sous_titres": [
+          {
+            "mot": "lumineux",
+            "texte": "Et ça reste lumineux",
+            "surligne": "lumineux",
+            "mot_surligne": "lumineux"
+          }
+        ]
+      }
+    }
+  ],
+  "mention": {
+    "mot": "Prix",
+    "l1": "Prix relevés le 13/11",
+    "l2": "hors chaussures et livraison",
+    "mot_l2": "hors"
+  },
+  "fin": {
+    "mot": "Alors",
+    "titre": {
+      "l1": "Laquelle",
+      "pre": "tu ",
+      "kw": "mets",
+      "post": " ?",
+      "mot_surligne": "mets"
+    },
+    "sous_titre": {
+      "mot": "Réponds",
+      "texte": "Réponds 1, 2 ou 3 en commentaire",
+      "surligne": "commentaire",
+      "mot_surligne": "commentaire"
+    },
+    "mots_numeros": [
+      "un",
+      "deux",
+      "trois"
+    ]
+  },
+  "publication": {
+    "date_prevue": "2026-11-25",
+    "plateformes": [
+      "TikTok",
+      "Instagram Reels"
+    ],
+    "forme_accroche": "Sensation du quotidien en question",
+    "meteo": "Mer 25/11 : froid et sec, 2 à 7 °C"
+  },
+  "mannequin": "ines",
+  "chaussures_en": "Plain black leather ankle boots without logo"
+}

@@ -1,0 +1,285 @@
+{
+  "id": "ines-pantalon-large-mythe",
+  "titre": "Pantalon large et petite taille (Inès)",
+  "date_releve": "2026-11-13",
+  "logo": {
+    "actif": true,
+    "variante": "creme",
+    "opacite": 0.8,
+    "largeur": 164
+  },
+  "script": "script.txt",
+  "voix": {
+    "fournisseur": "elevenlabs",
+    "voice_name": "Koraly - Promo Video",
+    "voice_id": "rbFGGoDXFHtVghjHuS3E",
+    "model_id": "eleven_v4",
+    "language_code": "fr",
+    "stability": 0.45,
+    "similarity_boost": 0.75,
+    "output_format": "mp3_44100_128"
+  },
+  "ouverture": 1,
+  "accroche": {
+    "l1": "Le large",
+    "pre": "",
+    "kw": "tasse les petites ?",
+    "post": "",
+    "mot_surligne": "petite"
+  },
+  "promesse": {
+    "mot": "Faux",
+    "l1": "Faux.",
+    "pre": "",
+    "kw": "3 tenues",
+    "post": "",
+    "mot_surligne": "prouver",
+    "sous_titre": {
+      "texte": "Taille haute obligatoire",
+      "surligne": "Taille haute",
+      "mot": "prouver"
+    }
+  },
+  "intro": {
+    "mots_cartes": {
+      "1": "pantalon",
+      "2": "large",
+      "3": "tasse"
+    },
+    "fin_s": 5,
+    "duree_images": 12,
+    "numeros": true
+  },
+  "tenues": [
+    {
+      "label": "Ton sur ton",
+      "total": "44,80 €",
+      "mot": "Un",
+      "mot_label": "Ton",
+      "image": "media/ines-pantalon-large-mythe-1-ton-sur-ton.jpg",
+      "rotation": "media/rotation-ines-pantalon-large-mythe-1-ton-sur-ton.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Beige de haut en bas",
+        "surligne": "haut en bas",
+        "mot": "Ton"
+      },
+      "pieces": [
+        {
+          "nom": "Col roulé chaud beige",
+          "enseigne": "Uniqlo",
+          "prix": "24,90 €",
+          "zone": "haut",
+          "url": "https://www.uniqlo.com/fr/fr/products/E471601-000/00?colorDisplayCode=31",
+          "mot": "Col",
+          "mot_prix": "vingt-quatre",
+          "desc_en": "beige fitted fine-knit turtleneck top, long sleeves"
+        },
+        {
+          "nom": "Chino large nude",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E492171-000/00?colorDisplayCode=30",
+          "mot": "Chino",
+          "mot_prix": "dix-neuf",
+          "desc_en": "nude beige wide-leg chino trousers, high waist, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "L'astuce",
+        "titre": {
+          "l1": "Une couleur,",
+          "pre": "",
+          "kw": "zéro coupure",
+          "post": "",
+          "mot_surligne": "coupure"
+        },
+        "sous_titres": [
+          {
+            "mot": "trait",
+            "texte": "L'œil file d'un trait",
+            "surligne": "d'un trait",
+            "mot_surligne": "trait"
+          },
+          {
+            "mot": "centimètres",
+            "texte": "Quelques centimètres en plus",
+            "surligne": "centimètres",
+            "mot_surligne": "centimètres"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Monochrome",
+      "total": "49,80 €",
+      "mot": "Deux",
+      "mot_label": "Monochrome",
+      "image": "media/ines-pantalon-large-mythe-2-monochrome.jpg",
+      "rotation": "media/rotation-ines-pantalon-large-mythe-2-monochrome.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Noir sur noir",
+        "surligne": "Noir",
+        "mot": "Monochrome"
+      },
+      "pieces": [
+        {
+          "nom": "Tee polaire manches longues",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "haut",
+          "url": "https://www.uniqlo.com/fr/fr/products/E470143-000/00?colorDisplayCode=09",
+          "mot": "Tee",
+          "mot_prix": "dix-neuf",
+          "desc_en": "black soft fleece long-sleeve crew-neck top, regular fit, tucked in at the front"
+        },
+        {
+          "nom": "Pantalon Barrel plissé noir",
+          "enseigne": "Uniqlo",
+          "prix": "29,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E491087-000/00?colorDisplayCode=09",
+          "mot": "Pantalon",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "black pleated barrel-leg trousers, high waist, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "La",
+        "titre": {
+          "l1": "Rentré",
+          "pre": "",
+          "kw": "devant",
+          "post": "",
+          "mot_surligne": "devant"
+        },
+        "sous_titres": [
+          {
+            "mot": "taille",
+            "texte": "La taille remonte",
+            "surligne": "remonte",
+            "mot_surligne": "remonte"
+          },
+          {
+            "mot": "volume",
+            "texte": "Et le volume reste",
+            "surligne": "volume",
+            "mot_surligne": "volume"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Gris",
+      "total": "49,80 €",
+      "mot": "Trois",
+      "mot_label": "Gris",
+      "image": "media/ines-pantalon-large-mythe-3-gris.jpg",
+      "rotation": "media/rotation-ines-pantalon-large-mythe-3-gris.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Gris clair sur gris clair",
+        "surligne": "gris clair",
+        "mot": "Gris"
+      },
+      "pieces": [
+        {
+          "nom": "Tee manches longues gris",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "haut",
+          "url": "https://www.uniqlo.com/fr/fr/products/E488230-000/00?colorDisplayCode=04",
+          "mot": "Tee",
+          "mot_prix": "dix-neuf",
+          "desc_en": "light gray long-sleeve cotton crew-neck t-shirt, regular fit, tucked in"
+        },
+        {
+          "nom": "Pantalon large coton gris",
+          "enseigne": "Uniqlo",
+          "prix": "29,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E487589-000/00?colorDisplayCode=07",
+          "mot": "Pantalon",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "light gray wide-leg easy cotton trousers, high waist, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "Le",
+        "titre": {
+          "l1": "Il couvre",
+          "pre": "",
+          "kw": "le talon",
+          "post": "",
+          "mot_surligne": "talon"
+        },
+        "sous_titres": [
+          {
+            "mot": "sol",
+            "texte": "Jusqu'au sol",
+            "surligne": "sol",
+            "mot_surligne": "sol"
+          },
+          {
+            "mot": "jambe",
+            "texte": "La jambe ne finit plus",
+            "surligne": "ne finit plus",
+            "mot_surligne": "jambe"
+          }
+        ]
+      }
+    }
+  ],
+  "mention": {
+    "mot": "Prix",
+    "l1": "Prix relevés le 13/11",
+    "l2": "hors chaussures et livraison",
+    "mot_l2": "hors"
+  },
+  "fin": {
+    "mot": "Alors",
+    "titre": {
+      "l1": "Laquelle",
+      "pre": "te ",
+      "kw": "va",
+      "post": " ?",
+      "mot_surligne": "mieux"
+    },
+    "sous_titre": {
+      "mot": "Réponds",
+      "texte": "Réponds 1, 2 ou 3 en commentaire",
+      "surligne": "commentaire",
+      "mot_surligne": "commentaire"
+    },
+    "mots_numeros": [
+      "un",
+      "deux",
+      "trois"
+    ]
+  },
+  "publication": {
+    "date_prevue": "2026-11-19",
+    "plateformes": [
+      "TikTok",
+      "Instagram Reels"
+    ],
+    "forme_accroche": "Mythe ? Faux.",
+    "meteo": "Jeu 19/11 : averses, 8 à 14 °C"
+  },
+  "mannequin": "ines",
+  "chaussures_en": "Plain black leather ankle boots without logo"
+}

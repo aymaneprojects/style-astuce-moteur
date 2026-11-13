@@ -1,0 +1,21 @@
+# phrase ajoutée à la fin de l'astuce de chaque tenue (durée cible 65 à 75 s)
+X = {
+'leo-pluie-3-tenues': ["Sous la capuche, tu restes au sec sans parapluie.", "Et si l'averse tombe, elle sèche en vingt minutes au bureau.", "Avec une parka par-dessus, tu tiens toute la journée."],
+'leo-3-details-cheap': ["Fais faire l'ourlet, ça coûte moins qu'un sandwich.", "Et rentre la chemise devant, ça tient mieux sous une veste.", "Pense à le plier, jamais à le suspendre, il garde sa forme."],
+'leo-tout-noir': ["Ajoute une montre ou une ceinture, et c'est réglé.", "Un seul noir, mais deux textures, et ça devient élégant.", "Le noir reste, sans peser."],
+'leo-devine-le-prix': ["Et des chaussures propres, ça change tout.", "Une tenue simple, qui marche pour un café ou un ciné.", "Une base que tu peux porter tout l'hiver."],
+'leo-sweat-adulte': ["Et la capuche reste à la maison.", "Tu gardes le confort, tu perds le côté canapé.", "C'est la base parfaite pour un dimanche pluvieux."],
+'leo-paraitre-plus-grand': ["Même avec un pantalon large, tu ne paraîs pas plus petit.", "Garde des chaussures de la même couleur que le pantalon si tu peux.", "Et évite les vestes longues qui coupent la jambe en deux."],
+'leo-hiver-3-tenues-chaudes': ["Ajoute une écharpe et tu ne sens plus le vent du matin.", "Garde un tee léger dessous, tu le retires au chaud.", "Et le velours encaisse le froid sec sans bouger."],
+'leo-capsule-4-pieces': ["Tu peux la porter du lundi au mercredi sans que personne le remarque.", "C'est la tenue détente pour le week-end.", "Une capsule, c'est moins de choix le matin, et plus de style."],
+'leo-pull-noel-3-facons': ["Et laisse dépasser un petit col de tee blanc.", "Avec une veste sombre par-dessus, ça passe en réunion.", "Tu peux le garder jusqu'au premier janvier sans te lasser."],
+'ines-50-euros-3-tenues': ["Et le gris clair reste lumineux par temps couvert.", "Tu peux la porter au bureau puis en terrasse.", "Avec une écharpe neutre, c'est encore plus doux."],
+'ines-pantalon-large-mythe': ["Même avec une petite taille, tu as l'air élancée.", "Choisis-le taille haute, c'est la clé.", "Ajoute des bottines à petit talon, et tu gagnes encore."],
+'ines-rien-a-mettre-ce-soir': ["Glisse un petit sac noir, et tu es prête.", "Avec des bottines, tu traverses les flaques sans souci.", "Et tu restes au chaud jusqu'à la fin de la soirée."],
+'ines-arrete-tout-noir': ["Le gris clair adoucit encore plus le rose.", "Choisis des bottines nude ou noires, ça marche dans les deux cas.", "Garde le noir pour les chaussures, et c'est parfait."],
+'ines-meme-pantalon-3-tenues': ["Rentre juste le devant du pull, et la taille se dessine.", "Laisse le col ouvert d'un bouton, c'est plus moderne.", "Et ça marche aussi pour un dîner en famille."],
+'ines-col-roule-ou-col-v': ["Ajoute une petite chaîne fine par-dessus, et c'est chic.", "Ajoute un collier fin pour souligner la forme du col.", "Rentre-le devant, et la taille ressort tout de suite."],
+'ines-devine-le-prix': ["Ajoute une ceinture marron, et c'est encore plus chic.", "Personne ne voit la différence de prix.", "Le contraste reste doux, même par grand froid."],
+'ines-froid-au-bureau': ["Personne ne voit qu'il y a une couche en dessous.", "Tu passes la journée au chaud, sans changer de tenue.", "Avec un manteau camel, c'est la tenue parfaite pour sortir."],
+'ines-capsule-4-pieces': ["Et le rouge réveille les journées grises.", "Ajoute des boucles dorées, et ça devient une tenue de soirée.", "Une capsule, c'est moins de choix le matin, et plus de style."],
+}

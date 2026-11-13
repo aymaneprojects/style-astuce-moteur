@@ -1,0 +1,273 @@
+{
+  "id": "ines-col-roule-ou-col-v",
+  "titre": "Col roulé ou col V ? (Inès)",
+  "date_releve": "2026-11-13",
+  "logo": {
+    "actif": true,
+    "variante": "creme",
+    "opacite": 0.8,
+    "largeur": 164
+  },
+  "script": "script.txt",
+  "voix": {
+    "fournisseur": "elevenlabs",
+    "voice_name": "Koraly - Promo Video",
+    "voice_id": "rbFGGoDXFHtVghjHuS3E",
+    "model_id": "eleven_v4",
+    "language_code": "fr",
+    "stability": 0.45,
+    "similarity_boost": 0.75,
+    "output_format": "mp3_44100_128"
+  },
+  "ouverture": 1,
+  "accroche": {
+    "l1": "Col roulé",
+    "pre": "",
+    "kw": "ou col V ?",
+    "post": "",
+    "mot_surligne": "mieux"
+  },
+  "promesse": {
+    "mot": "Trois",
+    "l1": "3 cols",
+    "pre": "",
+    "kw": "pour choisir",
+    "post": "",
+    "mot_surligne": "choisir",
+    "sous_titre": {
+      "texte": "Roulé, V ou rond",
+      "surligne": "rond",
+      "mot": "choisir"
+    }
+  },
+  "intro": {
+    "mots_cartes": {
+      "1": "roulé",
+      "2": "col",
+      "3": "mieux"
+    },
+    "fin_s": 5,
+    "duree_images": 12,
+    "numeros": true
+  },
+  "tenues": [
+    {
+      "label": "Roulé",
+      "total": "44,80 €",
+      "mot": "Un",
+      "mot_label": "Roulé",
+      "image": "media/ines-col-roule-ou-col-v-1-roule.jpg",
+      "rotation": "media/rotation-ines-col-roule-ou-col-v-1-roule.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Col roulé + chino nude",
+        "surligne": "chino nude",
+        "mot": "Roulé"
+      },
+      "pieces": [
+        {
+          "nom": "Col roulé chaud gris",
+          "enseigne": "Uniqlo",
+          "prix": "24,90 €",
+          "zone": "haut",
+          "url": "https://www.uniqlo.com/fr/fr/products/E471601-000/00?colorDisplayCode=07",
+          "mot": "Col",
+          "mot_prix": "vingt-quatre",
+          "desc_en": "heather gray fitted fine-knit turtleneck top, long sleeves"
+        },
+        {
+          "nom": "Chino large nude",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E492171-000/00?colorDisplayCode=30",
+          "mot": "Chino",
+          "mot_prix": "dix-neuf",
+          "desc_en": "nude beige wide-leg chino trousers, high waist, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "L'astuce",
+        "titre": {
+          "l1": "Cou long ?",
+          "pre": "",
+          "kw": "Col roulé",
+          "post": "",
+          "mot_surligne": "longs"
+        },
+        "sous_titres": [
+          {
+            "mot": "vent",
+            "texte": "Il coupe le vent",
+            "surligne": "vent",
+            "mot_surligne": "vent"
+          },
+          {
+            "mot": "court",
+            "texte": "Cou court : col replié",
+            "surligne": "replié",
+            "mot_surligne": "replie"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Col V",
+      "total": "49,80 €",
+      "mot": "Deux",
+      "mot_label": "Col",
+      "image": "media/ines-col-roule-ou-col-v-2-col-v.jpg",
+      "rotation": "media/rotation-ines-col-roule-ou-col-v-2-col-v.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Col V + maille grise",
+        "surligne": "maille grise",
+        "mot": "Col"
+      },
+      "pieces": [
+        {
+          "nom": "Pull col V noir",
+          "enseigne": "Uniqlo",
+          "prix": "29,90 €",
+          "zone": "haut",
+          "url": "https://www.uniqlo.com/fr/fr/products/E486320-000/00?colorDisplayCode=09",
+          "mot": "Pull",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "soft black fine-knit V-neck sweater, relaxed regular fit"
+        },
+        {
+          "nom": "Pantalon maille côtelée gris",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E486092-000/00?colorDisplayCode=06",
+          "mot": "Pantalon",
+          "mot_prix": "dix-neuf",
+          "desc_en": "mid gray ribbed knit straight-leg pull-on trousers, full length, soft drape"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "La",
+        "titre": {
+          "l1": "Le col V",
+          "pre": "",
+          "kw": "allonge",
+          "post": "",
+          "mot_surligne": "allonge"
+        },
+        "sous_titres": [
+          {
+            "mot": "flatteur",
+            "texte": "Le plus flatteur",
+            "surligne": "flatteur",
+            "mot_surligne": "flatteur"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Rond",
+      "total": "49,80 €",
+      "mot": "Trois",
+      "mot_label": "Rond",
+      "image": "media/ines-col-roule-ou-col-v-3-rond.jpg",
+      "rotation": "media/rotation-ines-col-roule-ou-col-v-3-rond.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Col rond + pantalon beige",
+        "surligne": "pantalon beige",
+        "mot": "Rond"
+      },
+      "pieces": [
+        {
+          "nom": "Tee manches longues marron",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "haut",
+          "url": "https://www.uniqlo.com/fr/fr/products/E488230-000/00?colorDisplayCode=35",
+          "mot": "Tee",
+          "mot_prix": "dix-neuf",
+          "desc_en": "brown long-sleeve cotton crew-neck t-shirt, regular fit"
+        },
+        {
+          "nom": "Pantalon large coton beige",
+          "enseigne": "Uniqlo",
+          "prix": "29,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E487589-000/00?colorDisplayCode=32",
+          "mot": "Pantalon",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "beige wide-leg easy cotton trousers, high waist, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "Le",
+        "titre": {
+          "l1": "Le col rond,",
+          "pre": "",
+          "kw": "c'est le joker",
+          "post": "",
+          "mot_surligne": "joker"
+        },
+        "sous_titres": [
+          {
+            "mot": "beige",
+            "texte": "Marron sur beige",
+            "surligne": "beige",
+            "mot_surligne": "beige"
+          }
+        ]
+      }
+    }
+  ],
+  "mention": {
+    "mot": "Prix",
+    "l1": "Prix relevés le 13/11",
+    "l2": "hors chaussures et livraison",
+    "mot_l2": "hors"
+  },
+  "fin": {
+    "mot": "Alors",
+    "titre": {
+      "l1": "Plutôt",
+      "pre": "",
+      "kw": "lequel",
+      "post": " ?",
+      "mot_surligne": "rond"
+    },
+    "sous_titre": {
+      "mot": "Réponds",
+      "texte": "Réponds 1, 2 ou 3 en commentaire",
+      "surligne": "commentaire",
+      "mot_surligne": "commentaire"
+    },
+    "mots_numeros": [
+      "un",
+      "deux",
+      "trois"
+    ]
+  },
+  "publication": {
+    "date_prevue": "2026-11-23",
+    "plateformes": [
+      "TikTok",
+      "Instagram Reels"
+    ],
+    "forme_accroche": "A ou B ?",
+    "meteo": "Lun 23/11 : bruine et vent, 6 à 12 °C"
+  },
+  "mannequin": "ines",
+  "chaussures_en": "Plain black leather ankle boots without logo"
+}

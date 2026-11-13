@@ -1,0 +1,267 @@
+{
+  "id": "ines-capsule-4-pieces",
+  "titre": "Défi : 4 pièces, 3 tenues (Inès)",
+  "date_releve": "2026-11-13",
+  "logo": {
+    "actif": true,
+    "variante": "creme",
+    "opacite": 0.8,
+    "largeur": 164
+  },
+  "script": "script.txt",
+  "voix": {
+    "fournisseur": "elevenlabs",
+    "voice_name": "Koraly - Promo Video",
+    "voice_id": "rbFGGoDXFHtVghjHuS3E",
+    "model_id": "eleven_v4",
+    "language_code": "fr",
+    "stability": 0.45,
+    "similarity_boost": 0.75,
+    "output_format": "mp3_44100_128"
+  },
+  "ouverture": 1,
+  "accroche": {
+    "l1": "4 pièces,",
+    "pre": "",
+    "kw": "3 tenues",
+    "post": "",
+    "mot_surligne": "tenues"
+  },
+  "promesse": {
+    "mot": "Je",
+    "l1": "Le défi",
+    "pre": "",
+    "kw": "jours de gel",
+    "post": "",
+    "mot_surligne": "gel",
+    "sous_titre": {
+      "texte": "Torsadé, col roulé, maille, chino",
+      "surligne": "maille",
+      "mot": "tenues"
+    }
+  },
+  "intro": {
+    "mots_cartes": {
+      "1": "Quatre",
+      "2": "pièces",
+      "3": "euros"
+    },
+    "fin_s": 5,
+    "duree_images": 12,
+    "numeros": true
+  },
+  "tenues": [
+    {
+      "label": "Gel",
+      "total": "49,80 €",
+      "mot": "Un",
+      "mot_label": "Gel",
+      "image": "media/ines-capsule-4-pieces-1-gel.jpg",
+      "rotation": "media/rotation-ines-capsule-4-pieces-1-gel.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Torsadé + maille grise",
+        "surligne": "maille grise",
+        "mot": "Gel"
+      },
+      "pieces": [
+        {
+          "nom": "Pull torsadé rouge",
+          "enseigne": "Uniqlo",
+          "prix": "29,90 €",
+          "zone": "haut",
+          "url": "https://www.uniqlo.com/fr/fr/products/E488243-000/00?colorDisplayCode=14",
+          "mot": "Pull",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "red cable-knit crew-neck sweater, regular fit"
+        },
+        {
+          "nom": "Pantalon maille côtelée gris",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E486092-000/00?colorDisplayCode=06",
+          "mot": "Pantalon",
+          "mot_prix": "dix-neuf",
+          "desc_en": "mid gray ribbed knit straight-leg pull-on trousers, full length, soft drape"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "L'astuce",
+        "titre": {
+          "l1": "Le torsadé,",
+          "pre": "",
+          "kw": "la pièce chaude",
+          "post": "",
+          "mot_surligne": "chaude"
+        },
+        "sous_titres": [
+          {
+            "mot": "matins",
+            "texte": "Les matins qui gèlent",
+            "surligne": "gèlent",
+            "mot_surligne": "gèle"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Net",
+      "total": "44,80 €",
+      "mot": "Deux",
+      "mot_label": "Net",
+      "image": "media/ines-capsule-4-pieces-2-net.jpg",
+      "rotation": "media/rotation-ines-capsule-4-pieces-2-net.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Col roulé noir + chino nude",
+        "surligne": "chino nude",
+        "mot": "Net"
+      },
+      "pieces": [
+        {
+          "nom": "Col roulé chaud noir",
+          "enseigne": "Uniqlo",
+          "prix": "24,90 €",
+          "zone": "haut",
+          "url": "https://www.uniqlo.com/fr/fr/products/E471601-000/00?colorDisplayCode=09",
+          "mot": "Col",
+          "mot_prix": "vingt-quatre",
+          "desc_en": "black fitted fine-knit turtleneck top, long sleeves"
+        },
+        {
+          "nom": "Chino large nude",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E492171-000/00?colorDisplayCode=30",
+          "mot": "Chino",
+          "mot_prix": "dix-neuf",
+          "desc_en": "nude beige wide-leg chino trousers, high waist, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "La",
+        "titre": {
+          "l1": "Chaque haut",
+          "pre": "",
+          "kw": "va avec chaque bas",
+          "post": "",
+          "mot_surligne": "bas"
+        },
+        "sous_titres": [
+          {
+            "mot": "dîner",
+            "texte": "Du bureau au dîner",
+            "surligne": "dîner",
+            "mot_surligne": "dîner"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Mix",
+      "total": "44,80 €",
+      "mot": "Trois",
+      "mot_label": "Mix",
+      "image": "media/ines-capsule-4-pieces-3-mix.jpg",
+      "rotation": "media/rotation-ines-capsule-4-pieces-3-mix.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Col roulé + maille grise",
+        "surligne": "maille grise",
+        "mot": "Mix"
+      },
+      "pieces": [
+        {
+          "nom": "Col roulé chaud noir",
+          "enseigne": "Uniqlo",
+          "prix": "24,90 €",
+          "zone": "haut",
+          "url": "https://www.uniqlo.com/fr/fr/products/E471601-000/00?colorDisplayCode=09",
+          "mot": "col",
+          "mot_prix": "vingt-quatre",
+          "desc_en": "black fitted fine-knit turtleneck top, long sleeves"
+        },
+        {
+          "nom": "Pantalon maille côtelée gris",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E486092-000/00?colorDisplayCode=06",
+          "mot": "pantalon",
+          "mot_prix": "dix-neuf",
+          "desc_en": "mid gray ribbed knit straight-leg pull-on trousers, full length, soft drape"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "Le",
+        "titre": {
+          "l1": "Tu croises,",
+          "pre": "",
+          "kw": "tu doubles",
+          "post": "",
+          "mot_surligne": "doubles"
+        },
+        "sous_titres": [
+          {
+            "mot": "reste",
+            "texte": "Et une option bonus",
+            "surligne": "bonus",
+            "mot_surligne": "quatrième"
+          }
+        ]
+      }
+    }
+  ],
+  "mention": {
+    "mot": "Prix",
+    "l1": "Prix relevés le 13/11",
+    "l2": "hors chaussures et livraison",
+    "mot_l2": "hors"
+  },
+  "fin": {
+    "mot": "Alors",
+    "titre": {
+      "l1": "Laquelle",
+      "pre": "tu ",
+      "kw": "portes",
+      "post": " ?",
+      "mot_surligne": "portes"
+    },
+    "sous_titre": {
+      "mot": "Réponds",
+      "texte": "Réponds 1, 2 ou 3 en commentaire",
+      "surligne": "commentaire",
+      "mot_surligne": "commentaire"
+    },
+    "mots_numeros": [
+      "un",
+      "deux",
+      "trois"
+    ]
+  },
+  "publication": {
+    "date_prevue": "2026-11-26",
+    "plateformes": [
+      "TikTok",
+      "Instagram Reels"
+    ],
+    "forme_accroche": "Défi",
+    "meteo": "Jeu 26/11 : froid, gelées le matin au nord, 0 à 7 °C"
+  },
+  "mannequin": "ines",
+  "chaussures_en": "Plain black leather ankle boots without logo"
+}

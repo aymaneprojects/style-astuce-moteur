@@ -1,0 +1,284 @@
+{
+  "id": "leo-sweat-adulte",
+  "titre": "Le sweat, version adulte (Léo)",
+  "date_releve": "2026-11-13",
+  "logo": {
+    "actif": true,
+    "variante": "creme",
+    "opacite": 0.8,
+    "largeur": 164
+  },
+  "script": "script.txt",
+  "voix": {
+    "fournisseur": "elevenlabs",
+    "voice_name": "Benjamin",
+    "voice_id": "F9KUTOne5xOKqAbIU7yg",
+    "model_id": "eleven_v4",
+    "language_code": "fr",
+    "stability": 0.45,
+    "similarity_boost": 0.75,
+    "output_format": "mp3_44100_128"
+  },
+  "ouverture": 1,
+  "accroche": {
+    "l1": "Garde ton sweat.",
+    "pre": "",
+    "kw": "Change le reste",
+    "post": "",
+    "mot_surligne": "Change"
+  },
+  "promesse": {
+    "mot": "Voici",
+    "l1": "3 sweats",
+    "pre": "",
+    "kw": "version adulte",
+    "post": "",
+    "mot_surligne": "façons",
+    "sous_titre": {
+      "texte": "Sans capuche, sans logo",
+      "surligne": "sans logo",
+      "mot": "façons"
+    }
+  },
+  "intro": {
+    "mots_cartes": {
+      "1": "sweat",
+      "2": "Change",
+      "3": "autour"
+    },
+    "fin_s": 5,
+    "duree_images": 12,
+    "numeros": true
+  },
+  "tenues": [
+    {
+      "label": "Bordeaux",
+      "total": "40,00 €",
+      "mot": "Un",
+      "mot_label": "Bordeaux",
+      "image": "media/leo-sweat-adulte-1-bordeaux.jpg",
+      "rotation": "media/rotation-leo-sweat-adulte-1-bordeaux.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Bordeaux + gris foncé",
+        "surligne": "gris foncé",
+        "mot": "Bordeaux"
+      },
+      "pieces": [
+        {
+          "nom": "Sweat col rond bordeaux",
+          "enseigne": "Jules",
+          "prix": "25,00 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100676214252.html",
+          "mot": "Sweat",
+          "mot_prix": "vingt-cinq",
+          "desc_en": "plain burgundy (bordeaux) crew-neck sweatshirt, regular fit"
+        },
+        {
+          "nom": "Chino large gris foncé",
+          "enseigne": "Jules",
+          "prix": "15,00 €",
+          "zone": "bas",
+          "url": "https://www.jules.com/fr-fr/p/100648218817.html",
+          "mot": "Chino",
+          "mot_prix": "quinze",
+          "desc_en": "dark charcoal gray wide-leg chino trousers, relaxed fit, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "L'astuce",
+        "titre": {
+          "l1": "Uni,",
+          "pre": "",
+          "kw": "sans logo",
+          "post": "",
+          "mot_surligne": "logo"
+        },
+        "sous_titres": [
+          {
+            "mot": "chino",
+            "texte": "Un chino, pas un jogging",
+            "surligne": "chino",
+            "mot_surligne": "chino"
+          },
+          {
+            "mot": "brunch",
+            "texte": "Du canapé au brunch",
+            "surligne": "brunch",
+            "mot_surligne": "brunch"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Zip",
+      "total": "40,00 €",
+      "mot": "Deux",
+      "mot_label": "Zip",
+      "image": "media/leo-sweat-adulte-2-zip.jpg",
+      "rotation": "media/rotation-leo-sweat-adulte-2-zip.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Col zippé + jean loose",
+        "surligne": "jean loose",
+        "mot": "Zip"
+      },
+      "pieces": [
+        {
+          "nom": "Sweat zippé vert",
+          "enseigne": "Jules",
+          "prix": "20,00 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100717616658.html",
+          "mot": "Sweat",
+          "mot_prix": "vingt",
+          "desc_en": "dark green quarter-zip high-neck sweatshirt, plain, regular fit"
+        },
+        {
+          "nom": "Jean loose à plis",
+          "enseigne": "Jules",
+          "prix": "20,00 €",
+          "zone": "bas",
+          "url": "https://www.jules.com/fr-fr/p/100666211234.html",
+          "mot": "Jean",
+          "mot_prix": "vingt",
+          "desc_en": "medium blue wash loose-fit pleated jeans, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "La",
+        "titre": {
+          "l1": "Le col zippé",
+          "pre": "",
+          "kw": "a grandi",
+          "post": "",
+          "mot_surligne": "grandi"
+        },
+        "sous_titres": [
+          {
+            "mot": "moitié",
+            "texte": "Zip à moitié",
+            "surligne": "moitié",
+            "mot_surligne": "moitié"
+          },
+          {
+            "mot": "maille",
+            "texte": "Presque une maille",
+            "surligne": "maille",
+            "mot_surligne": "maille"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Molleton",
+      "total": "44,99 €",
+      "mot": "Trois",
+      "mot_label": "Molleton",
+      "image": "media/leo-sweat-adulte-3-molleton.jpg",
+      "rotation": "media/rotation-leo-sweat-adulte-3-molleton.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Molleton + chino écru",
+        "surligne": "chino écru",
+        "mot": "Molleton"
+      },
+      "pieces": [
+        {
+          "nom": "Sweat molleton marine",
+          "enseigne": "Jules",
+          "prix": "29,99 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100795111876.html",
+          "mot": "Sweat",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "plain dark navy blue heavy fleece crew-neck sweatshirt, regular fit"
+        },
+        {
+          "nom": "Chino large écru",
+          "enseigne": "Jules",
+          "prix": "15,00 €",
+          "zone": "bas",
+          "url": "https://www.jules.com/fr-fr/p/100648210100.html",
+          "mot": "Chino",
+          "mot_prix": "quinze",
+          "desc_en": "ecru off-white wide-leg chino trousers, relaxed fit, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "Le",
+        "titre": {
+          "l1": "Molleton",
+          "pre": "",
+          "kw": "épais",
+          "post": "",
+          "mot_surligne": "épais"
+        },
+        "sous_titres": [
+          {
+            "mot": "gondole",
+            "texte": "Il ne gondole pas",
+            "surligne": "gondole",
+            "mot_surligne": "gondole"
+          },
+          {
+            "mot": "soigné",
+            "texte": "Plus soigné",
+            "surligne": "soigné",
+            "mot_surligne": "soigné"
+          }
+        ]
+      }
+    }
+  ],
+  "mention": {
+    "mot": "Prix",
+    "l1": "Prix relevés le 13/11",
+    "l2": "hors chaussures et livraison",
+    "mot_l2": "hors"
+  },
+  "fin": {
+    "mot": "Alors",
+    "titre": {
+      "l1": "Lequel",
+      "pre": "tu ",
+      "kw": "gardes",
+      "post": " ?",
+      "mot_surligne": "gardes"
+    },
+    "sous_titre": {
+      "mot": "Réponds",
+      "texte": "Réponds 1, 2 ou 3 en commentaire",
+      "surligne": "commentaire",
+      "mot_surligne": "commentaire"
+    },
+    "mots_numeros": [
+      "un",
+      "deux",
+      "trois"
+    ]
+  },
+  "publication": {
+    "date_prevue": "2026-11-22",
+    "plateformes": [
+      "TikTok",
+      "Instagram Reels"
+    ],
+    "forme_accroche": "Arrête de faire X (variante « Garde ton X, change Y »)",
+    "meteo": "Dim 22/11 : bruine, 4 à 13 °C"
+  },
+  "mannequin": "leo"
+}

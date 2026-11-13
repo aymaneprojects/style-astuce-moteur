@@ -158,6 +158,14 @@ Petit cartouche « SA Style Astuce » en Fraunces (SA orange #D9662B sur crème)
 
 `variante` : `creme` (défaut) ou `blanc` (blanc avec ombre douce) ; `opacite` 0.5..1 ; `largeur` 120..200 px. La QA (`qa.json` → `logo`) vérifie qu'aucun bord net n'entre dans un anneau de 10 à 22 px autour du logo (donc qu'il ne masque ni Léo, ni les cartes, ni les prix, ni les sous-titres).
 
+## Pastille « 360° » (désactivée par défaut)
+
+Depuis le 13/11 (demande d'Aymane), aucune étiquette « 360° » n'est affichée sur la rotation ; la rotation elle-même reste. Pour la réactiver sur un épisode : `"pastille_360": true` dans `episode.json`.
+
+## Mannequins et voix
+
+`"mannequin": "leo"` (défaut) ou `"ines"` dans `episode.json` : `prompts` prend alors les références et le prompt de base dans `/workspace/styleastuce/<mannequin>/` (identite/maitre-visage.jpg, identite/maitre-corps.jpg, prompts.md) et accorde le texte (his/her, young man/young woman). `"chaussures_en"` (épisode ou tenue) remplace les baskets blanches par défaut dans le prompt (ex. bottines par temps de pluie). La voix vient du bloc `voix` : Benjamin `F9KUTOne5xOKqAbIU7yg` pour Léo, Koraly - Promo Video `rbFGGoDXFHtVghjHuS3E` pour Inès. `prompts` télécharge aussi la photo produit Uniqlo du coloris (`colorDisplayCode`).
+
 ## Ombre de contact (pieds posés au sol)
 
 `sa.py timeline` lit le détourage de chaque tenue (`public/leo/cut-<n>.png`) et enregistre dans `props.json` → `looks[k].pieds` le bas des semelles (dernière ligne opaque) et, pour chaque chaussure, son propre bas et sa largeur. `Episode.tsx` (`ContactShadow`) cale dessus une ombre courte et dense sous chaque chaussure, qui remonte de 4 px derrière la semelle, plus une ombre ambiante légère sur la ligne de sol. Pendant un balayage de tenue, l'ombre suit la tenue dont les pieds sont visibles ; pendant une rotation 360°, elle s'efface avec Léo (la vidéo de rotation a son propre sol).

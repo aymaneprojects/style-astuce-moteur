@@ -1,0 +1,272 @@
+{
+  "id": "ines-arrete-tout-noir",
+  "titre": "Arrête le tout noir en hiver (Inès)",
+  "date_releve": "2026-11-13",
+  "logo": {
+    "actif": true,
+    "variante": "creme",
+    "opacite": 0.8,
+    "largeur": 164
+  },
+  "script": "script.txt",
+  "voix": {
+    "fournisseur": "elevenlabs",
+    "voice_name": "Koraly - Promo Video",
+    "voice_id": "rbFGGoDXFHtVghjHuS3E",
+    "model_id": "eleven_v4",
+    "language_code": "fr",
+    "stability": 0.45,
+    "similarity_boost": 0.75,
+    "output_format": "mp3_44100_128"
+  },
+  "ouverture": 1,
+  "accroche": {
+    "l1": "Arrête",
+    "pre": "",
+    "kw": "le tout noir",
+    "post": "",
+    "mot_surligne": "noir"
+  },
+  "promesse": {
+    "mot": "Trois",
+    "l1": "3 couleurs",
+    "pre": "",
+    "kw": "qui réchauffent",
+    "post": "",
+    "mot_surligne": "réchauffent",
+    "sous_titre": {
+      "texte": "Rose, nude, vert",
+      "surligne": "nude",
+      "mot": "douces"
+    }
+  },
+  "intro": {
+    "mots_cartes": {
+      "1": "Arrête",
+      "2": "noir",
+      "3": "gris"
+    },
+    "fin_s": 5,
+    "duree_images": 12,
+    "numeros": true
+  },
+  "tenues": [
+    {
+      "label": "Rose",
+      "total": "49,80 €",
+      "mot": "Un",
+      "mot_label": "Rose",
+      "image": "media/ines-arrete-tout-noir-1-rose.jpg",
+      "rotation": "media/rotation-ines-arrete-tout-noir-1-rose.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Rose + gris clair",
+        "surligne": "gris clair",
+        "mot": "Rose"
+      },
+      "pieces": [
+        {
+          "nom": "Tee polaire rose",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "haut",
+          "url": "https://www.uniqlo.com/fr/fr/products/E470143-000/00?colorDisplayCode=10",
+          "mot": "Tee",
+          "mot_prix": "dix-neuf",
+          "desc_en": "soft pastel pink soft fleece long-sleeve crew-neck top, regular fit"
+        },
+        {
+          "nom": "Pantalon large coton gris",
+          "enseigne": "Uniqlo",
+          "prix": "29,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E487589-000/00?colorDisplayCode=07",
+          "mot": "Pantalon",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "light gray wide-leg easy cotton trousers, high waist, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "L'astuce",
+        "titre": {
+          "l1": "Rose pâle",
+          "pre": "",
+          "kw": "+ gris clair",
+          "post": "",
+          "mot_surligne": "teint"
+        },
+        "sous_titres": [
+          {
+            "mot": "polaire",
+            "texte": "La polaire remplace le pull",
+            "surligne": "remplace",
+            "mot_surligne": "remplace"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Nude",
+      "total": "49,80 €",
+      "mot": "Deux",
+      "mot_label": "Nude",
+      "image": "media/ines-arrete-tout-noir-2-nude.jpg",
+      "rotation": "media/rotation-ines-arrete-tout-noir-2-nude.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Nude de haut en bas",
+        "surligne": "haut en bas",
+        "mot": "Nude"
+      },
+      "pieces": [
+        {
+          "nom": "Pull mérinos col tunisien",
+          "enseigne": "Uniqlo",
+          "prix": "29,90 €",
+          "zone": "haut",
+          "url": "https://www.uniqlo.com/fr/fr/products/E488210-000/00?colorDisplayCode=30",
+          "mot": "Pull",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "nude beige merino wool blend sweater with henley button placket neckline, regular fit"
+        },
+        {
+          "nom": "Pantalon maille côtelée nude",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E486092-000/00?colorDisplayCode=30",
+          "mot": "Pantalon",
+          "mot_prix": "dix-neuf",
+          "desc_en": "nude beige ribbed knit straight-leg pull-on trousers, full length, soft drape"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "La",
+        "titre": {
+          "l1": "Ton sur ton,",
+          "pre": "",
+          "kw": "deux matières",
+          "post": "",
+          "mot_surligne": "matières"
+        },
+        "sous_titres": [
+          {
+            "mot": "laine",
+            "texte": "Laine en haut",
+            "surligne": "Laine",
+            "mot_surligne": "laine"
+          },
+          {
+            "mot": "cher",
+            "texte": "Et ça fait cher",
+            "surligne": "cher",
+            "mot_surligne": "cher"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Vert",
+      "total": "44,80 €",
+      "mot": "Trois",
+      "mot_label": "Vert",
+      "image": "media/ines-arrete-tout-noir-3-vert.jpg",
+      "rotation": "media/rotation-ines-arrete-tout-noir-3-vert.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Vert sauge + nude",
+        "surligne": "nude",
+        "mot": "Vert"
+      },
+      "pieces": [
+        {
+          "nom": "Col roulé chaud vert",
+          "enseigne": "Uniqlo",
+          "prix": "24,90 €",
+          "zone": "haut",
+          "url": "https://www.uniqlo.com/fr/fr/products/E471601-000/00?colorDisplayCode=55",
+          "mot": "Col",
+          "mot_prix": "vingt-quatre",
+          "desc_en": "sage green fitted fine-knit turtleneck top, long sleeves"
+        },
+        {
+          "nom": "Chino large nude",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E492171-000/00?colorDisplayCode=30",
+          "mot": "Chino",
+          "mot_prix": "dix-neuf",
+          "desc_en": "nude beige wide-leg chino trousers, high waist, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "Le",
+        "titre": {
+          "l1": "Le vert doux",
+          "pre": "",
+          "kw": "remplace le noir",
+          "post": "",
+          "mot_surligne": "noir"
+        },
+        "sous_titres": [
+          {
+            "mot": "frais",
+            "texte": "Frais en plein hiver",
+            "surligne": "Frais",
+            "mot_surligne": "frais"
+          }
+        ]
+      }
+    }
+  ],
+  "mention": {
+    "mot": "Prix",
+    "l1": "Prix relevés le 13/11",
+    "l2": "hors chaussures et livraison",
+    "mot_l2": "hors"
+  },
+  "fin": {
+    "mot": "Alors",
+    "titre": {
+      "l1": "Quelle couleur",
+      "pre": "tu ",
+      "kw": "oses",
+      "post": " ?",
+      "mot_surligne": "oses"
+    },
+    "sous_titre": {
+      "mot": "Réponds",
+      "texte": "Réponds 1, 2 ou 3 en commentaire",
+      "surligne": "commentaire",
+      "mot_surligne": "commentaire"
+    },
+    "mots_numeros": [
+      "un",
+      "deux",
+      "trois"
+    ]
+  },
+  "publication": {
+    "date_prevue": "2026-11-21",
+    "plateformes": [
+      "TikTok",
+      "Instagram Reels"
+    ],
+    "forme_accroche": "Arrête de faire X",
+    "meteo": "Sam 21/11 : averses, 5 à 12 °C"
+  },
+  "mannequin": "ines"
+}

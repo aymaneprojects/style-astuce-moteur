@@ -1,0 +1,78 @@
+{
+ "nom": "2026-11-18_26",
+ "note": "Lot du 18 au 26/11 : 9 Léo (Benjamin) + 9 Inès (Koraly), 2 vidéos par jour. Construit par lots/specs/construire.py.",
+ "episodes": [
+  {
+   "id": "leo-pluie-3-tenues",
+   "date": "2026-11-18"
+  },
+  {
+   "id": "leo-3-details-cheap",
+   "date": "2026-11-19"
+  },
+  {
+   "id": "leo-tout-noir",
+   "date": "2026-11-20"
+  },
+  {
+   "id": "leo-devine-le-prix",
+   "date": "2026-11-21"
+  },
+  {
+   "id": "leo-sweat-adulte",
+   "date": "2026-11-22"
+  },
+  {
+   "id": "leo-paraitre-plus-grand",
+   "date": "2026-11-23"
+  },
+  {
+   "id": "leo-hiver-3-tenues-chaudes",
+   "date": "2026-11-24"
+  },
+  {
+   "id": "leo-capsule-4-pieces",
+   "date": "2026-11-25"
+  },
+  {
+   "id": "leo-pull-noel-3-facons",
+   "date": "2026-11-26"
+  },
+  {
+   "id": "ines-50-euros-3-tenues",
+   "date": "2026-11-18"
+  },
+  {
+   "id": "ines-pantalon-large-mythe",
+   "date": "2026-11-19"
+  },
+  {
+   "id": "ines-rien-a-mettre-ce-soir",
+   "date": "2026-11-20"
+  },
+  {
+   "id": "ines-arrete-tout-noir",
+   "date": "2026-11-21"
+  },
+  {
+   "id": "ines-meme-pantalon-3-tenues",
+   "date": "2026-11-22"
+  },
+  {
+   "id": "ines-col-roule-ou-col-v",
+   "date": "2026-11-23"
+  },
+  {
+   "id": "ines-devine-le-prix",
+   "date": "2026-11-24"
+  },
+  {
+   "id": "ines-froid-au-bureau",
+   "date": "2026-11-25"
+  },
+  {
+   "id": "ines-capsule-4-pieces",
+   "date": "2026-11-26"
+  }
+ ]
+}

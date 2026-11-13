@@ -1,0 +1,284 @@
+{
+  "id": "leo-3-details-cheap",
+  "titre": "3 détails qui font cheap (Léo)",
+  "date_releve": "2026-11-13",
+  "logo": {
+    "actif": true,
+    "variante": "creme",
+    "opacite": 0.8,
+    "largeur": 164
+  },
+  "script": "script.txt",
+  "voix": {
+    "fournisseur": "elevenlabs",
+    "voice_name": "Benjamin",
+    "voice_id": "F9KUTOne5xOKqAbIU7yg",
+    "model_id": "eleven_v4",
+    "language_code": "fr",
+    "stability": 0.45,
+    "similarity_boost": 0.75,
+    "output_format": "mp3_44100_128"
+  },
+  "ouverture": 1,
+  "accroche": {
+    "l1": "Arrête le jean",
+    "pre": "",
+    "kw": "trop long",
+    "post": "",
+    "mot_surligne": "long"
+  },
+  "promesse": {
+    "mot": "Voici",
+    "l1": "3 détails",
+    "pre": "",
+    "kw": "qui changent tout",
+    "post": "",
+    "mot_surligne": "changent",
+    "sous_titre": {
+      "texte": "Longueur, manches, col",
+      "surligne": "manches",
+      "mot": "détails"
+    }
+  },
+  "intro": {
+    "mots_cartes": {
+      "1": "Arrête",
+      "2": "jean",
+      "3": "pluie"
+    },
+    "fin_s": 5,
+    "duree_images": 12,
+    "numeros": true
+  },
+  "tenues": [
+    {
+      "label": "Longueur",
+      "total": "44,99 €",
+      "mot": "Un",
+      "mot_label": "Longueur",
+      "image": "media/leo-3-details-cheap-1-longueur.jpg",
+      "rotation": "media/rotation-leo-3-details-cheap-1-longueur.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Le jean pile à la chaussure",
+        "surligne": "pile",
+        "mot": "Longueur"
+      },
+      "pieces": [
+        {
+          "nom": "Sweat col rond vert",
+          "enseigne": "Jules",
+          "prix": "15,00 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100566916722.html",
+          "mot": "Sweat",
+          "mot_prix": "quinze",
+          "desc_en": "plain dark forest green crew-neck sweatshirt, regular fit"
+        },
+        {
+          "nom": "Jean slim brut",
+          "enseigne": "Jules",
+          "prix": "29,99 €",
+          "zone": "bas",
+          "url": "https://www.jules.com/fr-fr/p/10090569980.html",
+          "mot": "Jean",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "dark raw indigo slim-fit jeans, unwashed, hem ending exactly on top of the shoe without stacking"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "Le",
+        "titre": {
+          "l1": "Le jean",
+          "pre": "",
+          "kw": "pile sur la chaussure",
+          "post": "",
+          "mot_surligne": "chaussure"
+        },
+        "sous_titres": [
+          {
+            "mot": "sans",
+            "texte": "Zéro pli en accordéon",
+            "surligne": "accordéon",
+            "mot_surligne": "accordéon"
+          },
+          {
+            "mot": "Trop",
+            "texte": "Trop long = flaques",
+            "surligne": "flaques",
+            "mot_surligne": "flaques"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Manches",
+      "total": "40,99 €",
+      "mot": "Deux",
+      "mot_label": "Manches",
+      "image": "media/leo-3-details-cheap-2-manches.jpg",
+      "rotation": "media/rotation-leo-3-details-cheap-2-manches.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Chemise + chino",
+        "surligne": "chino",
+        "mot": "Manches"
+      },
+      "pieces": [
+        {
+          "nom": "Chemise slim bleu clair",
+          "enseigne": "Jules",
+          "prix": "25,99 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100783411000.html",
+          "mot": "Chemise",
+          "mot_prix": "vingt-cinq",
+          "desc_en": "light sky blue slim-fit cotton shirt, long sleeves ending exactly at the wrist bone, buttoned, tucked in"
+        },
+        {
+          "nom": "Chino large gris foncé",
+          "enseigne": "Jules",
+          "prix": "15,00 €",
+          "zone": "bas",
+          "url": "https://www.jules.com/fr-fr/p/100648218817.html",
+          "mot": "Chino",
+          "mot_prix": "quinze",
+          "desc_en": "dark charcoal gray wide-leg chino trousers, relaxed fit, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "La",
+        "titre": {
+          "l1": "La manche",
+          "pre": "",
+          "kw": "au poignet",
+          "post": "",
+          "mot_surligne": "poignet"
+        },
+        "sous_titres": [
+          {
+            "mot": "jamais",
+            "texte": "Jamais sur la main",
+            "surligne": "main",
+            "mot_surligne": "main"
+          },
+          {
+            "mot": "Si",
+            "texte": "Pouce couvert ? Taille en dessous",
+            "surligne": "Taille en dessous",
+            "mot_surligne": "dessous"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Col",
+      "total": "49,99 €",
+      "mot": "Trois",
+      "mot_label": "Col",
+      "image": "media/leo-3-details-cheap-3-col.jpg",
+      "rotation": "media/rotation-leo-3-details-cheap-3-col.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Col roulé + jean loose",
+        "surligne": "Col roulé",
+        "mot": "Col"
+      },
+      "pieces": [
+        {
+          "nom": "Pull col roulé marine",
+          "enseigne": "Jules",
+          "prix": "29,99 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100868511844.html",
+          "mot": "Pull",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "dark navy blue fine-knit turtleneck sweater, regular fit"
+        },
+        {
+          "nom": "Jean loose à plis",
+          "enseigne": "Jules",
+          "prix": "20,00 €",
+          "zone": "bas",
+          "url": "https://www.jules.com/fr-fr/p/100666211234.html",
+          "mot": "Jean",
+          "mot_prix": "vingt",
+          "desc_en": "medium blue wash loose-fit pleated jeans, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "Le",
+        "titre": {
+          "l1": "Un col",
+          "pre": "",
+          "kw": "qui tient",
+          "post": "",
+          "mot_surligne": "tient"
+        },
+        "sous_titres": [
+          {
+            "mot": "droit",
+            "texte": "Bien droit = plus net",
+            "surligne": "plus net",
+            "mot_surligne": "net"
+          },
+          {
+            "mot": "chaud",
+            "texte": "Et au chaud",
+            "surligne": "chaud",
+            "mot_surligne": "chaud"
+          }
+        ]
+      }
+    }
+  ],
+  "mention": {
+    "mot": "Prix",
+    "l1": "Prix relevés le 13/11",
+    "l2": "hors chaussures et livraison",
+    "mot_l2": "hors"
+  },
+  "fin": {
+    "mot": "Alors",
+    "titre": {
+      "l1": "Quel détail",
+      "pre": "tu ",
+      "kw": "changes",
+      "post": " ?",
+      "mot_surligne": "changes"
+    },
+    "sous_titre": {
+      "mot": "Réponds",
+      "texte": "Réponds 1, 2 ou 3 en commentaire",
+      "surligne": "commentaire",
+      "mot_surligne": "commentaire"
+    },
+    "mots_numeros": [
+      "un",
+      "deux",
+      "trois"
+    ]
+  },
+  "publication": {
+    "date_prevue": "2026-11-19",
+    "plateformes": [
+      "TikTok",
+      "Instagram Reels"
+    ],
+    "forme_accroche": "Arrête de faire X",
+    "meteo": "Jeu 19/11 : averses, 8 à 14 °C"
+  },
+  "mannequin": "leo"
+}

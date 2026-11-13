@@ -1,0 +1,284 @@
+{
+  "id": "leo-paraitre-plus-grand",
+  "titre": "Paraître plus grand : 3 tenues (Léo)",
+  "date_releve": "2026-11-13",
+  "logo": {
+    "actif": true,
+    "variante": "creme",
+    "opacite": 0.8,
+    "largeur": 164
+  },
+  "script": "script.txt",
+  "voix": {
+    "fournisseur": "elevenlabs",
+    "voice_name": "Benjamin",
+    "voice_id": "F9KUTOne5xOKqAbIU7yg",
+    "model_id": "eleven_v4",
+    "language_code": "fr",
+    "stability": 0.45,
+    "similarity_boost": 0.75,
+    "output_format": "mp3_44100_128"
+  },
+  "ouverture": 1,
+  "accroche": {
+    "l1": "Pantalon large",
+    "pre": "",
+    "kw": "réservé aux grands ?",
+    "post": "",
+    "mot_surligne": "grand"
+  },
+  "promesse": {
+    "mot": "Faux",
+    "l1": "Faux.",
+    "pre": "",
+    "kw": "3 astuces",
+    "post": "",
+    "mot_surligne": "centimètres",
+    "sous_titre": {
+      "texte": "Pour gagner des centimètres",
+      "surligne": "centimètres",
+      "mot": "centimètres"
+    }
+  },
+  "intro": {
+    "mots_cartes": {
+      "1": "grand",
+      "2": "pantalon",
+      "3": "large"
+    },
+    "fin_s": 5,
+    "duree_images": 12,
+    "numeros": true
+  },
+  "tenues": [
+    {
+      "label": "Ton sur ton",
+      "total": "44,99 €",
+      "mot": "Un",
+      "mot_label": "Ton",
+      "image": "media/leo-paraitre-plus-grand-1-ton-sur-ton.jpg",
+      "rotation": "media/rotation-leo-paraitre-plus-grand-1-ton-sur-ton.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Écru de la tête aux pieds",
+        "surligne": "tête aux pieds",
+        "mot": "Ton"
+      },
+      "pieces": [
+        {
+          "nom": "Pull col roulé écru",
+          "enseigne": "Jules",
+          "prix": "29,99 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100868510117.html",
+          "mot": "Pull",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "ecru off-white fine-knit turtleneck sweater, regular fit"
+        },
+        {
+          "nom": "Chino large écru",
+          "enseigne": "Jules",
+          "prix": "15,00 €",
+          "zone": "bas",
+          "url": "https://www.jules.com/fr-fr/p/100648210100.html",
+          "mot": "Chino",
+          "mot_prix": "quinze",
+          "desc_en": "ecru off-white wide-leg chino trousers, relaxed fit, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "L'astuce",
+        "titre": {
+          "l1": "Une couleur",
+          "pre": "",
+          "kw": "du col aux chevilles",
+          "post": "",
+          "mot_surligne": "chevilles"
+        },
+        "sous_titres": [
+          {
+            "mot": "ceinture",
+            "texte": "L'œil ne coupe pas",
+            "surligne": "coupe",
+            "mot_surligne": "ceinture"
+          },
+          {
+            "mot": "longue",
+            "texte": "Silhouette plus longue",
+            "surligne": "plus longue",
+            "mot_surligne": "longue"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Cheville",
+      "total": "49,89 €",
+      "mot": "Deux",
+      "mot_label": "Cheville",
+      "image": "media/leo-paraitre-plus-grand-2-cheville.jpg",
+      "rotation": "media/rotation-leo-paraitre-plus-grand-2-cheville.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Pantalon arrêté à la cheville",
+        "surligne": "cheville",
+        "mot": "Cheville"
+      },
+      "pieces": [
+        {
+          "nom": "Pull col V marine",
+          "enseigne": "Jules",
+          "prix": "29,99 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100727711247.html",
+          "mot": "Pull",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "dark navy blue fine-knit V-neck sweater, regular fit"
+        },
+        {
+          "nom": "Pantalon 7/8 flanelle gris",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E486822-000/00?colorDisplayCode=06",
+          "mot": "Pantalon",
+          "mot_prix": "dix-neuf",
+          "desc_en": "mid gray flannel easy ankle-length (7/8) trousers, relaxed straight leg ending at the ankle"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "La",
+        "titre": {
+          "l1": "Arrêté",
+          "pre": "",
+          "kw": "à la cheville",
+          "post": "",
+          "mot_surligne": "cheville"
+        },
+        "sous_titres": [
+          {
+            "mot": "chaussure",
+            "texte": "On voit la chaussure",
+            "surligne": "chaussure",
+            "mot_surligne": "chaussure"
+          },
+          {
+            "mot": "col",
+            "texte": "Le col V allonge",
+            "surligne": "allonge",
+            "mot_surligne": "ligne"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Court",
+      "total": "35,00 €",
+      "mot": "Trois",
+      "mot_label": "Court",
+      "image": "media/leo-paraitre-plus-grand-3-court.jpg",
+      "rotation": "media/rotation-leo-paraitre-plus-grand-3-court.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Haut court + chino large",
+        "surligne": "chino large",
+        "mot": "Court"
+      },
+      "pieces": [
+        {
+          "nom": "Sweat zippé bleu clair",
+          "enseigne": "Jules",
+          "prix": "20,00 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100717611047.html",
+          "mot": "Sweat",
+          "mot_prix": "vingt",
+          "desc_en": "pale gray-blue quarter-zip high-neck sweatshirt, plain, regular fit, ending at the belt line"
+        },
+        {
+          "nom": "Chino large gris foncé",
+          "enseigne": "Jules",
+          "prix": "15,00 €",
+          "zone": "bas",
+          "url": "https://www.jules.com/fr-fr/p/100648218817.html",
+          "mot": "Chino",
+          "mot_prix": "quinze",
+          "desc_en": "dark charcoal gray wide-leg chino trousers, relaxed fit, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "Le",
+        "titre": {
+          "l1": "Haut court",
+          "pre": "",
+          "kw": "= jambes longues",
+          "post": "",
+          "mot_surligne": "jambes"
+        },
+        "sous_titres": [
+          {
+            "mot": "jamais",
+            "texte": "Jamais plus bas",
+            "surligne": "plus bas",
+            "mot_surligne": "bas"
+          },
+          {
+            "mot": "tasse",
+            "texte": "Le large ne tasse plus",
+            "surligne": "tasse",
+            "mot_surligne": "tasse"
+          }
+        ]
+      }
+    }
+  ],
+  "mention": {
+    "mot": "Prix",
+    "l1": "Prix relevés le 13/11",
+    "l2": "hors chaussures et livraison",
+    "mot_l2": "hors"
+  },
+  "fin": {
+    "mot": "Alors",
+    "titre": {
+      "l1": "Laquelle",
+      "pre": "te ",
+      "kw": "grandit",
+      "post": " ?",
+      "mot_surligne": "grandit"
+    },
+    "sous_titre": {
+      "mot": "Réponds",
+      "texte": "Réponds 1, 2 ou 3 en commentaire",
+      "surligne": "commentaire",
+      "mot_surligne": "commentaire"
+    },
+    "mots_numeros": [
+      "un",
+      "deux",
+      "trois"
+    ]
+  },
+  "publication": {
+    "date_prevue": "2026-11-23",
+    "plateformes": [
+      "TikTok",
+      "Instagram Reels"
+    ],
+    "forme_accroche": "Mythe ? Faux.",
+    "meteo": "Lun 23/11 : bruine et vent, 6 à 12 °C"
+  },
+  "mannequin": "leo"
+}

@@ -319,6 +319,7 @@ const LookTags: React.FC<{f: number}> = ({f}) => {
 };
 
 // ---------- Rotation à 360° pendant l'astuce ----------
+// pastille « 360° » sur la rotation : désactivée par défaut (demande d'Aymane du 13/11), réactivable avec "pastille_360": true dans episode.json
 const Rotation: React.FC<{f: number; k: number}> = ({f, k}) => {
   const {rot0: r0, rot1: r1} = L[k];
   const p = interpolate(f, [r0, r0 + 12], [0, 1], {...clamp, easing: io});
@@ -335,8 +336,8 @@ const Rotation: React.FC<{f: number; k: number}> = ({f, k}) => {
     <div style={{position: 'absolute', left: CX - w / 2, top, width: w, height: h, borderRadius: 34, overflow: 'hidden', opacity: Math.min(1, kk * 2.5),
       boxShadow: '0 30px 70px rgba(120,70,40,.28)', outline: '6px solid #fff'}}>
       <OffthreadVideo src={staticFile(L[k].rotSrc)} muted playbackRate={rate} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
-      <div style={{position: 'absolute', right: 18, top: 18, background: ORANGE, color: '#fff', borderRadius: 999, padding: '6px 18px',
-        fontFamily: 'Inter', fontWeight: 800, fontSize: 34, scale: String(chip)}}>360°</div>
+      {T.pastille360 ? <div style={{position: 'absolute', right: 18, top: 18, background: ORANGE, color: '#fff', borderRadius: 999, padding: '6px 18px',
+        fontFamily: 'Inter', fontWeight: 800, fontSize: 34, scale: String(chip)}}>360°</div> : null}
     </div>
   );
 };

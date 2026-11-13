@@ -1,0 +1,285 @@
+{
+  "id": "leo-pluie-3-tenues",
+  "titre": "Pluie : 3 tenues qui tiennent (Léo)",
+  "date_releve": "2026-11-13",
+  "logo": {
+    "actif": true,
+    "variante": "creme",
+    "opacite": 0.8,
+    "largeur": 164
+  },
+  "script": "script.txt",
+  "voix": {
+    "fournisseur": "elevenlabs",
+    "voice_name": "Benjamin",
+    "voice_id": "F9KUTOne5xOKqAbIU7yg",
+    "model_id": "eleven_v4",
+    "language_code": "fr",
+    "stability": 0.45,
+    "similarity_boost": 0.75,
+    "output_format": "mp3_44100_128"
+  },
+  "ouverture": 1,
+  "accroche": {
+    "l1": "Il pleut ?",
+    "pre": "",
+    "kw": "Zéro sac poubelle",
+    "post": "",
+    "mot_surligne": "poubelle"
+  },
+  "promesse": {
+    "mot": "Trois",
+    "l1": "3 tenues",
+    "pre": "",
+    "kw": "anti-averses",
+    "post": "",
+    "mot_surligne": "averses",
+    "sous_titre": {
+      "texte": "Et tu restes stylé",
+      "surligne": "stylé",
+      "mot": "style"
+    }
+  },
+  "intro": {
+    "mots_cartes": {
+      "1": "pleut",
+      "2": "sac",
+      "3": "poubelle"
+    },
+    "fin_s": 5,
+    "duree_images": 12,
+    "numeros": true
+  },
+  "tenues": [
+    {
+      "label": "Parka",
+      "total": "45,00 €",
+      "mot": "Un",
+      "mot_label": "Parka",
+      "image": "media/leo-pluie-3-tenues-1-parka.jpg",
+      "rotation": "media/rotation-leo-pluie-3-tenues-1-parka.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Parka + chino foncé",
+        "surligne": "chino foncé",
+        "mot": "Parka"
+      },
+      "pieces": [
+        {
+          "nom": "Parka courte imperméable",
+          "enseigne": "Jules",
+          "prix": "30,00 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100712116101.html",
+          "mot": "Parka",
+          "mot_prix": "trente",
+          "desc_en": "olive khaki green short waterproof hooded parka jacket, matte nylon, zipped up to the chin, hood down, hip length"
+        },
+        {
+          "nom": "Chino large gris foncé",
+          "enseigne": "Jules",
+          "prix": "15,00 €",
+          "zone": "bas",
+          "url": "https://www.jules.com/fr-fr/p/100648218817.html",
+          "mot": "Chino",
+          "mot_prix": "quinze",
+          "desc_en": "dark charcoal gray wide-leg chino trousers, relaxed fit, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "L'astuce",
+        "titre": {
+          "l1": "Zippée",
+          "pre": "",
+          "kw": "jusqu'en haut",
+          "post": "",
+          "mot_surligne": "haut"
+        },
+        "sous_titres": [
+          {
+            "mot": "basique",
+            "texte": "Un tee basique dessous",
+            "surligne": "tee basique",
+            "mot_surligne": "basique"
+          },
+          {
+            "mot": "foncé",
+            "texte": "Foncé = éclaboussures cachées",
+            "surligne": "éclaboussures",
+            "mot_surligne": "éclaboussures"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Surchemise",
+      "total": "49,99 €",
+      "mot": "Deux",
+      "mot_label": "Surchemise",
+      "image": "media/leo-pluie-3-tenues-2-surchemise.jpg",
+      "rotation": "media/rotation-leo-pluie-3-tenues-2-surchemise.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Surchemise + jean brut",
+        "surligne": "jean brut",
+        "mot": "Surchemise"
+      },
+      "pieces": [
+        {
+          "nom": "Surchemise mi-saison noire",
+          "enseigne": "Jules",
+          "prix": "20,00 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100658718000.html",
+          "mot": "Surchemise",
+          "mot_prix": "vingt",
+          "desc_en": "black cotton overshirt (shirt jacket), buttoned up, worn as the only top layer, regular fit"
+        },
+        {
+          "nom": "Jean straight brut",
+          "enseigne": "Jules",
+          "prix": "29,99 €",
+          "zone": "bas",
+          "url": "https://www.jules.com/fr-fr/p/10055149980.html",
+          "mot": "Jean",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "dark raw indigo straight-leg jeans, unwashed, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "La",
+        "titre": {
+          "l1": "Doux et pluie ?",
+          "pre": "",
+          "kw": "Surchemise",
+          "post": "",
+          "mot_surligne": "remplace"
+        },
+        "sous_titres": [
+          {
+            "mot": "Boutonnée",
+            "texte": "Boutonnée jusqu'en haut",
+            "surligne": "jusqu'en haut",
+            "mot_surligne": "haut"
+          },
+          {
+            "mot": "comme",
+            "texte": "Comme une chemise épaisse",
+            "surligne": "chemise épaisse",
+            "mot_surligne": "épaisse"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Zip",
+      "total": "45,99 €",
+      "mot": "Trois",
+      "mot_label": "Zip",
+      "image": "media/leo-pluie-3-tenues-3-zip.jpg",
+      "rotation": "media/rotation-leo-pluie-3-tenues-3-zip.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Col montant + jogging",
+        "surligne": "jogging",
+        "mot": "Zip"
+      },
+      "pieces": [
+        {
+          "nom": "Sweat zippé beige",
+          "enseigne": "Jules",
+          "prix": "20,00 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100717610446.html",
+          "mot": "Sweat",
+          "mot_prix": "vingt",
+          "desc_en": "beige sand quarter-zip high-neck sweatshirt, plain, regular fit"
+        },
+        {
+          "nom": "Jogging straight noir",
+          "enseigne": "Jules",
+          "prix": "25,99 €",
+          "zone": "bas",
+          "url": "https://www.jules.com/fr-fr/p/100803718000.html",
+          "mot": "Jogging",
+          "mot_prix": "vingt-cinq",
+          "desc_en": "black straight-leg jogger trousers with slightly tapered hem, smart look, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "Le",
+        "titre": {
+          "l1": "Le col montant",
+          "pre": "",
+          "kw": "coupe le vent",
+          "post": "",
+          "mot_surligne": "vent"
+        },
+        "sous_titres": [
+          {
+            "mot": "jogging",
+            "texte": "Bas resserré",
+            "surligne": "resserré",
+            "mot_surligne": "resserré"
+          },
+          {
+            "mot": "traîne",
+            "texte": "Zéro ourlet mouillé",
+            "surligne": "mouillé",
+            "mot_surligne": "flaques"
+          }
+        ]
+      }
+    }
+  ],
+  "mention": {
+    "mot": "Prix",
+    "l1": "Prix relevés le 13/11",
+    "l2": "hors chaussures et livraison",
+    "mot_l2": "hors"
+  },
+  "fin": {
+    "mot": "Alors",
+    "titre": {
+      "l1": "Laquelle",
+      "pre": "tu ",
+      "kw": "mets",
+      "post": " ?",
+      "mot_surligne": "mets"
+    },
+    "sous_titre": {
+      "mot": "Réponds",
+      "texte": "Réponds 1, 2 ou 3 en commentaire",
+      "surligne": "commentaire",
+      "mot_surligne": "commentaire"
+    },
+    "mots_numeros": [
+      "un",
+      "deux",
+      "trois"
+    ]
+  },
+  "publication": {
+    "date_prevue": "2026-11-18",
+    "plateformes": [
+      "TikTok",
+      "Instagram Reels"
+    ],
+    "forme_accroche": "Sensation du quotidien en question",
+    "meteo": "Mer 18/11 : doux (10 à 15 °C), averses et vent, fortes pluies dans le Sud-Ouest"
+  },
+  "mannequin": "leo",
+  "chaussures_en": "Plain dark brown leather lace-up ankle boots without logo"
+}

@@ -1,0 +1,278 @@
+{
+  "id": "leo-tout-noir",
+  "titre": "Tout en noir : classe ou triste ? (Léo)",
+  "date_releve": "2026-11-13",
+  "logo": {
+    "actif": true,
+    "variante": "creme",
+    "opacite": 0.8,
+    "largeur": 164
+  },
+  "script": "script.txt",
+  "voix": {
+    "fournisseur": "elevenlabs",
+    "voice_name": "Benjamin",
+    "voice_id": "F9KUTOne5xOKqAbIU7yg",
+    "model_id": "eleven_v4",
+    "language_code": "fr",
+    "stability": 0.45,
+    "similarity_boost": 0.75,
+    "output_format": "mp3_44100_128"
+  },
+  "ouverture": 2,
+  "accroche": {
+    "l1": "Tout en noir :",
+    "pre": "",
+    "kw": "classe ou triste ?",
+    "post": "",
+    "mot_surligne": "triste"
+  },
+  "promesse": {
+    "mot": "Trois",
+    "l1": "Le noir",
+    "pre": "",
+    "kw": "sans faire triste",
+    "post": "",
+    "mot_surligne": "prouver",
+    "sous_titre": {
+      "texte": "Tout se joue sur la matière",
+      "surligne": "matière",
+      "mot": "prouver"
+    }
+  },
+  "intro": {
+    "mots_cartes": {
+      "1": "noir",
+      "2": "classe",
+      "3": "triste"
+    },
+    "fin_s": 5,
+    "duree_images": 12,
+    "numeros": true
+  },
+  "tenues": [
+    {
+      "label": "Smart",
+      "total": "45,89 €",
+      "mot": "Un",
+      "mot_label": "Smart",
+      "image": "media/leo-tout-noir-1-smart.jpg",
+      "rotation": "media/rotation-leo-tout-noir-1-smart.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Chemise noire + flanelle",
+        "surligne": "flanelle",
+        "mot": "Smart"
+      },
+      "pieces": [
+        {
+          "nom": "Chemise slim noire",
+          "enseigne": "Jules",
+          "prix": "25,99 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100783418000.html",
+          "mot": "Chemise",
+          "mot_prix": "vingt-cinq",
+          "desc_en": "plain black slim-fit cotton shirt, long sleeves, buttoned, tucked into the trousers"
+        },
+        {
+          "nom": "Pantalon 7/8 flanelle noir",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E486822-000/00?colorDisplayCode=09",
+          "mot": "Pantalon",
+          "mot_prix": "dix-neuf",
+          "desc_en": "black flannel easy ankle-length (7/8) trousers, relaxed straight leg ending at the ankle"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "L'astuce",
+        "titre": {
+          "l1": "Mélange",
+          "pre": "",
+          "kw": "les matières",
+          "post": "",
+          "mot_surligne": "matières"
+        },
+        "sous_titres": [
+          {
+            "mot": "lisse",
+            "texte": "Lisse en haut",
+            "surligne": "Lisse",
+            "mot_surligne": "lisse"
+          },
+          {
+            "mot": "flanelle",
+            "texte": "Flanelle en bas",
+            "surligne": "Flanelle",
+            "mot_surligne": "flanelle"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Cosy",
+      "total": "49,89 €",
+      "mot": "Deux",
+      "mot_label": "Cosy",
+      "image": "media/leo-tout-noir-2-cosy.jpg",
+      "rotation": "media/rotation-leo-tout-noir-2-cosy.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Col roulé + même flanelle",
+        "surligne": "même flanelle",
+        "mot": "Cosy"
+      },
+      "pieces": [
+        {
+          "nom": "Pull col roulé noir",
+          "enseigne": "Jules",
+          "prix": "29,99 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100868518005.html",
+          "mot": "Pull",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "plain black fine-knit turtleneck sweater, regular fit"
+        },
+        {
+          "nom": "Pantalon 7/8 flanelle noir",
+          "enseigne": "Uniqlo",
+          "prix": "19,90 €",
+          "zone": "bas",
+          "url": "https://www.uniqlo.com/fr/fr/products/E486822-000/00?colorDisplayCode=09",
+          "mot": "pantalon",
+          "mot_prix": "dix-neuf",
+          "desc_en": "black flannel easy ankle-length (7/8) trousers, relaxed straight leg ending at the ankle"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "La",
+        "titre": {
+          "l1": "La maille",
+          "pre": "",
+          "kw": "capte la lumière",
+          "post": "",
+          "mot_surligne": "lumière"
+        },
+        "sous_titres": [
+          {
+            "mot": "encadre",
+            "texte": "Le col encadre le visage",
+            "surligne": "visage",
+            "mot_surligne": "visage"
+          },
+          {
+            "mot": "cheville",
+            "texte": "Arrêté à la cheville",
+            "surligne": "cheville",
+            "mot_surligne": "cheville"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Contraste",
+      "total": "44,99 €",
+      "mot": "Trois",
+      "mot_label": "Contraste",
+      "image": "media/leo-tout-noir-3-contraste.jpg",
+      "rotation": "media/rotation-leo-tout-noir-3-contraste.mp4",
+      "coupe": {
+        "ourlet_y": "auto",
+        "chaussures_y": 1640
+      },
+      "sous_titre": {
+        "texte": "Noir en haut, écru en bas",
+        "surligne": "écru",
+        "mot": "Contraste"
+      },
+      "pieces": [
+        {
+          "nom": "Sweat molleton noir",
+          "enseigne": "Jules",
+          "prix": "29,99 €",
+          "zone": "haut",
+          "url": "https://www.jules.com/fr-fr/p/100795118000.html",
+          "mot": "Sweat",
+          "mot_prix": "vingt-neuf",
+          "desc_en": "plain black heavy fleece crew-neck sweatshirt, regular fit"
+        },
+        {
+          "nom": "Chino large écru",
+          "enseigne": "Jules",
+          "prix": "15,00 €",
+          "zone": "bas",
+          "url": "https://www.jules.com/fr-fr/p/100648210100.html",
+          "mot": "Chino",
+          "mot_prix": "quinze",
+          "desc_en": "ecru off-white wide-leg chino trousers, relaxed fit, full length"
+        }
+      ],
+      "mot_total": "Total",
+      "astuce": {
+        "mot": "Le",
+        "titre": {
+          "l1": "Noir en haut,",
+          "pre": "",
+          "kw": "clair",
+          "post": " en bas",
+          "mot_surligne": "éclaire"
+        },
+        "sous_titres": [
+          {
+            "mot": "contraste",
+            "texte": "Plus vivant",
+            "surligne": "vivant",
+            "mot_surligne": "vivant"
+          }
+        ]
+      }
+    }
+  ],
+  "mention": {
+    "mot": "Prix",
+    "l1": "Prix relevés le 13/11",
+    "l2": "hors chaussures et livraison",
+    "mot_l2": "hors"
+  },
+  "fin": {
+    "mot": "Alors",
+    "titre": {
+      "l1": "Classe ou triste",
+      "pre": "tu ",
+      "kw": "votes",
+      "post": " ?",
+      "mot_surligne": "votes"
+    },
+    "sous_titre": {
+      "mot": "Réponds",
+      "texte": "Réponds 1, 2 ou 3 en commentaire",
+      "surligne": "commentaire",
+      "mot_surligne": "commentaire"
+    },
+    "mots_numeros": [
+      "un",
+      "deux",
+      "trois"
+    ]
+  },
+  "publication": {
+    "date_prevue": "2026-11-20",
+    "plateformes": [
+      "TikTok",
+      "Instagram Reels"
+    ],
+    "forme_accroche": "A ou B ?",
+    "meteo": "Ven 20/11 : pluie (jusqu’à 11 mm à Paris), 7 à 12 °C"
+  },
+  "mannequin": "leo"
+}

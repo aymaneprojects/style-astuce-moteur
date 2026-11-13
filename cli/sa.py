@@ -216,7 +216,9 @@ def cmd_timeline(ep, a, W=None, sortie=None):
             lk['rotSrc'] = f'rot-{k + 1}.mp4'; info = json.load(open(ep.pub / f'rot-{k + 1}.json')) if (ep.pub / f'rot-{k + 1}.json').exists() else {'frames': 181, 'ar': 1920 / 1080}
             lk['rotFrames'] = info['frames']; lk['rotAR'] = info['ar']
         else: lk['rotSrc'] = None
-        lk['pieds'] = pieds_detoure(ep.pub / 'leo' / f'cut-{k + 1}.png')
+        cut_ = ep.pub / 'leo' / f'cut-{k + 1}.png'
+        if not cut_.exists() and sortie is None: stop(f'détourage absent : {cut_} (lancer « vignettes »)')
+        lk['pieds'] = pieds_detoure(cut_) if cut_.exists() else None   # phase 1 (verifier) : pas encore de détourage
         looks.append(lk); data.append(dict(key=str(k + 1), label=t['label'], total=t['total'], pieces=pd))
         sl = t['sous_titre']; subs.append([a_, sl['texte'], sl.get('surligne'), F(idx(sl['mot'], s0)) if sl.get('surligne') else None])
         for s_ in t.get('sous_titres', []):   # pastilles en plus avant les pièces (rythme : un événement par seconde au moins)
@@ -255,7 +257,7 @@ def cmd_timeline(ep, a, W=None, sortie=None):
     log('intro : cartes ' + ', '.join(f"{k + 1}@{t_ / FPS:.2f}s" for k, t_ in enumerate(ats)) + f' ; posées avant {fin / FPS:.2f} s')
     props = dict(fps=FPS, total=math.ceil((W[-1]['e'] + 1.6) * FPS), openLook=E['ouverture'], looks=looks, looksData=data, titles=titles, subs=subs,
                  promise=F(i_prom), mention=F(i_ment), hors=F(idx(M['mot_l2'], i_ment)), mentionL1=M['l1'], mentionL2=M['l2'],
-                 end=F(i_fin), reponds=F(ir), nums=nums, intro=intro, audio='mix.wav', logo=logo_props(E))
+                 end=F(i_fin), reponds=F(ir), nums=nums, intro=intro, audio='mix.wav', logo=logo_props(E), pastille360=bool(E.get('pastille_360', False)))
     sortie = sortie or ep.out / 'props.json'
     json.dump({'data': props}, open(sortie, 'w'), ensure_ascii=False, indent=1)
     log(f"timeline : {props['total']} images ({props['total'] / FPS:.1f} s) ->", sortie)
@@ -632,17 +634,23 @@ def cmd_verifier(ep, a):
 
 # ------------------------------------------------------------------ prompts (images Léo + rotations, à passer à GenerateImage / GenerateVideo)
 LEO = MOTEUR.parent / 'leo'
-def bloc_prompt_base():
-    t = (LEO / 'prompts.md').read_text(encoding='utf-8')
+MANNEQUINS = {'leo': dict(dir=MOTEUR.parent / 'leo', nom='Léo', pr='his', pr2='he', qui='young man'),
+              'ines': dict(dir=MOTEUR.parent / 'ines', nom='Inès', pr='her', pr2='she', qui='young woman')}
+def mannequin(E):
+    m = E.get('mannequin', 'leo')
+    if m not in MANNEQUINS: stop(f'mannequin inconnu : {m} ({", ".join(MANNEQUINS)})')
+    return MANNEQUINS[m]
+def bloc_prompt_base(M=None):
+    t = ((M or MANNEQUINS['leo'])['dir'] / 'prompts.md').read_text(encoding='utf-8')
     m = re.search(r'## 1\..*?```\n(.*?)```', t, re.S)
     return m.group(1).strip() if m else ''
 def cmd_prompts(ep, a):
-    base = bloc_prompt_base(); E = ep.E; (ep.media / 'produits').mkdir(exist_ok=True); L_ = []
+    E = ep.E; M = mannequin(E); base = bloc_prompt_base(M); (ep.media / 'produits').mkdir(exist_ok=True); L_ = []
     L_.append(f"# Prompts de génération : {E['titre']}\n\nFichier produit par `sa.py prompts` le {datetime.date.today():%d/%m/%Y}. PAYANT : rien n'est généré sans le oui d'Aymane.\n"
               "Images : GenerateImage, `aspect_ratio` 9:16, références dans l'ordre indiqué. Rotations : GenerateVideo à partir de l'image validée (clip 6 s, vertical).\n"
-              "Relire chaque image (visage de Léo, couleur et coupe des pièces, aucun logo) avant de lancer sa rotation. Déposer les fichiers aux chemins indiqués, puis `sa.py vignettes` et régler `coupe`.\n")
+              f"Relire chaque image (visage de {M['nom']}, couleur et coupe des pièces, aucun logo) avant de lancer sa rotation. Déposer les fichiers aux chemins indiqués, puis `sa.py vignettes` et régler `coupe`.\n")
     for k, t in enumerate(E['tenues'], 1):
-        refs = [str(LEO / 'identite' / 'maitre-visage.jpg'), str(LEO / 'identite' / 'maitre-corps.jpg')]
+        refs = [str(M['dir'] / 'identite' / 'maitre-visage.jpg'), str(M['dir'] / 'identite' / 'maitre-corps.jpg')]
         for j, pc in enumerate(t['pieces'], 1):
             dst = ep.media / 'produits' / f'{k}-{j}-{pc["zone"]}.jpg'
             if not dst.exists() and 'jules.com' in pc['url'] and not a.sans_reseau:
@@ -651,18 +659,23 @@ def cmd_prompts(ep, a):
                     im = re.search(r'<meta property="og:image" content="([^"]+)"', h)
                     if im: dst.write_bytes(lire_url(urllib.request.Request(html_unescape(im.group(1)), headers={'User-Agent': UA})))
                 except Exception as e: log('photo produit non téléchargée :', pc['nom'], type(e).__name__)
+            if not dst.exists() and 'uniqlo.com' in pc['url'] and not a.sans_reseau:
+                try:
+                    pid = re.search(r'/products/E(\d+)-', pc['url']).group(1); col = (re.search(r'colorDisplayCode=(\d+)', pc['url']) or [None, '09'])[1]
+                    dst.write_bytes(lire_url(urllib.request.Request(f'https://image.uniqlo.com/UQ/ST3/eu/imagesgoods/{pid}/item/eugoods_{col}_{pid}_3x4.jpg', headers={'User-Agent': UA})))
+                except Exception as e: log('photo produit Uniqlo non téléchargée :', pc['nom'], type(e).__name__)
             if dst.exists(): refs.append(str(dst))
         tenue = '; '.join(('top: ' if pc['zone'] == 'haut' else 'bottom: ') + (pc.get('desc_en') or pc['nom']) for pc in t['pieces'])
-        bloc = (f"CHANGE ONLY HIS CLOTHES. Outfit: {tenue}. Plain clean white low-top sneakers without logo. No jewelry, no hat, no glasses. "
+        bloc = (f"CHANGE ONLY {M['pr'].upper()} CLOTHES. Outfit: {tenue}. {t.get('chaussures_en') or E.get('chaussures_en') or 'Plain clean white low-top sneakers without logo'}. No jewelry, no hat, no glasses. "
                 "The garments must match the product photos in the references: same color, same cut, same fabric look. No logo, no text, no brand label anywhere.")
-        pose = ("Pose: standing straight, full body visible from hair to shoes, facing the camera almost front-on, arms relaxed at his sides, calm neutral expression "
+        pose = (f"Pose: standing straight, full body visible from hair to shoes, facing the camera almost front-on, arms relaxed at {M['pr']} sides, calm neutral expression "
                 "with a very slight closed-mouth smile. Framing: centered, generous empty space above the head and below the shoes.")
         prompt = base.replace('[TENUE]', bloc).replace('[POSE ET CADRAGE]', pose) if base else bloc + '\n' + pose
         L_.append(f"\n## Tenue {k} : {t['label']} ({t['total']})\n\n### Image -> `{ep.dir.name}/{t['image']}`\n\nRéférences :\n" + '\n'.join(f'- `{r}`' for r in refs) +
                   "\n\n(Recadrer toute photo produit qui montre un logo ou un texte avant de la passer.)\n\n```\n" + prompt + "\n```\n")
         if t.get('rotation'):
             L_.append(f"### Rotation 360° -> `{ep.dir.name}/{t['rotation']}`\n\nImage de départ : l'image validée ci-dessus.\n\n```\n"
-                      "The same young man, same outfit, same light gray studio, slowly turns a full 360 degrees in place like a fashion mannequin on a turntable, "
+                      f"The same {M['qui']}, same outfit, same light gray studio, slowly turns a full 360 degrees in place like a fashion mannequin on a turntable, "
                       "at a constant speed, arms relaxed, feet staying on the same spot, ending facing the camera again. Static camera, no zoom, no cut, "
                       "full body always in frame with space above the head and below the shoes. No text, no logo.\n```\n")
     (ep.media / 'prompts.md').write_text(''.join(L_), encoding='utf-8')
