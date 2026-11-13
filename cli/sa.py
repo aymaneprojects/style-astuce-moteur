@@ -306,19 +306,38 @@ def seg_vetements(src, cache):
     o = s.inner_session.run(None, s.normalize(im, (0.485, 0.456, 0.406), (0.229, 0.224, 0.225), (768, 768)))
     pm = Image.fromarray(np.argmax(o[0], axis=1)[0].astype(np.uint8)).resize((1080, 1920), Image.NEAREST); pm.save(cache)
     return np.array(pm)
+def chaussures_fantomes(img):
+    """Vrai si le bas de la silhouette (110 px : les chaussures) est surtout semi-transparent (détourage raté sur fond clair)."""
+    a = np.asarray(img.convert('RGBA'))[..., 3]; rows = np.where((a > 30).sum(1) > 3)[0]
+    if not len(rows): return True
+    reg = a[rows.max() - 110:rows.max() + 1]; op = int((reg > 200).sum()); semi = int(((reg > 30) & (reg <= 200)).sum())
+    return semi > 0.35 * op or op < 12000
+
+
 def cmd_vignettes(ep, a):
     from PIL import Image, ImageFilter
     from scipy import ndimage
     (ep.pub / 'leo').mkdir(exist_ok=True); (ep.pub / 'produits').mkdir(exist_ok=True); (ep.pub / 'fonts').mkdir(exist_ok=True)
     for f in (MOTEUR / 'fonts').glob('*.ttf'): shutil.copy(f, ep.pub / 'fonts' / f.name)
-    sess = None
+    sess = {}
+    def session(nom):
+        from rembg import new_session
+        if nom not in sess: sess[nom] = new_session(nom)
+        return sess[nom]
     for k, t in enumerate(ep.E['tenues'], 1):
         cut_p = ep.pub / 'leo' / f'cut-{k}.png'
         if not cut_p.exists() or a.refaire:
-            if sess is None:
-                from rembg import remove, new_session; sess = new_session('isnet-general-use')
+            from rembg import remove
             im = Image.open(ep.p(t['image'])).convert('RGB').resize((1080, 1920), Image.LANCZOS).filter(ImageFilter.UnsharpMask(radius=1.6, percent=70, threshold=2))
-            remove(im, session=sess).save(cut_p)
+            modele = t.get('coupe', {}).get('detourage', 'isnet-general-use')
+            o = remove(im, session=session(modele))
+            if chaussures_fantomes(o) and 'detourage' not in t.get('coupe', {}):
+                # baskets blanches sur fond clair : isnet les rend à moitié transparentes ; BiRefNet les garde opaques
+                log(f'tenue {k} : chaussures semi-transparentes au détourage, nouvel essai avec birefnet-general-lite')
+                import gc; sess.clear(); gc.collect()   # libère isnet : BiRefNet demande environ 6 Go
+                o = remove(im, session=session('birefnet-general-lite'))
+            o.save(cut_p)
+        if chaussures_fantomes(Image.open(cut_p)): log(f'ATTENTION : tenue {k} : chaussures semi-transparentes dans {cut_p.name} (relancer vignettes --refaire ou fixer coupe.detourage)')
         C = t.get('coupe', {}); SHOE = C.get('chaussures_y', 1590)
         im = np.array(Image.open(cut_p).convert('RGBA')).astype(float); brut = im.copy()
         HEM = C.get('ourlet_y', 890)
@@ -493,6 +512,17 @@ def cmd_qa(ep, a):
         a_ = LS[bi]['a']; wipe = min(1, max(0, (fi - a_ - 4) / 14))
         if 0 < wipe < 1: return None   # balayage en cours : contrôlé par la règle de bascule (voir Episode.tsx)
         return bi + 1 if wipe >= 1 else (P['openLook'] if bi == 0 else bi)
+    from PIL import Image as _Im
+    ref = {}   # par tenue et chaussure : la chaussure attendue (détourage réduit à l'échelle) pour reconnaître une chaussure masquée
+    def chaussure_ref(k, c):
+        if (k, c['x0']) not in ref:
+            im = _Im.open(ep.out / 'public' / 'leo' / f'cut-{k}.png').convert('RGBA'); y0 = c['y'] - 40
+            pc = im.crop((c['x0'], y0, c['x1'] + 1, c['y'] + 1)); w, h = max(1, round(pc.width * Sc)), max(1, round(pc.height * Sc))
+            pc = np.asarray(pc.resize((w, h), _Im.LANCZOS)).astype(float)
+            lum = 16 + 219 * (pc[..., :3] @ [0.299, 0.587, 0.114]) / 255
+            ref[(k, c['x0'])] = (int(round(LT + y0 * Sc)), int(round(LL + c['x0'] * Sc)), lum, pc[..., 3] > 200)
+        return ref[(k, c['x0'])]
+    masquees = 0
     for i, f in enumerate(fr):
         fi = round(i * FPS / 10); k = cle_vue(fi)
         if k is None or k > len(LS) or not LS[k - 1].get('pieds'): continue
@@ -500,12 +530,16 @@ def cmd_qa(ep, a):
         for c in LS[k - 1]['pieds']['chaussures']:
             ys = int(round(LT + (c['y'] + 1) * Sc)); x0 = int(LL + c['x0'] * Sc) + 6; x1 = int(LL + c['x1'] * Sc) - 6
             if x1 <= x0: continue
+            # chaussure recouverte par une carte ou une vignette (ou en fondu) : rien à mesurer sur cette image
+            ry, rx, lum, m = chaussure_ref(k, c); zone = f[ry:ry + lum.shape[0], rx:rx + lum.shape[1]]
+            if zone.shape == lum.shape and m.sum() > 20 and np.abs(zone[m] - lum[m]).mean() > 30:
+                masquees += 1; continue
             g = 0
             while g < 20 and fond[ys + g] - f[ys + g, x0:x1].mean() < 10: g += 1
             gaps.append(g)
             if g > worst[0]: worst = (g, round(i / 10, 1))
     R['ombre_contact'] = dict(ecart_max_px=worst[0], instant_s=worst[1], mesures=len(gaps), seuil_px=4,
-                              au_dela_seuil=int(sum(1 for g in gaps if g > 4)))
+                              au_dela_seuil=int(sum(1 for g in gaps if g > 4)), chaussures_masquees=masquees)
     # événements informatifs (bloc de 60 px qui change) et passages figés
     sm = fr[:, ::4, ::4].astype(float); d = np.abs(np.diff(sm, axis=0)); B = 15
     blk = d[:, :480 // B * B, :270 // B * B].reshape(len(d), 480 // B, B, 270 // B, B).mean(axis=(2, 4)).max(axis=(1, 2))
@@ -517,12 +551,21 @@ def cmd_qa(ep, a):
     if not a.sans_whisper:
         from faster_whisper import WhisperModel
         au = lire_audio(V, 16000); m = WhisperModel('small', device='cpu', compute_type='int8', cpu_threads=4)
-        seg, _ = m.transcribe(au, language='fr', beam_size=5, word_timestamps=True); ws = [(w.word.strip(), w.start) for s in seg for w in s.words]
+        seg, _ = m.transcribe(au, language='fr', beam_size=5, word_timestamps=True, condition_on_previous_text=False); ws = [(w.word.strip(), w.start) for s in seg for w in s.words]
+        # seuls les mots qui sont des nombres comptent (chiffres ou nombres en lettres) : un « Total » voisin n'est pas un prix
+        NB = set(UNITES + list(DIZ.values()) + 'dix-sept dix-huit dix-neuf cent cents quatre-vingt quatre-vingts euro euros'.split())
+        def est_nombre(m_):
+            m_ = ''.join(ch for ch in m_.lower() if ch.isalnum() or ch in '-, ')
+            return any(ch.isdigit() for ch in m_) or any(p in NB for p in m_.replace('-', ' ').split())
+        wn = [x for x in ws if est_nombre(x[0])]
         T = json.load(open(ep.out / 'props.json'))['data']; S = []
         for k, l in enumerate(T['looks']):
             for key in ('price1', 'price2'):
-                t = l[key] / FPS; near = min(ws, key=lambda x: abs(x[1] - t)); S.append(dict(tenue=k + 1, quoi=key, affiche_s=round(t, 2), entendu=near[0], ecart_ms=round((near[1] - t) * 1000)))
-        R['sync_prix'] = dict(detail=S, ecart_max_ms=max(abs(x['ecart_ms']) for x in S))
+                t = l[key] / FPS; c = [x for x in wn if abs(x[1] - t) <= 2.0]
+                if not c: S.append(dict(tenue=k + 1, quoi=key, affiche_s=round(t, 2), entendu=None, ecart_ms=None)); continue
+                near = min(c, key=lambda x: abs(x[1] - t)); S.append(dict(tenue=k + 1, quoi=key, affiche_s=round(t, 2), entendu=near[0], ecart_ms=round((near[1] - t) * 1000)))
+        ok = [abs(x['ecart_ms']) for x in S if x['ecart_ms'] is not None]
+        R['sync_prix'] = dict(detail=S, ecart_max_ms=max(ok) if ok else None, non_entendus=sum(1 for x in S if x['ecart_ms'] is None))
     json.dump(R, open(q / 'qa.json', 'w'), ensure_ascii=False, indent=1)
     log(f"QA : {R['format']['duree_s']:.1f} s, {R['lufs']} LUFS, crête {R['crete_dbfs']} dBFS, zones {[(k, v['images_hors_zone']) for k, v in R['zones'].items()]}, logo {R.get('logo', {}).get('images_en_contact')}, ombre {R.get('ombre_contact', {}).get('ecart_max_px')} px, "
         f"rythme {R['rythme']}, sync prix max {R.get('sync_prix', {}).get('ecart_max_ms')} ms -> {q}")
@@ -531,7 +574,8 @@ def cmd_qa(ep, a):
     if any(v['images_hors_zone'] for v in R['zones'].values()): pb.append('contenu hors zone sûre')
     if R.get('ombre_contact', {}).get('ecart_max_px', 0) > 4: pb.append(f"Léo flotte : {R['ombre_contact']['ecart_max_px']} px entre semelles et ombre")
     if R.get('logo', {}).get('images_en_contact'): pb.append('un élément touche le logo')
-    if R.get('sync_prix') and R['sync_prix']['ecart_max_ms'] > 250: pb.append('prix décalé de plus de 250 ms')
+    if R.get('sync_prix') and (R['sync_prix']['ecart_max_ms'] or 0) > 250: pb.append('prix décalé de plus de 250 ms')
+    if R.get('sync_prix', {}).get('non_entendus'): pb.append(f"{R['sync_prix']['non_entendus']} prix non retrouvés par whisper à moins de 2 s")
     if pb: log('ATTENTION :', ' ; '.join(pb))
 
 # ------------------------------------------------------------------ verifier (phase 1, sans réseau ni crédit)
