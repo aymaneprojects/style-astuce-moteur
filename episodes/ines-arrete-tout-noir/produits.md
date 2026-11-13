@@ -1,6 +1,6 @@
 # Produits : Arrête le tout noir en hiver (Inès)
 
-Relevé automatique `sa.py prix` le 2026-11-13T04:23+01:00 (heure de Paris). Prix TTC lus sur la fiche, hors chaussures et livraison.
+Relevé automatique `sa.py prix` le 2026-11-13T05:01+01:00 (heure de Paris). Prix TTC lus sur la fiche, hors chaussures et livraison.
 
 | Tenue | Pièce | Enseigne | Prix épisode | Prix lu | Prix de base | Stock | Fiche |
 |---|---|---|---|---|---|---|---|

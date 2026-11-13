@@ -37,8 +37,11 @@ for x in sorted(lot['episodes'], key=lambda x: (x['date'], x['id'][:3] != 'leo')
         if q['ombre_contact']['ecart_max_px'] > 4: pb.append(f"ombre {q['ombre_contact']['ecart_max_px']} px")
         sp = q.get('sync_prix') or {}
         mx = max([abs(d.get('ecart_ms') or 0) for d in sp.get('detail', [])] or [0])
-        if mx > 400: pb.append(f'sync {mx} ms')
+        if mx > 400: pb.append(f'sync whisper {mx} ms')
+        if (sp.get('alignement_ecart_max_ms') or 0) > 150: pb.append(f"sync alignement {sp['alignement_ecart_max_ms']} ms")
+        if 'alignement_ecart_max_ms' not in sp: pb.append('QA ancienne version')
         qa = 'oui' if not pb else 'ÉCHEC : ' + ', '.join(pb)
+    dur = f"{q['format']['duree_s']:.1f} s" if qa != 'non' else ''
     tot_t = ' / '.join(f"{t['label']} {t['total']}" for t in ej['tenues'])
     L.append(f"| {x['date']} | {e} | {'Léo' if ej.get('mannequin','leo')=='leo' else 'Inès'} | {prix} | {ver} | {oui(cr>0)} ({cr}) | {img}/{n} | {rot}/{n} | {oui(rendu)} | {qa} | {notes.get(e,'')} |")
 H = [f"# Progression du lot {NOM}", '', f"Mise à jour : {time.strftime('%d/%m/%Y %H:%M')} (heure de Paris)", '',

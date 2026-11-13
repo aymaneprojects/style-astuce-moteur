@@ -1,6 +1,6 @@
 # Produits : Même pull de Noël, 3 tenues (Léo)
 
-Relevé automatique `sa.py prix` le 2026-11-13T04:21+01:00 (heure de Paris). Prix TTC lus sur la fiche, hors chaussures et livraison.
+Relevé automatique `sa.py prix` le 2026-11-13T04:53+01:00 (heure de Paris). Prix TTC lus sur la fiche, hors chaussures et livraison.
 
 | Tenue | Pièce | Enseigne | Prix épisode | Prix lu | Prix de base | Stock | Fiche |
 |---|---|---|---|---|---|---|---|

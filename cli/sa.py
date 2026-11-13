@@ -565,7 +565,15 @@ def cmd_qa(ep, a):
                 if not c: S.append(dict(tenue=k + 1, quoi=key, affiche_s=round(t, 2), entendu=None, ecart_ms=None)); continue
                 near = min(c, key=lambda x: abs(x[1] - t)); S.append(dict(tenue=k + 1, quoi=key, affiche_s=round(t, 2), entendu=near[0], ecart_ms=round((near[1] - t) * 1000)))
         ok = [abs(x['ecart_ms']) for x in S if x['ecart_ms'] is not None]
-        R['sync_prix'] = dict(detail=S, ecart_max_ms=max(ok) if ok else None, non_entendus=sum(1 for x in S if x['ecart_ms'] is None))
+        # contrôle exact par l'alignement ElevenLabs (temps des mots de la voix montée) : le prix doit s'afficher
+        # entre 150 ms avant et 150 ms après le début du nombre dit
+        Wd = json.load(open(ep.voix / 'words.json')); wn2 = [w for w in Wd if est_nombre(w['w'])]
+        for x in S:
+            t = x['affiche_s']; c = min(wn2, key=lambda w: abs(w['s'] - t)) if wn2 else None
+            x['alignement_mot'], x['alignement_ecart_ms'] = (c['w'], round((c['s'] - t) * 1000)) if c else (None, None)
+        al = [abs(x['alignement_ecart_ms']) for x in S if x['alignement_ecart_ms'] is not None]
+        R['sync_prix'] = dict(detail=S, ecart_max_ms=max(ok) if ok else None, non_entendus=sum(1 for x in S if x['ecart_ms'] is None),
+                              alignement_ecart_max_ms=max(al) if al else None, seuil_whisper_ms=400, seuil_alignement_ms=150)
     json.dump(R, open(q / 'qa.json', 'w'), ensure_ascii=False, indent=1)
     log(f"QA : {R['format']['duree_s']:.1f} s, {R['lufs']} LUFS, crête {R['crete_dbfs']} dBFS, zones {[(k, v['images_hors_zone']) for k, v in R['zones'].items()]}, logo {R.get('logo', {}).get('images_en_contact')}, ombre {R.get('ombre_contact', {}).get('ecart_max_px')} px, "
         f"rythme {R['rythme']}, sync prix max {R.get('sync_prix', {}).get('ecart_max_ms')} ms -> {q}")
@@ -574,7 +582,9 @@ def cmd_qa(ep, a):
     if any(v['images_hors_zone'] for v in R['zones'].values()): pb.append('contenu hors zone sûre')
     if R.get('ombre_contact', {}).get('ecart_max_px', 0) > 4: pb.append(f"Léo flotte : {R['ombre_contact']['ecart_max_px']} px entre semelles et ombre")
     if R.get('logo', {}).get('images_en_contact'): pb.append('un élément touche le logo')
-    if R.get('sync_prix') and (R['sync_prix']['ecart_max_ms'] or 0) > 250: pb.append('prix décalé de plus de 250 ms')
+    # whisper date les mots à environ 300 ms près : seuil 400 ms ; l'alignement ElevenLabs, lui, est exact : seuil 150 ms
+    if R.get('sync_prix') and (R['sync_prix']['ecart_max_ms'] or 0) > 400: pb.append('prix décalé de plus de 400 ms (whisper)')
+    if R.get('sync_prix') and (R['sync_prix'].get('alignement_ecart_max_ms') or 0) > 150: pb.append('prix décalé de plus de 150 ms (alignement de la voix)')
     if R.get('sync_prix', {}).get('non_entendus'): pb.append(f"{R['sync_prix']['non_entendus']} prix non retrouvés par whisper à moins de 2 s")
     if pb: log('ATTENTION :', ' ; '.join(pb))
 
