@@ -1,0 +1,36 @@
+{
+ "nom": "2026-11-27_29",
+ "note": "Nouvelle formule 20-26 s (format look). Scripts validés par Aymane le 25/11 à 11:08. Relancer « prix » le 27/11 au matin (Black Friday) avant toute voix. Si les crédits arrivent tard, décaler toute la série d’un créneau.",
+ "episodes": [
+  {
+   "id": "leo-epaules-larges-grand-froid",
+   "date": "2026-11-27",
+   "heure": "12:30"
+  },
+  {
+   "id": "ines-petite-manteau-court",
+   "date": "2026-11-27",
+   "heure": "19:00"
+  },
+  {
+   "id": "leo-haul-uniqlo-moins-2",
+   "date": "2026-11-28",
+   "heure": "12:30"
+  },
+  {
+   "id": "ines-grande-jean-trop-court",
+   "date": "2026-11-28",
+   "heure": "19:00"
+  },
+  {
+   "id": "leo-petit-ventre-pluie",
+   "date": "2026-11-29",
+   "heure": "12:30"
+  },
+  {
+   "id": "ines-jambes-courtes-59e",
+   "date": "2026-11-29",
+   "heure": "19:00"
+  }
+ ]
+}

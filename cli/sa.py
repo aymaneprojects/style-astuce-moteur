@@ -48,58 +48,135 @@ def lire_url(req, essais=4):
         except Exception:
             if k == essais - 1: raise
             time.sleep(2 * (k + 1))
+def pieces_de(E):
+    """(libellé, total, pièce) pour chaque pièce : format historique (tenues) ou format « look » (un seul look)."""
+    if E.get('format') == 'look':
+        Lk = E['look']
+        for pc in Lk['pieces']: yield Lk['label'], Lk['total'], pc
+    else:
+        for t in E['tenues']:
+            for pc in t['pieces']: yield t['label'], t['total'], pc
+
+_WEB = {}
+def web(url, imp='chrome'):
+    """Page web lue avec curl_cffi (empreinte de navigateur réelle). Primark, Decathlon, Kiabi, H&M et Celio refusent urllib (403)."""
+    if url in _WEB: return _WEB[url]
+    try:
+        from curl_cffi import requests as cr
+    except ImportError: stop('curl_cffi absent du venv : pip install curl_cffi')
+    if imp not in _WEB: _WEB[imp] = cr.Session(impersonate=imp)
+    for k in range(3):
+        try:
+            r = _WEB[imp].get(url, timeout=40)
+            if r.status_code == 200: _WEB[url] = r.text; return r.text
+            err = f'HTTP {r.status_code}'
+        except Exception as e: err = type(e).__name__
+        time.sleep(2 * (k + 1))
+    raise SAErreur(f'lecture impossible ({err}) : {url}')
+def next_data(url, imp='chrome'):
+    m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', web(url, imp), re.S)
+    return json.loads(m.group(1)) if m else {}
+def parcours(x, f):
+    if isinstance(x, dict):
+        if f(x): yield x
+        for v in x.values(): yield from parcours(v, f)
+    elif isinstance(x, list):
+        for v in x: yield from parcours(v, f)
+def offres_ld(h):
+    """(prix, disponibilité, images) lus dans le JSON-LD Product d'une fiche."""
+    out, imgs = [], []
+    for m in re.finditer(r'<script[^>]*ld\+json[^>]*>(.*?)</script>', h, re.S):
+        try: d = json.loads(m.group(1))
+        except Exception: continue
+        for p in parcours(d, lambda x: 'offers' in x):
+            im = p.get('image'); imgs += im if isinstance(im, list) else [im] if im else []
+            o = p['offers']; o = o.get('offers', o) if isinstance(o, dict) else o
+            for z in (o if isinstance(o, list) else [o]):
+                if not isinstance(z, dict): continue
+                pr = z.get('price') or z.get('lowPrice') or (z.get('priceSpecification') or {}).get('price')
+                if pr is not None: out.append((float(pr), str(z.get('availability', '')).split('/')[-1]))
+    return out, [i if isinstance(i, str) else (i or {}).get('url') for i in imgs]
+IMPERSONATE = {'celio.com': 'safari'}
+def enseigne_url(url):
+    for k in ('jules.com', 'uniqlo.com', 'primark.com', 'decathlon.fr', 'celio.com', 'kiabi.com', 'hm.com'):
+        if k in url: return k
+    return None
+def lire_prix(pc):
+    """Prix lu, prix de base (si promo), note de stock, note. Une fonction par site ; aucune enseigne n'est devinée."""
+    url = pc['url']; site = enseigne_url(url); trouve = base = None; note_stock = ''
+    if site == 'jules.com':
+        h = lire_url(urllib.request.Request(url, headers={'User-Agent': UA})).decode('utf-8', 'ignore')
+        for m in re.finditer(r'<script[^>]*application/ld\+json[^>]*>(.*?)</script>', h, re.S):
+            try: d = json.loads(m.group(1))
+            except Exception: continue
+            for x in (d if isinstance(d, list) else [d]):
+                if x.get('@type') == 'Product':
+                    o = x.get('offers'); o = o[0] if isinstance(o, list) else o; trouve = float(o['price'])
+                    if 'InStock' not in str(o.get('availability', 'InStock')): note_stock = 'rupture de stock sur la fiche'
+    elif site == 'uniqlo.com':
+        pid = re.search(r'/products/(E\d+-\d+)/(\d+)', url); col = re.search(r'colorDisplayCode=(\d+)', url)
+        api = f'https://www.uniqlo.com/fr/api/commerce/v5/fr/products/{pid.group(1)}/price-groups/{pid.group(2)}/l2s?withPrices=true&withStocks=true&httpFailure=true'
+        d = json.loads(lire_url(urllib.request.Request(api, headers={'User-Agent': UA, 'x-fr-clientid': 'uq.fr.web-spa'})))['result']
+        for l2 in d['l2s']:
+            if not col or l2['color']['displayCode'] == col.group(1):
+                pr = d['prices'].get(l2['l2Id'], {}); base = pr.get('base', {}).get('value')
+                trouve = (pr.get('promo') or {}).get('value') or base
+                ids = [x['l2Id'] for x in d['l2s'] if x['color']['displayCode'] == l2['color']['displayCode']]; sts = [d.get('stocks', {})[i] for i in ids if i in d.get('stocks', {})]
+                if sts and not any(v.get('statusCode') != 'STOCK_OUT' and v.get('quantity', 1) > 0 for v in sts): note_stock = 'rupture : aucune taille en stock dans ce coloris'
+                break
+    elif site in ('primark.com', 'decathlon.fr', 'celio.com'):
+        o, _ = offres_ld(web(url, IMPERSONATE.get(site, 'chrome')))
+        if not o: raise SAErreur('aucun prix dans le JSON-LD de la fiche')
+        trouve = o[0][0]
+        if o[0][1] and o[0][1] != 'InStock': note_stock = f'fiche : {o[0][1]}'
+    elif site == 'kiabi.com':
+        # les fiches Kiabi répondent 403 : prix et stock lus dans la page catégorie (liste_url), données __NEXT_DATA__
+        if not pc.get('liste_url'): raise SAErreur('Kiabi : ajouter « liste_url » (page catégorie qui contient la pièce)')
+        path = re.sub(r'^https://www\.kiabi\.com', '', url)
+        it = next(parcours(next_data(pc['liste_url']), lambda x: x.get('productUrl') == path and 'display' in x), None)
+        if not it: raise SAErreur('Kiabi : pièce absente de la page catégorie')
+        p_ = it['display']['price']; trouve = float(p_['salePrice'])
+        if p_.get('listPrice') and float(p_['listPrice']) > trouve + 0.001: base = float(p_['listPrice'])
+        if sum(k.get('inventory') or 0 for k in p_.get('skus') or []) <= 0: note_stock = 'rupture : aucune taille en stock'
+    elif site == 'hm.com':
+        if not pc.get('liste_url'): raise SAErreur('H&M : ajouter « liste_url » (page catégorie qui contient la pièce)')
+        art = re.search(r'productpage\.(\d+)\.html', url).group(1)
+        it = next(parcours(next_data(pc['liste_url']), lambda x: x.get('id') == art and 'prices' in x), None)
+        if not it: raise SAErreur('H&M : pièce absente de la page catégorie')
+        ps = [float(x['price']) for x in it['prices']]; trouve = min(ps)
+        if max(ps) > trouve + 0.001: base = max(ps)
+        if (it.get('availability') or {}).get('stockState') not in ('Available', None): note_stock = f"stock : {it['availability'].get('stockState')}"
+    else:
+        return None, None, '', 'enseigne non automatisée : vérifier à la main'
+    return trouve, base, note_stock, ''
 def cmd_prix(ep, a):
-    res = []; ok = True
-    for t in ep.E['tenues']:
-        for pc in t['pieces']:
-            url = pc['url']; attendu = prix_num(pc['prix']); barre = prix_num(pc['prix_barre']) if pc.get('prix_barre') else None
-            trouve = base = None; note = ''; note_stock = ''
-            try:
-                if 'jules.com' in url:
-                    h = lire_url(urllib.request.Request(url, headers={'User-Agent': UA})).decode('utf-8', 'ignore')
-                    for m in re.finditer(r'<script[^>]*application/ld\+json[^>]*>(.*?)</script>', h, re.S):
-                        try: d = json.loads(m.group(1))
-                        except Exception: continue
-                        for x in (d if isinstance(d, list) else [d]):
-                            if x.get('@type') == 'Product':
-                                o = x.get('offers'); o = o[0] if isinstance(o, list) else o; trouve = float(o['price'])
-                                if 'InStock' not in str(o.get('availability', 'InStock')): note_stock = 'rupture de stock sur la fiche'
-                elif 'uniqlo.com' in url:
-                    pid = re.search(r'/products/(E\d+-\d+)/(\d+)', url); col = re.search(r'colorDisplayCode=(\d+)', url)
-                    api = f'https://www.uniqlo.com/fr/api/commerce/v5/fr/products/{pid.group(1)}/price-groups/{pid.group(2)}/l2s?withPrices=true&withStocks=true&httpFailure=true'
-                    d = json.loads(lire_url(urllib.request.Request(api, headers={'User-Agent': UA, 'x-fr-clientid': 'uq.fr.web-spa'})))['result']
-                    for l2 in d['l2s']:
-                        if not col or l2['color']['displayCode'] == col.group(1):
-                            pr = d['prices'].get(l2['l2Id'], {}); base = pr.get('base', {}).get('value')
-                            trouve = (pr.get('promo') or {}).get('value') or base
-                            ids = [x['l2Id'] for x in d['l2s'] if x['color']['displayCode'] == l2['color']['displayCode']]; sts = [d.get('stocks', {})[i] for i in ids if i in d.get('stocks', {})]
-                            if sts and not any(v.get('statusCode') != 'STOCK_OUT' and v.get('quantity', 1) > 0 for v in sts): note_stock = 'rupture : aucune taille en stock dans ce coloris'
-                            break
-                else:
-                    note = 'enseigne non automatisée : vérifier à la main'
-            except Exception as e:
-                note = f'lecture impossible ({type(e).__name__})'
-            bon = trouve is not None and abs(trouve - attendu) < 0.005 and (barre is None or (base is not None and abs(base - barre) < 0.005))
-            ok &= bon or bool(note)
-            res.append(dict(piece=pc['nom'], enseigne=pc['enseigne'], attendu=attendu, trouve=trouve, prix_de_base=base, ok=bon, note=note, stock=note_stock or 'ok', url=url))
-            log(f"{'OK ' if bon else '!! '} {pc['nom']:<28} attendu {attendu:6.2f}  trouvé {trouve}  {('base ' + str(base)) if base else ''} {note} {note_stock}")
+    res = []; ok = True; look = ep.E.get('format') == 'look'
+    for label, total, pc in pieces_de(ep.E):
+        attendu = prix_num(pc['prix']); barre = prix_num(pc['prix_barre']) if pc.get('prix_barre') else None
+        trouve = base = None; note = ''; note_stock = ''
+        try: trouve, base, note_stock, note = lire_prix(pc)
+        except Exception as e: note = f'lecture impossible ({e if isinstance(e, SAErreur) else type(e).__name__})'
+        bon = trouve is not None and abs(trouve - attendu) < 0.005 and (barre is None or (base is not None and abs(base - barre) < 0.005))
+        ok &= bon or bool(note)
+        res.append(dict(piece=pc['nom'], enseigne=pc['enseigne'], zone=pc.get('zone'), attendu=attendu, trouve=trouve, prix_de_base=base, ok=bon, note=note, stock=note_stock or 'ok', url=pc['url'], tenue=label, total=total))
+        log(f"{'OK ' if bon else '!! '} {pc['nom']:<28} attendu {attendu:6.2f}  trouvé {trouve}  {('base ' + str(base)) if base else ''} {note} {note_stock}")
     stamp = datetime.datetime.now().astimezone().isoformat(timespec='minutes')
     json.dump(dict(verifie_le=stamp, pieces=res), open(ep.out / 'prix.json', 'w'), ensure_ascii=False, indent=1)
-    if not all(r['ok'] for r in res if not r['note']): stop('au moins un prix a changé : corriger episode.json (et le script si le prix est dit)')
+    # produits.md versionné avec l'épisode : URL, prix lu, date et heure du relevé, stock (écrit avant tout arrêt, pour garder la trace)
+    portee = 'chaussures comprises, hors livraison' if look else 'hors chaussures et livraison'
+    md = [f"# Produits : {ep.E['titre']}\n", f"Relevé automatique `sa.py prix` le {stamp} (heure de Paris). Prix TTC lus sur le site de chaque enseigne, {portee}.\n",
+          '| Tenue | Pièce | Enseigne | Prix épisode | Prix lu | Prix de base | Stock | Fiche |', '|---|---|---|---|---|---|---|---|']
+    for (label, total, pc), r in zip(pieces_de(ep.E), res):
+        md.append(f"| {label} ({total}) | {pc['nom']} | {pc['enseigne']} | {pc['prix']} | {r['trouve'] if r['trouve'] is not None else 'non lu : ' + r['note']} | {r['prix_de_base'] or ''} | {r['stock']} | {pc['url']} |")
+    (ep.dir / 'produits.md').write_text('\n'.join(md) + '\n', encoding='utf-8')
+    log('prix vérifiés ->', ep.out / 'prix.json', '+', ep.dir / 'produits.md')
+    if not all(r['ok'] for r in res if not r['note']): stop('au moins un prix a changé : corriger episode.json (et le script si le prix est dit, avec un nouvel accord d’Aymane)')
     rup = [r['piece'] for r in res if r['stock'] != 'ok']
     if rup: stop('pièce(s) en rupture, à remplacer : ' + ', '.join(rup))
     nl = [r['piece'] for r in res if r['note']]
-    if nl: log('ATTENTION, prix non lus, à vérifier à la main avant envoi :', ', '.join(nl))
-    # produits.md versionné avec l'épisode : URL, prix lu, date et heure du relevé, stock
-    md = [f"# Produits : {ep.E['titre']}\n", f"Relevé automatique `sa.py prix` le {stamp} (heure de Paris). Prix TTC lus sur la fiche, hors chaussures et livraison.\n",
-          '| Tenue | Pièce | Enseigne | Prix épisode | Prix lu | Prix de base | Stock | Fiche |', '|---|---|---|---|---|---|---|---|']
-    k = 0
-    for t in ep.E['tenues']:
-        for pc in t['pieces']:
-            r = res[k]; k += 1
-            md.append(f"| {t['label']} ({t['total']}) | {pc['nom']} | {pc['enseigne']} | {pc['prix']} | {r['trouve'] if r['trouve'] is not None else 'non lu'} | {r['prix_de_base'] or ''} | {r['stock']} | {pc['url']} |")
-    (ep.dir / 'produits.md').write_text('\n'.join(md) + '\n', encoding='utf-8')
-    log('prix vérifiés ->', ep.out / 'prix.json', '+', ep.dir / 'produits.md')
+    if nl:
+        log('ATTENTION, prix non lus, à vérifier à la main avant envoi :', ', '.join(nl))
+        if look: stop('format look : tous les prix doivent être lus automatiquement (voir les notes ci-dessus)')
 
 # ------------------------------------------------------------------ voix (ElevenLabs, réglages Benjamin)
 def lire_cle(fichier):
@@ -182,6 +259,7 @@ def cmd_silences(ep, a):
 # ------------------------------------------------------------------ timeline (script + words.json -> props.json)
 norm = lambda s: re.sub(r"[.,:;!?«»\"]", '', s.lower()).strip()
 def cmd_timeline(ep, a, W=None, sortie=None):
+    if est_look(ep.E): return timeline_look(ep, a, W, sortie)
     E = ep.E; W = W if W is not None else json.load(open(ep.voix / 'words.json'))
     def F(i): return max(0, round(W[i]['s'] * FPS) + SHIFT)
     def idx(word, start=0, stop_=None):
@@ -315,6 +393,7 @@ def chaussures_fantomes(img):
 
 
 def cmd_vignettes(ep, a):
+    if est_look(ep.E): return vignettes_look(ep, a)
     from PIL import Image, ImageFilter
     from scipy import ndimage
     (ep.pub / 'leo').mkdir(exist_ok=True); (ep.pub / 'produits').mkdir(exist_ok=True); (ep.pub / 'fonts').mkdir(exist_ok=True)
@@ -435,12 +514,15 @@ def cmd_audio(ep, a):
         i = int(frame / FPS * SR); n = min(len(s), N - i)
         if n <= 0: return
         sfx[i:i + n, 0] += s[:n] * (1 - pan); sfx[i:i + n, 1] += s[:n] * (1 + pan); ev.append((int(frame), kind))
-    for k, l in enumerate(T['looks']):
+    if T.get('format') == 'look':   # format look : événements calculés par la timeline
+        gen = dict(whoosh=lambda: whoosh(), pop=lambda: pop(880), chime=lambda: chime())
+        for fr_, kind, pan in T['sfx']: add(gen[kind](), fr_, pan, kind)
+    for k, l in enumerate(T.get('looks', [])):
         add(whoosh(), l['a'] - 6, 0.2 * (-1) ** k, 'whoosh')
         add(pop(784), l['piece1'] - 2, -0.3, 'pop'); add(pop(880), l['piece2'] - 2, 0.3, 'pop')
         add(pop(1046, 0.06), l['total'] - 1, 0, 'pop')
         if l.get('rotSrc'): add(whoosh(0.5, 0.08), l['rot0'], 0, 'whoosh'); add(chime(), l['rot0'] + 10, 0, 'chime')
-    add(pop(988, 0.07), T['end'] + 2, 0, 'pop'); add(chime(0.045), T['nums'][-1] + 16, 0, 'chime')
+    if T.get('format') != 'look': add(pop(988, 0.07), T['end'] + 2, 0, 'pop'); add(chime(0.045), T['nums'][-1] + 16, 0, 'chime')
     env = np.abs(voice); w = int(0.02 * SR); env = np.sqrt(np.convolve(env ** 2, np.ones(w) / w, 'same'))
     g = np.zeros_like(env); a_att = np.exp(-1 / (0.03 * SR)); a_rel = np.exp(-1 / (0.30 * SR)); s = 0.0; act = (env > 0.02).astype(np.float32)
     for i in range(0, N, 48):
@@ -500,7 +582,7 @@ def cmd_qa(ep, a):
         R['logo'] = dict(boite=[lx0, ly0, lx1, ly1], images_en_contact=len(hit), instants=hit[:20])
     # ombre de contact : sous chaque semelle (ligne connue par le détourage), les 6 premières lignes doivent déjà être
     # dans l'ombre (plus sombres que le fond de la même ligne pris à x 960..1000). Écart = lignes claires avant l'ombre.
-    P = json.load(open(ep.out / 'props.json'))['data']; LS = P['looks']; Sc = 0.47; LT = 500; LL = 524 - 549 * Sc
+    P = json.load(open(ep.out / 'props.json'))['data']; LS = P.get('looks', []); Sc = 0.47; LT = 500; LL = 524 - 549 * Sc
     gaps, worst = [], (0, None)
     def cle_vue(fi):  # même logique que Leo() dans Episode.tsx (tenue dont les pieds sont visibles), None si Léo masqué
         bi = next((k for k, l in enumerate(LS) if fi >= l['a'] - 6 and fi < l['b']), -1)
@@ -523,7 +605,7 @@ def cmd_qa(ep, a):
             ref[(k, c['x0'])] = (int(round(LT + y0 * Sc)), int(round(LL + c['x0'] * Sc)), lum, pc[..., 3] > 200)
         return ref[(k, c['x0'])]
     masquees = 0
-    for i, f in enumerate(fr):
+    for i, f in enumerate(fr if P.get('format') != 'look' else []):
         fi = round(i * FPS / 10); k = cle_vue(fi)
         if k is None or k > len(LS) or not LS[k - 1].get('pieds'): continue
         f = f.astype(np.int16); fond = f[:, 960:1000].mean(1)
@@ -540,6 +622,7 @@ def cmd_qa(ep, a):
             if g > worst[0]: worst = (g, round(i / 10, 1))
     R['ombre_contact'] = dict(ecart_max_px=worst[0], instant_s=worst[1], mesures=len(gaps), seuil_px=4,
                               au_dela_seuil=int(sum(1 for g in gaps if g > 4)), chaussures_masquees=masquees)
+    if P.get('format') == 'look': R['ombre_contact'] = ombre_look(P, fr, ep)
     # événements informatifs (bloc de 60 px qui change) et passages figés
     sm = fr[:, ::4, ::4].astype(float); d = np.abs(np.diff(sm, axis=0)); B = 15
     blk = d[:, :480 // B * B, :270 // B * B].reshape(len(d), 480 // B, B, 270 // B, B).mean(axis=(2, 4)).max(axis=(1, 2))
@@ -547,40 +630,42 @@ def cmd_qa(ep, a):
     best = cur = 0
     for s in blk < 2.0: cur = cur + 1 if s else 0; best = max(best, cur)
     R['rythme'] = dict(evenements_par_s_moyenne=round(float(ev.sum()) / n, 2), secondes_sans_evenement=[i for i, p in enumerate(per) if p == 0], plus_long_fige_s=best / 10)
-    # sync des prix : whisper sur la piste finale, comparé à l'instant d'affichage
+    # sync des prix : instants d'affichage comparés à l'alignement de la voix montée (toujours) et à whisper sur la piste finale (sauf --sans-whisper)
+    NB = set(UNITES + list(DIZ.values()) + 'dix-sept dix-huit dix-neuf cent cents quatre-vingt quatre-vingts euro euros'.split())
+    def est_nombre(m_):
+        m_ = ''.join(ch for ch in m_.lower() if ch.isalnum() or ch in '-, ')
+        m_ = m_.lstrip('-, ')
+        if m_[:1].isalpha() and any(ch.isdigit() for ch in m_): return False   # « uniclo2990 » : mot fusionné qui commence par des lettres, son début n'est pas le prix (« 20EUR » reste un prix)
+        return any(ch.isdigit() for ch in m_) or any(p in NB for p in m_.replace('-', ' ').split())
+    T = json.load(open(ep.out / 'props.json'))['data']
+    aff = [(1, f'piece{j + 1}', fr_) for j, fr_ in enumerate(T['prixAt'])] if T.get('format') == 'look' else \
+          [(k + 1, key, l[key]) for k, l in enumerate(T['looks']) for key in ('price1', 'price2')]
+    S = [dict(tenue=tn, quoi=key, affiche_s=round(fr_ / FPS, 2), entendu=None, ecart_ms=None) for tn, key, fr_ in aff]
     if not a.sans_whisper:
         from faster_whisper import WhisperModel
         au = lire_audio(V, 16000); m = WhisperModel('small', device='cpu', compute_type='int8', cpu_threads=4)
         seg, _ = m.transcribe(au, language='fr', beam_size=5, word_timestamps=True, condition_on_previous_text=False); ws = [(w.word.strip(), w.start) for s in seg for w in s.words]
         # seuls les mots qui sont des nombres comptent (chiffres ou nombres en lettres) : un « Total » voisin n'est pas un prix
-        NB = set(UNITES + list(DIZ.values()) + 'dix-sept dix-huit dix-neuf cent cents quatre-vingt quatre-vingts euro euros'.split())
-        def est_nombre(m_):
-            m_ = ''.join(ch for ch in m_.lower() if ch.isalnum() or ch in '-, ')
-            m_ = m_.lstrip('-, ')
-            if m_[:1].isalpha() and any(ch.isdigit() for ch in m_): return False   # « uniclo2990 » : mot fusionné qui commence par des lettres, son début n'est pas le prix (« 20EUR » reste un prix)
-            return any(ch.isdigit() for ch in m_) or any(p in NB for p in m_.replace('-', ' ').split())
         wn = [x for x in ws if est_nombre(x[0])]
-        T = json.load(open(ep.out / 'props.json'))['data']; S = []
-        for k, l in enumerate(T['looks']):
-            for key in ('price1', 'price2'):
-                t = l[key] / FPS; c = [x for x in wn if abs(x[1] - t) <= 2.0]
-                if not c: S.append(dict(tenue=k + 1, quoi=key, affiche_s=round(t, 2), entendu=None, ecart_ms=None)); continue
-                near = min(c, key=lambda x: abs(x[1] - t)); S.append(dict(tenue=k + 1, quoi=key, affiche_s=round(t, 2), entendu=near[0], ecart_ms=round((near[1] - t) * 1000)))
-        ok = [abs(x['ecart_ms']) for x in S if x['ecart_ms'] is not None]
-        # contrôle exact par l'alignement ElevenLabs (temps des mots de la voix montée) : le prix doit s'afficher
-        # entre 150 ms avant et 150 ms après le début du nombre dit
-        Wd = json.load(open(ep.voix / 'words.json')); wn2 = [w for w in Wd if est_nombre(w['w'])]
         for x in S:
-            t = x['affiche_s']; c = min(wn2, key=lambda w: abs(w['s'] - t)) if wn2 else None
-            x['alignement_mot'], x['alignement_ecart_ms'] = (c['w'], round((c['s'] - t) * 1000)) if c else (None, None)
-        al = [abs(x['alignement_ecart_ms']) for x in S if x['alignement_ecart_ms'] is not None]
-        R['sync_prix'] = dict(detail=S, ecart_max_ms=max(ok) if ok else None, non_entendus=sum(1 for x in S if x['ecart_ms'] is None),
-                              alignement_ecart_max_ms=max(al) if al else None, seuil_whisper_ms=400, seuil_alignement_ms=150)
+            t = x['affiche_s']; c = [w for w in wn if abs(w[1] - t) <= 2.0]
+            if c: near = min(c, key=lambda w: abs(w[1] - t)); x['entendu'] = near[0]; x['ecart_ms'] = round((near[1] - t) * 1000)
+    ok = [abs(x['ecart_ms']) for x in S if x['ecart_ms'] is not None]
+    # contrôle exact par l'alignement de la voix (temps des mots de la voix montée) : le prix doit s'afficher
+    # entre 150 ms avant et 150 ms après le début du nombre dit
+    Wd = json.load(open(ep.voix / 'words.json')); wn2 = [w for w in Wd if est_nombre(w['w'])]
+    for x in S:
+        t = x['affiche_s']; c = min(wn2, key=lambda w: abs(w['s'] - t)) if wn2 else None
+        x['alignement_mot'], x['alignement_ecart_ms'] = (c['w'], round((c['s'] - t) * 1000)) if c else (None, None)
+    al = [abs(x['alignement_ecart_ms']) for x in S if x['alignement_ecart_ms'] is not None]
+    R['sync_prix'] = dict(detail=S, ecart_max_ms=max(ok) if ok else None, non_entendus=None if a.sans_whisper else sum(1 for x in S if x['ecart_ms'] is None),
+                          alignement_ecart_max_ms=max(al) if al else None, seuil_whisper_ms=400, seuil_alignement_ms=150, whisper=not a.sans_whisper)
     json.dump(R, open(q / 'qa.json', 'w'), ensure_ascii=False, indent=1)
     log(f"QA : {R['format']['duree_s']:.1f} s, {R['lufs']} LUFS, crête {R['crete_dbfs']} dBFS, zones {[(k, v['images_hors_zone']) for k, v in R['zones'].items()]}, logo {R.get('logo', {}).get('images_en_contact')}, ombre {R.get('ombre_contact', {}).get('ecart_max_px')} px, "
         f"rythme {R['rythme']}, sync prix max {R.get('sync_prix', {}).get('ecart_max_ms')} ms -> {q}")
     pb = []
     if not -14 <= R['lufs'] <= -12: pb.append('niveau hors -14..-12 LUFS')
+    if P.get('format') == 'look' and not 20 <= R['format']['duree_s'] <= 28: pb.append(f"durée {R['format']['duree_s']:.1f} s hors 20..28 s (voix 20..26 s + fin)")
     if any(v['images_hors_zone'] for v in R['zones'].values()): pb.append('contenu hors zone sûre')
     if R.get('ombre_contact', {}).get('ecart_max_px', 0) > 4: pb.append(f"{'Inès' if ep.E.get('mannequin') == 'ines' else 'Léo'} flotte : {R['ombre_contact']['ecart_max_px']} px entre semelles et ombre")
     if R.get('logo', {}).get('images_en_contact'): pb.append('un élément touche le logo')
@@ -598,7 +683,10 @@ UNITES = 'zéro un deux trois quatre cinq six sept huit neuf dix onze douze trei
 DIZ = {2: 'vingt', 3: 'trente', 4: 'quarante', 5: 'cinquante', 6: 'soixante'}
 MOIS = 'janvier février mars avril mai juin juillet août septembre octobre novembre décembre'.split()
 def fr_nombre(n):
-    """0..99 en lettres, orthographe à traits d'union (comme dans les scripts)."""
+    """0..999 en lettres, orthographe à traits d'union (comme dans les scripts)."""
+    if n >= 100:
+        c, r = divmod(n, 100); tete = 'cent' if c == 1 else fr_nombre(c) + '-cent' + ('s' if r == 0 else '')
+        return tete if r == 0 else tete + '-' + fr_nombre(r)
     if n < 17: return UNITES[n]
     if n < 20: return 'dix-' + UNITES[n - 10]
     if n < 70:
@@ -606,7 +694,11 @@ def fr_nombre(n):
     if n < 80: return 'soixante-' + ('et-onze' if n == 71 else fr_nombre(n - 60))
     return 'quatre-vingt' + ('s' if n == 80 else '-' + fr_nombre(n - 80))
 def fr_variantes(n):
-    v = fr_nombre(n); return {v, v.replace('-et-', ' et '), v.replace('-', ' ')}
+    v = fr_nombre(n); out = {v, v.replace('-et-', ' et '), v.replace('-', ' ')}
+    if n >= 100 and n % 100:   # « cent dix-neuf », « deux-cent vingt » : espace après la centaine, traits d'union ensuite
+        c = n // 100; tete = 'cent' if c == 1 else fr_nombre(c) + '-cent'; r = fr_nombre(n % 100)
+        out |= {f'{tete} {r}', f"{tete.replace('-', ' ')} {r}", f"{tete} {r.replace('-et-', ' et ')}"}
+    return out
 def mots_simules(texte):
     """Faux words.json : temps proportionnels au nombre de caractères (calibrage de la référence)."""
     W = []; t = 0.0
@@ -621,7 +713,7 @@ def textes_visibles(E):
     def walk(x, chemin):
         if isinstance(x, dict):
             for k, v in x.items():
-                if k in ('url', 'image', 'rotation', 'script', 'voix', 'id', 'date_releve', 'publication', 'desc_en') or k.startswith('mot'): continue
+                if k in ('url', 'liste_url', 'image', 'image_erreur', 'erreur_en', 'rotation', 'script', 'voix', 'id', 'date_releve', 'publication', 'desc_en', 'chaussures_en', 'coupe', 'format', 'mannequin') or k.startswith('mot'): continue
                 walk(v, f'{chemin}.{k}')
         elif isinstance(x, list):
             for i, v in enumerate(x): walk(v, f'{chemin}[{i}]')
@@ -663,6 +755,7 @@ def logo_props(E):
 
 
 def cmd_verifier(ep, a):
+    if est_look(ep.E): return verifier_look(ep, a)
     E = ep.E; txt = ep.script(); err = []; avert = []; R = {'id': ep.id}
     for chemin, t in [('script', txt)] + textes_visibles(E):
         for rx, why in INTERDITS:
@@ -733,6 +826,347 @@ def cmd_verifier(ep, a):
     if err: stop(f'{len(err)} erreur(s) de vérification')
     return R
 
+# ================================================================== FORMAT « LOOK » (depuis le 25/11/2026)
+# Un seul look de 3 ou 4 pièces (manteau, haut, bas, chaussures), 20 à 26 s de voix, pas d'intro de cartes :
+# l'image 0 montre l'erreur (ouverture.type « erreur ») ou la bonne tenue qui tourne (« rotation »), du mouvement dès l'image 1.
+# Chaussures montrées avec leur prix et comptées dans le total ; date du relevé affichée, pas dite ; fin sur un teaser.
+# Les épisodes sans "format": "look" suivent toujours le format historique, inchangé.
+ZONES_LOOK = ('manteau', 'haut', 'bas', 'chaussures')
+LOOK_S, LOOK_CX, LOOK_TOP = 0.47, 400, 500           # Léo / Inès un peu à gauche : les 4 cartes pièce tiennent à droite
+LOOK_LEFT = LOOK_CX - 549 * LOOK_S
+DUREE_CIBLE_LOOK = (20, 26)                          # durée de la voix (silences raccourcis), hors 1,2 s de fin
+MARQUES = ('croix', 'trait', 'fleche', 'cercle', 'ligne')
+def est_look(E): return E.get('format') == 'look'
+
+def timeline_look(ep, a, W=None, sortie=None):
+    E = ep.E; W = W if W is not None else json.load(open(ep.voix / 'words.json'))
+    def F(i): return max(0, round(W[i]['s'] * FPS) + SHIFT)
+    def idx(word, start=0):
+        for i in range(start, len(W)):
+            if norm(W[i]['w']) == norm(word): return i
+        stop(f'mot « {word} » introuvable après l’index {start} dans words.json (vérifier episode.json)')
+    Lk = E['look']; O = E.get('ouverture') or {}; typ = O.get('type', 'erreur'); P_ = Lk['pieces']
+    if typ not in ('erreur', 'rotation'): stop(f'ouverture.type inconnu : {typ} (erreur ou rotation)')
+    if not 3 <= len(P_) <= 4: stop('format look : 3 ou 4 pièces')
+    if not any(pc.get('zone') == 'chaussures' for pc in P_): stop('format look : les chaussures sont obligatoires (zone « chaussures »)')
+    c = 0; bascule = None
+    if typ == 'erreur':
+        ib = idx(O['mot_bascule']); bascule = F(ib); c = ib
+    tags = []; prix_at = []
+    for j, pc in enumerate(P_, 1):
+        if pc.get('zone') not in ZONES_LOOK: stop(f"pièce {j} : zone « {pc.get('zone')} » inconnue ({', '.join(ZONES_LOOK)})")
+        ip = idx(pc['mot'], c); ipr = idx(pc['mot_prix'], ip)
+        tags.append(dict(at=F(ip), priceAt=F(ipr), brandAt=F(idx(pc['mot_enseigne'], ip)) if pc.get('mot_enseigne') else None,
+                         wasAt=F(idx(pc['mot_barre'], ipr)) if pc.get('mot_barre') else None, zone=pc['zone'], name=pc['nom'], brand=pc['enseigne'],
+                         price=pc['prix'], was=pc.get('prix_barre'), img=f'produits/piece-{j}.png'))
+        prix_at.append(F(ipr)); c = ipr
+    itot = idx(Lk.get('mot_total', 'Total'), c); iast = idx(E['astuce']['mot'], itot); itz = idx(E['teaser']['mot'], iast)
+    # rotation : à l'ouverture (« rotation ») ou pendant l'astuce (« erreur »), toujours à la taille et à la place exactes de Léo (aucun zoom)
+    rot = None
+    if Lk.get('rotation'):
+        if typ == 'rotation':
+            r0 = 0; r1 = F(idx(O['mot_fin_rotation'])) if O.get('mot_fin_rotation') else tags[0]['at'] - 4
+        else:
+            r0 = F(iast) - 6; r1 = F(itz) - 4
+        if r1 - r0 < 30: stop(f'rotation trop courte ({r1 - r0} images) : choisir d’autres mots')
+        info = json.load(open(ep.pub / 'rot-1.json')) if (ep.pub / 'rot-1.json').exists() else {'frames': 181, 'ar': 1920 / 1080}
+        rot = dict(src='rot-1.mp4', frames=info['frames'], ar=info['ar'], r0=r0, r1=r1)
+    elif typ == 'rotation': stop('ouverture « rotation » : look.rotation obligatoire')
+    tags_end = rot['r0'] + 4 if (rot and typ == 'erreur') else F(itz)
+    # titres et pastilles
+    A = E['accroche']; titles = [dict(at=0, **{k: A[k] for k in ('l1', 'pre', 'kw', 'post')}, hl=F(idx(A['mot_surligne'])) if A.get('mot_surligne') else None)]
+    tt = Lk.get('titre_total') or dict(l1='Total', pre='', kw=Lk['total'], post='', mot_surligne=Lk.get('mot_total', 'Total'))
+    titles.append(dict(at=F(itot), **{k: tt[k] for k in ('l1', 'pre', 'kw', 'post')}, hl=F(idx(tt['mot_surligne'], itot))))
+    ta = E['astuce']['titre']; titles.append(dict(at=F(iast), **{k: ta[k] for k in ('l1', 'pre', 'kw', 'post')}, hl=F(idx(ta['mot_surligne'], iast))))
+    tz = E['teaser']['titre']; titles.append(dict(at=F(itz), **{k: tz[k] for k in ('l1', 'pre', 'kw', 'post')}, type=True, hl=F(idx(tz['mot_surligne'], itz))))
+    titles = [{k: v for k, v in t_.items() if v is not None} for t_ in titles]
+    subs = [[0, '']]
+    def sous(st, start):
+        im = idx(st['mot'], start); subs.append([F(im), st['texte'], st.get('surligne'), F(idx(st['mot_surligne'], im)) if st.get('surligne') else None])
+    if O.get('sous_titre'): sous(O['sous_titre'], 0); subs.append([tags[0]['at'], ''])   # la pastille d'ouverture s'efface à la 1re carte
+    subs.append([F(itot), ''])
+    for st in E['astuce'].get('sous_titres', []): sous(st, iast)
+    if E['teaser'].get('sous_titre'): sous(E['teaser']['sous_titre'], itz)
+    subs.sort(key=lambda x: x[0])
+    # marque de l'erreur (croix, trait, flèche, cercle) dès l'image 1, ou ligne sur la bonne tenue au mot indiqué
+    mq = None
+    if O.get('marque'):
+        if O['marque'] not in MARQUES: stop(f"ouverture.marque inconnue : {O['marque']} ({', '.join(MARQUES)})")
+        mq = dict(type=O['marque'], y=float(O.get('marque_y', 0.4)), at=F(idx(O['marque_mot'])) if O.get('marque_mot') else 1, duree=24)
+    # pieds (ombre de contact) : bonne tenue = 1, erreur = 0
+    pieds = {}
+    for key in (['0', '1'] if typ == 'erreur' else ['1']):
+        cut_ = ep.pub / 'leo' / f'cut-{key}.png'
+        if not cut_.exists() and sortie is None: stop(f'détourage absent : {cut_} (lancer « vignettes »)')
+        pieds[key] = pieds_detoure(cut_) if cut_.exists() else None
+    end = F(itz); total = math.ceil((W[-1]['e'] + 1.2) * FPS)
+    # instants où la silhouette est posée, entière et immobile (QA de l'ombre de contact)
+    vues = []
+    if typ == 'erreur':
+        vues.append([2, bascule - 2, '0'])
+        vues.append([bascule + 20, (rot['r0'] - 2) if rot else total - 1, '1'])
+        if rot: vues.append([rot['r1'] + 2, total - 1, '1'])
+    else: vues.append([rot['r1'] + 2, total - 1, '1'])
+    sfx = []
+    if typ == 'erreur': sfx.append([bascule - 4, 'whoosh', 0.2])
+    if mq: sfx.append([mq['at'], 'pop', 0.0])
+    for k_, t_ in enumerate(tags): sfx.append([t_['at'] - 2, 'pop', 0.3 if k_ % 2 else -0.3])
+    sfx.append([F(itot) - 1, 'pop', 0.0])
+    if rot and typ == 'erreur': sfx += [[rot['r0'], 'whoosh', 0.0], [rot['r0'] + 10, 'chime', 0.0]]
+    if rot and typ == 'rotation': sfx.append([4, 'chime', 0.0])
+    sfx.append([end + 2, 'pop', 0.0])
+    M = E['mention']
+    props = dict(format='look', fps=FPS, total=total, ouverture=dict(type=typ, bascule=bascule, marque=mq), rot=rot, tags=tags, tagsEnd=tags_end,
+                 titles=titles, subs=subs, mention=F(itot), reponds=max(F(iast), F(itot) + 75), end=end, mentionL1=M['l1'], mentionL2=M['l2'],
+                 look=dict(label=Lk['label'], total=Lk['total']), pieds=pieds, layout=dict(S=LOOK_S, top=LOOK_TOP, left=LOOK_LEFT, cx=LOOK_CX),
+                 qaVues=vues, prixAt=prix_at, sfx=sfx, audio='mix.wav', logo=logo_props(E), pastille360=False)
+    sortie = sortie or ep.out / 'props.json'
+    json.dump({'data': props}, open(sortie, 'w'), ensure_ascii=False, indent=1)
+    log(f"timeline (look, ouverture {typ}) : {total} images ({total / FPS:.1f} s), pièces à " + ', '.join(f"{t_['at'] / FPS:.2f}s" for t_ in tags) + f" -> {sortie}")
+    return props
+
+def detourer(src, dst, coupe, session, sess):
+    from PIL import Image, ImageFilter
+    from rembg import remove
+    im = Image.open(src).convert('RGB').resize((1080, 1920), Image.LANCZOS).filter(ImageFilter.UnsharpMask(radius=1.6, percent=70, threshold=2))
+    o = remove(im, session=session(coupe.get('detourage', 'isnet-general-use')))
+    if chaussures_fantomes(o) and 'detourage' not in coupe:
+        log(f'{dst.name} : chaussures semi-transparentes au détourage, nouvel essai avec birefnet-general-lite')
+        import gc; sess.clear(); gc.collect()
+        o = remove(im, session=session('birefnet-general-lite'))
+    o.save(dst)
+
+def vignettes_look(ep, a):
+    """Détourages (bonne tenue cut-1, erreur cut-0), vignettes des pièces et rotation.
+    Vignette d'une pièce : la photo produit de l'enseigne (media/produits/<n>-<zone>.jpg, téléchargée par « prompts ») détourée ;
+    à défaut, la zone découpée sur le mannequin : chaussures sous coupe.chaussures_y (ou 110 px au-dessus des semelles), bas entre
+    l'ourlet et les chaussures, haut et manteau au-dessus de l'ourlet."""
+    from PIL import Image
+    E = ep.E; Lk = E['look']; O = E.get('ouverture') or {}
+    for d_ in ('leo', 'produits', 'fonts'): (ep.pub / d_).mkdir(exist_ok=True)
+    for f in (MOTEUR / 'fonts').glob('*.ttf'): shutil.copy(f, ep.pub / 'fonts' / f.name)
+    sess = {}
+    def session(nom):
+        from rembg import new_session
+        if nom not in sess: sess[nom] = new_session(nom)
+        return sess[nom]
+    srcs = [('1', ep.p(Lk['image']), Lk.get('coupe', {}))]
+    if O.get('type', 'erreur') == 'erreur': srcs.append(('0', ep.p(O['image_erreur']), O.get('coupe', {})))
+    for key, src, coupe in srcs:
+        if not src.exists(): stop(f'image absente : {src}')
+        dst = ep.pub / 'leo' / f'cut-{key}.png'
+        if not dst.exists() or a.refaire: detourer(src, dst, coupe, session, sess)
+        if chaussures_fantomes(Image.open(dst)): log(f'ATTENTION : {dst.name} : chaussures semi-transparentes (relancer vignettes --refaire ou fixer coupe.detourage)')
+    cut = np.array(Image.open(ep.pub / 'leo' / 'cut-1.png').convert('RGBA'))
+    C = Lk.get('coupe', {}); pd_ = pieds_detoure(ep.pub / 'leo' / 'cut-1.png')
+    HEM = C.get('ourlet_y', 'auto'); HEM = ourlet_auto(cut.astype(float)) if HEM == 'auto' else int(HEM)
+    SHOE = int(C.get('chaussures_y', pd_['y'] - 110))
+    zones = dict(manteau=(250, HEM + 120), haut=(250, HEM), bas=(HEM + 20, SHOE), chaussures=(SHOE - 10, pd_['y'] + 2))
+    sources = []
+    for j, pc in enumerate(Lk['pieces'], 1):
+        out_ = ep.pub / 'produits' / f'piece-{j}.png'
+        photo = ep.media / 'produits' / f"{j}-{pc['zone']}.jpg"
+        if out_.exists() and not a.refaire: sources.append('déjà faite'); continue
+        if photo.exists():
+            from rembg import remove
+            o = remove(Image.open(photo).convert('RGB'), session=session('isnet-general-use'))
+            bb = o.getchannel('A').point(lambda v: 255 if v > 40 else 0).getbbox()
+            (o.crop(bb) if bb else o).save(out_); sources.append('photo produit')
+        else:
+            y0, y1 = zones[pc['zone']]; c = cut[y0:y1].copy()
+            if pc['zone'] == 'chaussures': c[..., 3] = np.where(c[..., 3] > 40, c[..., 3], 0)
+            im_ = Image.fromarray(c); bb = im_.getchannel('A').point(lambda v: 255 if v > 40 else 0).getbbox()
+            (im_.crop(bb) if bb else im_).save(out_); sources.append('découpe du mannequin')
+        log(f"pièce {j} ({pc['zone']}) : vignette depuis {sources[-1]} -> {out_.name}")
+    if Lk.get('rotation'):
+        src = ep.p(Lk['rotation']); dst = ep.pub / 'rot-1.mp4'
+        if not src.exists(): stop(f'rotation absente : {src}')
+        w_, h_ = map(int, subprocess.run(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height', '-of', 'csv=p=0', str(src)], capture_output=True, text=True).stdout.strip().split(','))
+        vf = 'fps=30' if w_ % 2 == 0 and w_ <= 1080 else 'crop=1080:1920:(iw-1080)/2:0,fps=30'
+        if not dst.exists() or a.refaire:
+            run(['nice', '-n', '10', 'ffmpeg', '-v', 'error', '-y', '-i', str(src), '-an', '-vf', vf, '-c:v', 'libx264', '-crf', '16', '-pix_fmt', 'yuv420p', str(dst)])
+        info = json.loads(subprocess.run(['ffprobe', '-v', 'error', '-count_frames', '-select_streams', 'v:0', '-show_entries', 'stream=nb_read_frames,width,height', '-of', 'json', str(dst)], capture_output=True, text=True).stdout)['streams'][0]
+        json.dump({'frames': int(info['nb_read_frames']), 'ar': int(info['height']) / int(info['width'])}, open(ep.pub / 'rot-1.json', 'w'))
+    # planche : erreur, bonne tenue, puis chaque vignette de pièce
+    ims = [ep.pub / 'leo' / f'cut-{k}.png' for k in ('0', '1') if (ep.pub / 'leo' / f'cut-{k}.png').exists()] + [ep.pub / 'produits' / f'piece-{j}.png' for j in range(1, len(Lk['pieces']) + 1)]
+    sheet = Image.new('RGB', (220 * len(ims), 400), (246, 235, 223))
+    for k, p_ in enumerate(ims):
+        v = Image.open(p_).convert('RGBA'); v.thumbnail((210, 390)); sheet.paste(v, (k * 220 + (220 - v.width) // 2, (400 - v.height) // 2), v)
+    sheet.save(ep.out / 'planche-vignettes.png'); log('détourages, vignettes et rotation prêts ; contrôle :', ep.out / 'planche-vignettes.png')
+
+def verifier_look(ep, a):
+    E = ep.E; txt = ep.script(); err = []; avert = []; R = {'id': ep.id, 'format': 'look'}
+    vis = textes_visibles(E)
+    for chemin, t in [('script', txt)] + vis:
+        for rx, why in INTERDITS:
+            if re.search(rx, t, re.I): err.append(f'{chemin} : {why} -> « {t[:60]} »')
+    for chemin, t in vis:
+        if '360' in t: err.append(f'{chemin} : aucun texte « 360° » à l’écran -> « {t[:60]} »')
+        if re.search(r'hors\s+chaussures', t, re.I): err.append(f'{chemin} : « hors chaussures » interdit dans le format look (chaussures comprises)')
+    if re.search(r'hors\s+chaussures', txt, re.I): err.append('script : « hors chaussures » interdit dans le format look')
+    if re.search(r'\d', txt): err.append('script : chiffres trouvés, écrire les nombres en lettres pour la voix')
+    def surl(x, chemin):
+        if isinstance(x, dict):
+            if x.get('surligne') and x.get('texte') is not None and x['surligne'] not in x['texte']:
+                err.append(f'{chemin} : surligne « {x["surligne"]} » absent de « {x["texte"]} » (respecter majuscules et accents)')
+            for k_, v in x.items(): surl(v, f'{chemin}.{k_}')
+        elif isinstance(x, list):
+            for i_, v in enumerate(x): surl(v, f'{chemin}[{i_}]')
+    surl(E, 'episode')
+    n = len(txt); voix_s = n * S_PAR_CAR
+    R.update(caracteres=n, duree_voix_estimee_s=round(voix_s, 1), duree_estimee_s=round(voix_s + 1.2, 1), credits_estimes=round(n * CREDITS_PAR_CAR))
+    if not DUREE_CIBLE_LOOK[0] <= voix_s <= DUREE_CIBLE_LOOK[1]: err.append(f'durée de voix estimée {voix_s:.1f} s hors cible {DUREE_CIBLE_LOOK[0]}..{DUREE_CIBLE_LOOK[1]} s ({n} caractères)')
+    accroche = re.split(r'(?<=[.?!])\s', txt, maxsplit=1)[0]; R['accroche_mots'] = len(accroche.split())
+    if len(accroche.split()) > 15: avert.append(f'accroche de {len(accroche.split())} mots (viser 12 au plus)')
+    Lk = E['look']; T_ = norm(txt)
+    for chemin, t_ in [('accroche', E['accroche']), ('astuce.titre', E['astuce']['titre']), ('teaser.titre', E['teaser']['titre'])] + ([('look.titre_total', Lk['titre_total'])] if Lk.get('titre_total') else []):
+        lg_ = max(len(t_['l1']), len(t_.get('pre', '') + t_['kw'] + t_.get('post', '')))
+        if lg_ > 30: err.append(f'{chemin} : ligne de {lg_} caractères, trop longue pour le titre (30 au plus, 24 en pleine taille)')
+        elif lg_ > 24: avert.append(f'{chemin} : ligne de {lg_} caractères, titre réduit à {88 * 24 // lg_} px')
+    zs = [pc.get('zone') for pc in Lk['pieces']]
+    if 'chaussures' not in zs: err.append('look : pas de pièce « chaussures » (toujours montrer les chaussures avec leur prix)')
+    if len(Lk['pieces']) not in (3, 4): err.append('look : 3 ou 4 pièces')
+    som = round(sum(prix_num(pc['prix']) for pc in Lk['pieces']), 2)
+    if abs(som - prix_num(Lk['total'])) > 0.005: err.append(f'look : total {Lk["total"]} mais somme des pièces {som:.2f}')
+    def dit(val):
+        e_, c_ = divmod(round(prix_num(val) * 100), 100)
+        return any(v in T_ for v in fr_variantes(e_)) and (c_ == 0 or any(v in T_ for v in fr_variantes(c_)))
+    for quoi, val in [(pc['nom'], pc['prix']) for pc in Lk['pieces']] + [('total', Lk['total'])] + [(pc['nom'] + ' (barré)', pc['prix_barre']) for pc in Lk['pieces'] if pc.get('prix_barre')]:
+        if not dit(val): err.append(f'prix {val} ({quoi}) affiché mais pas dit')
+    for pc in Lk['pieces']:
+        if pc.get('zone') == 'chaussures' and re.search(r'mocassin|loafer', pc['nom'] + ' ' + pc.get('desc_en', ''), re.I): err.append(f"chaussures : pas de mocassins ({pc['nom']})")
+    A = E['accroche']; full = ' '.join(A.get(x, '') for x in ('l1', 'pre', 'kw', 'post')); mots_ = [norm(w) for w in txt.split()]
+    for m in re.finditer(r'(\d+)\s*€', full):
+        pos = next((i for i, w in enumerate(mots_) if w in fr_variantes(int(m.group(1)))), None)
+        if pos is None: err.append(f'accroche : {m.group(0)} affiché mais jamais dit')
+        elif pos > 12: avert.append(f'accroche : {m.group(0)} affiché dès l’image 0 mais dit seulement au mot {pos + 1}')
+    # date du relevé : affichée (mention.l1), plus dite (accord d'Aymane du 25/11/2026) ; « chaussures comprises » affiché
+    d = datetime.date.fromisoformat(E['date_releve'])
+    if f'{d.day:02d}/{d.month:02d}' not in E['mention']['l1']: err.append(f'mention : la date {d:%d/%m} du relevé n’est pas dans « {E["mention"]["l1"]} »')
+    if 'chaussures comprises' not in E['mention']['l2']: err.append('mention : « chaussures comprises » absent de mention.l2')
+    if not E.get('teaser'): err.append('teaser absent : la fin annonce l’épisode suivant')
+    try:
+        W = mots_simules(txt); props = timeline_look(ep, a, W, ep.out / 'props-simule.json')
+        R['pieces_s'] = [round(t_['at'] / FPS, 2) for t_ in props['tags']]
+        if props['ouverture']['type'] == 'erreur':
+            R['bascule_s'] = round(props['ouverture']['bascule'] / FPS, 2)
+            if R['bascule_s'] > 6: avert.append(f"bascule vers la bonne tenue vers {R['bascule_s']} s (estimation) : viser moins de 6 s")
+    except SAErreur as e: err.append(f'timeline simulée : {e}')
+    manq = []; O = E.get('ouverture') or {}
+    if O.get('type', 'erreur') == 'erreur' and not ep.p(O.get('image_erreur', '-')).exists(): manq.append(dict(tenue='erreur', type='image erreur', fichier=O.get('image_erreur')))
+    if not ep.p(Lk['image']).exists(): manq.append(dict(tenue=1, type='image mannequin en tenue', fichier=Lk['image']))
+    if Lk.get('rotation') and not ep.p(Lk['rotation']).exists(): manq.append(dict(tenue=1, type='rotation 360°', fichier=Lk['rotation']))
+    R['medias_manquants'] = manq; R['voix_presente'] = (ep.voix / 'voice-raw.mp3').exists()
+    pr = ep.out / 'prix.json'
+    R['prix_verifies_le'] = json.load(open(pr))['verifie_le'] if pr.exists() else None
+    if not R['prix_verifies_le']: avert.append('prix jamais vérifiés : lancer « prix »')
+    R['erreurs'] = err; R['avertissements'] = avert
+    json.dump(R, open(ep.out / 'verif.json', 'w'), ensure_ascii=False, indent=1)
+    for x in err: log('ERREUR  ', x)
+    for x in avert: log('ATTENTION', x)
+    log(f"{ep.id} (look) : {n} caractères, voix ~{voix_s:.1f} s, ~{R['credits_estimes']} crédits ElevenLabs, {sum(1 for m in manq if m['type'].startswith('image'))} images et "
+        f"{sum(1 for m in manq if m['type'].startswith('rotation'))} rotation(s) à générer -> {ep.out / 'verif.json'}")
+    if err: stop(f'{len(err)} erreur(s) de vérification')
+    return R
+
+def photo_produit(pc, dst):
+    """Photo produit de l'enseigne, pour les références de GenerateImage et la vignette de la carte (aucun crédit)."""
+    site = enseigne_url(pc['url']); u_ = None
+    if site in ('primark.com', 'decathlon.fr', 'celio.com', 'jules.com'):
+        h = web(pc['url'], IMPERSONATE.get(site, 'chrome'))
+        m = re.search(r'<meta[^>]+property="og:image"[^>]+content="([^"]+)"', h) or re.search(r'<meta[^>]+content="([^"]+)"[^>]+property="og:image"', h)
+        og = html_unescape(m.group(1)) if m and 'no-image' not in m.group(1) else None   # Primark : og:image = image vide, prendre le JSON-LD
+        u_ = next((i for i in offres_ld(h)[1] if i), None) if (site == 'primark.com' or not og) else og
+        if u_ and 'amplience.net' in u_ and '?' not in u_: u_ += '?w=1200&fmt=jpg'
+    elif site == 'kiabi.com' and pc.get('liste_url'):
+        path = re.sub(r'^https://www\.kiabi\.com', '', pc['url'])
+        it = next(parcours(next_data(pc['liste_url']), lambda x: x.get('productUrl') == path and 'display' in x), None)
+        im = next(parcours(it or {}, lambda x: isinstance(x.get('img'), str)), None)
+        if im: u_ = ('https://www.kiabi.com' + im['img']) if im['img'].startswith('/') else im['img']
+    elif site == 'hm.com' and pc.get('liste_url'):
+        art = re.search(r'productpage\.(\d+)\.html', pc['url']).group(1)
+        it = next(parcours(next_data(pc['liste_url']), lambda x: x.get('id') == art and 'prices' in x), None)
+        u_ = (it or {}).get('productImage')
+    elif site == 'uniqlo.com':
+        pid = re.search(r'/products/E(\d+)-', pc['url']).group(1); col = (re.search(r'colorDisplayCode=(\d+)', pc['url']) or [None, '09'])[1]
+        pe = re.search(r'/products/(E\d+-\d+)/(\d+)', pc['url'])
+        det = json.loads(lire_url(urllib.request.Request(f'https://www.uniqlo.com/fr/api/commerce/v5/fr/products/{pe.group(1)}/price-groups/{pe.group(2)}/details?httpFailure=true', headers={'User-Agent': UA, 'x-fr-clientid': 'uq.fr.web-spa'})))['result']
+        u_ = ((det.get('images') or {}).get('main') or {}).get(col, {}).get('image') or f'https://image.uniqlo.com/UQ/ST3/eu/imagesgoods/{pid}/item/eugoods_{col}_{pid}_3x4.jpg'
+    if not u_: raise SAErreur('photo introuvable sur la fiche')
+    if u_.startswith('//'): u_ = 'https:' + u_
+    from curl_cffi import requests as cr
+    r = cr.get(u_, impersonate=IMPERSONATE.get(site, 'chrome'), timeout=40)
+    if r.status_code != 200 or len(r.content) < 2000: raise SAErreur(f'photo HTTP {r.status_code}')
+    from PIL import Image
+    import io
+    Image.open(io.BytesIO(r.content)).convert('RGB').save(dst, quality=92)
+
+def prompts_look(ep, a):
+    E = ep.E; M = mannequin(E); base = bloc_prompt_base(M); Lk = E['look']; O = E.get('ouverture') or {}
+    (ep.media / 'produits').mkdir(exist_ok=True)
+    refs_id = [str(M['dir'] / 'identite' / 'maitre-visage.jpg'), str(M['dir'] / 'identite' / 'maitre-corps.jpg')]
+    refs = list(refs_id)
+    for j, pc in enumerate(Lk['pieces'], 1):
+        dst = ep.media / 'produits' / f"{j}-{pc['zone']}.jpg"
+        if not dst.exists() and not a.sans_reseau:
+            try: photo_produit(pc, dst); log('photo produit :', pc['nom'], '->', dst.name)
+            except Exception as e: log('photo produit non téléchargée :', pc['nom'], e if isinstance(e, SAErreur) else type(e).__name__)
+        if dst.exists(): refs.append(str(dst))
+    nomz = dict(manteau='coat', haut='top', bas='bottom', chaussures='shoes')
+    tenue = '; '.join(f"{nomz[pc['zone']]}: {pc.get('desc_en') or pc['nom']}" for pc in Lk['pieces'])
+    shoes = next(pc for pc in Lk['pieces'] if pc['zone'] == 'chaussures')
+    pose = (f"Pose: standing straight, full body visible from hair to shoes, facing the camera almost front-on, arms relaxed at {M['pr']} sides, calm neutral expression "
+            "with a very slight closed-mouth smile. Framing: centered, generous empty space above the head and below the shoes, both soles flat on the floor.")
+    def prompt(bloc): return base.replace('[TENUE]', bloc).replace('[POSE ET CADRAGE]', pose) if base else bloc + '\n' + pose
+    bloc = (f"CHANGE ONLY {M['pr'].upper()} CLOTHES AND SHOES. Outfit: {tenue}. The shoes are exactly these: {shoes.get('desc_en') or shoes['nom']}, fully visible, not cropped, not hidden by the trousers. "
+            "No jewelry, no hat, no glasses. The garments and shoes must match the product photos in the references: same color, same cut, same fabric look. No logo, no text, no brand label anywhere.")
+    L_ = [f"# Prompts de génération : {E['titre']} (format look)\n\nFichier produit par `sa.py prompts` le {datetime.date.today():%d/%m/%Y}. PAYANT : rien n'est généré sans le oui d'Aymane.\n"
+          "Images : GenerateImage, `aspect_ratio` 9:16, références dans l'ordre indiqué. Rotation : GenerateVideo à partir de l'image validée (clip 6 s, vertical).\n"
+          f"Relire chaque image (visage de {M['nom']}, couleur et coupe des pièces, chaussures entières et posées au sol, aucun logo) avant de lancer la rotation.\n"
+          "Puis `sa.py vignettes` et régler `coupe` si besoin.\n",
+          f"\n## Bonne tenue : {Lk['label']} ({Lk['total']}, chaussures comprises)\n\n### Image -> `{ep.dir.name}/{Lk['image']}`\n\nRéférences :\n" + '\n'.join(f'- `{r}`' for r in refs) +
+          "\n\n(Recadrer toute photo produit qui montre un logo ou un texte avant de la passer.)\n\n```\n" + prompt(bloc) + "\n```\n"]
+    if O.get('type', 'erreur') == 'erreur':
+        be = (f"CHANGE ONLY {M['pr'].upper()} CLOTHES AND SHOES. Outfit (a deliberate styling mistake, shown as the 'before'): {O.get('erreur_en', 'to describe')}. "
+              "Ordinary unbranded clothes, no logo, no text, no brand label anywhere. Shoes fully visible and flat on the floor.")
+        L_.append(f"\n## Erreur (image 0, sans prix)\n\n### Image -> `{ep.dir.name}/{O['image_erreur']}`\n\nRéférences :\n" + '\n'.join(f'- `{r}`' for r in refs_id) + "\n\n```\n" + prompt(be) + "\n```\n")
+    if Lk.get('rotation'):
+        L_.append(f"\n### Rotation 360° -> `{ep.dir.name}/{Lk['rotation']}`\n\nImage de départ : l'image validée de la bonne tenue.\n\n```\n"
+                  f"The same {M['qui']}, same outfit, same shoes, same light gray studio, slowly turns a full 360 degrees in place like a fashion mannequin on a turntable, "
+                  "at a constant speed, arms relaxed, feet staying on the same spot, ending facing the camera again. Static camera, no zoom, no cut, "
+                  "full body always in frame with space above the head and below the shoes. No text, no logo.\n```\n")
+    (ep.media / 'prompts.md').write_text(''.join(L_), encoding='utf-8')
+    log('prompts (look) ->', ep.media / 'prompts.md')
+
+def ombre_look(P, fr, ep):
+    """Ombre de contact, format look : mesurée sur les plages où la silhouette est posée et entière (props.qaVues)."""
+    from PIL import Image as _Im
+    Lay = P['layout']; Sc, LT, LL = Lay['S'], Lay['top'], Lay['left']; gaps, worst, masquees, ref = [], (0, None), 0, {}
+    def cle(fi):
+        for f0, f1, k in P['qaVues']:
+            if f0 <= fi <= f1: return k
+        return None
+    for i, f in enumerate(fr):
+        fi = round(i * FPS / 10); k = cle(fi)
+        if k is None or not (P['pieds'] or {}).get(k): continue
+        f = f.astype(np.int16); fond = f[:, 960:1000].mean(1)
+        for c in P['pieds'][k]['chaussures']:
+            ys = int(round(LT + (c['y'] + 1) * Sc)); x0 = int(LL + c['x0'] * Sc) + 6; x1 = int(LL + c['x1'] * Sc) - 6
+            if x1 <= x0: continue
+            if (k, c['x0']) not in ref:
+                im = _Im.open(ep.pub / 'leo' / f'cut-{k}.png').convert('RGBA'); y0 = c['y'] - 40
+                pc = im.crop((c['x0'], y0, c['x1'] + 1, c['y'] + 1)); w, h = max(1, round(pc.width * Sc)), max(1, round(pc.height * Sc))
+                pc = np.asarray(pc.resize((w, h), _Im.LANCZOS)).astype(float); lum = 16 + 219 * (pc[..., :3] @ [0.299, 0.587, 0.114]) / 255
+                ref[(k, c['x0'])] = (int(round(LT + y0 * Sc)), int(round(LL + c['x0'] * Sc)), lum, pc[..., 3] > 200)
+            ry, rx, lum, m = ref[(k, c['x0'])]; zone = f[ry:ry + lum.shape[0], rx:rx + lum.shape[1]]
+            if zone.shape == lum.shape and m.sum() > 20 and np.abs(zone[m] - lum[m]).mean() > 30: masquees += 1; continue
+            g = 0
+            while g < 20 and fond[ys + g] - f[ys + g, x0:x1].mean() < 10: g += 1
+            gaps.append(g)
+            if g > worst[0]: worst = (g, round(i / 10, 1))
+    return dict(ecart_max_px=worst[0], instant_s=worst[1], mesures=len(gaps), seuil_px=4, au_dela_seuil=int(sum(1 for g in gaps if g > 4)), chaussures_masquees=masquees)
+# ================================================================== fin du format « look »
+
 # ------------------------------------------------------------------ prompts (images Léo + rotations, à passer à GenerateImage / GenerateVideo)
 LEO = MOTEUR.parent / 'leo'
 MANNEQUINS = {'leo': dict(dir=MOTEUR.parent / 'leo', nom='Léo', pr='his', pr2='he', qui='young man'),
@@ -746,6 +1180,7 @@ def bloc_prompt_base(M=None):
     m = re.search(r'## 1\..*?```\n(.*?)```', t, re.S)
     return m.group(1).strip() if m else ''
 def cmd_prompts(ep, a):
+    if est_look(ep.E): return prompts_look(ep, a)
     E = ep.E; M = mannequin(E); base = bloc_prompt_base(M); (ep.media / 'produits').mkdir(exist_ok=True); L_ = []
     L_.append(f"# Prompts de génération : {E['titre']}\n\nFichier produit par `sa.py prompts` le {datetime.date.today():%d/%m/%Y}. PAYANT : rien n'est généré sans le oui d'Aymane.\n"
               "Images : GenerateImage, `aspect_ratio` 9:16, références dans l'ordre indiqué. Rotations : GenerateVideo à partir de l'image validée (clip 6 s, vertical).\n"
@@ -794,7 +1229,10 @@ def cmd_nouveau(a):
     src = MOTEUR / 'episodes' / (a.depuis or 'leo-4-tenues-50e')
     dst.mkdir(parents=True); (dst / 'media').mkdir()
     E = json.load(open(src / 'episode.json', encoding='utf-8')); E['id'] = a.episode; E['date_releve'] = f'{datetime.date.today():%Y-%m-%d}'
-    for t in E['tenues']:
+    if est_look(E):
+        E['look']['image'] = f'media/{a.episode}-look.jpg'; E['look']['rotation'] = f'media/rotation-{a.episode}-look.mp4'
+        if (E.get('ouverture') or {}).get('type', 'erreur') == 'erreur': E['ouverture']['image_erreur'] = f'media/{a.episode}-erreur.jpg'
+    for t in E.get('tenues', []):
         slug = re.sub(r'[^a-z0-9]+', '-', t['label'].lower()).strip('-'); t['image'] = f'media/{a.episode}-{slug}.jpg'; t['rotation'] = f'media/rotation-{a.episode}-{slug}.mp4'
     E['publication'] = dict(date_prevue='AAAA-MM-JJ', plateformes=['TikTok', 'Instagram Reels'], forme_accroche='à remplir')
     json.dump(E, open(dst / 'episode.json', 'w'), ensure_ascii=False, indent=2)
@@ -827,7 +1265,7 @@ def cmd_lot(a):
             v = ep.out / 'verif.json'
             if v.exists():
                 V = json.load(open(v)); r.update({k: V.get(k) for k in ('caracteres', 'duree_estimee_s', 'credits_estimes', 'medias_manquants', 'avertissements', 'prix_verifies_le')})
-            r['titre'] = ep.E['titre']; r['tenues'] = ' / '.join(f"{t['label']} {t['total']}" for t in ep.E['tenues'])
+            r['titre'] = ep.E['titre']; r['tenues'] = ' / '.join(f"{t['label']} {t['total']}" for t in (ep.E['tenues'] if not est_look(ep.E) else [ep.E['look']]))
             mp4 = ep.out / f'{ep.id}.mp4'; r['video'] = str(mp4) if mp4.exists() else ''
         except SAErreur as x: r['statut'] = 'ERREUR'; r['detail'] = str(x)
         except Exception as x: r['statut'] = 'ERREUR'; r['detail'] = f'{type(x).__name__}: {x}'

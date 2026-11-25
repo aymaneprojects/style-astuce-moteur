@@ -1,0 +1,143 @@
+{
+ "id": "ines-petite-manteau-court",
+ "format": "look",
+ "titre": "Petite ? Pas ce manteau",
+ "mannequin": "ines",
+ "date_releve": "2026-11-25",
+ "logo": {
+  "actif": true,
+  "variante": "creme",
+  "opacite": 0.8,
+  "largeur": 164
+ },
+ "script": "script.txt",
+ "voix": {
+  "fournisseur": "elevenlabs",
+  "voice_name": "Koraly - Promo Video",
+  "voice_id": "rbFGGoDXFHtVghjHuS3E",
+  "model_id": "eleven_v4",
+  "language_code": "fr",
+  "stability": 0.45,
+  "similarity_boost": 0.75,
+  "output_format": "mp3_44100_128"
+ },
+ "accroche": {
+  "l1": "Petite ?",
+  "pre": "",
+  "kw": "Ce manteau te coupe en deux",
+  "post": "",
+  "mot_surligne": "coupe"
+ },
+ "ouverture": {
+  "type": "erreur",
+  "marque": "trait",
+  "marque_y": 0.5,
+  "mot_bascule": "Mets",
+  "sous_titre": {
+   "mot": "Mets",
+   "texte": "Mets plutôt ça",
+   "surligne": "plutôt ça",
+   "mot_surligne": "plutôt"
+  },
+  "erreur_en": "a long black padded puffer coat reaching the ankles, closed, over straight blue jeans that are too long and pool on the floor, flat black ankle boots partly hidden",
+  "image_erreur": "media/ines-petite-manteau-court-erreur.jpg"
+ },
+ "look": {
+  "label": "Petite",
+  "total": "103,99 €",
+  "image": "media/ines-petite-manteau-court-look.jpg",
+  "rotation": "media/rotation-ines-petite-manteau-court-look.mp4",
+  "coupe": {},
+  "pieces": [
+   {
+    "nom": "Veste courte marron",
+    "enseigne": "Primark",
+    "prix": "24 €",
+    "zone": "manteau",
+    "url": "https://www.primark.com/fr-fr/p/veste-courte-a-col-cheminee-marron-991184884616",
+    "mot": "Veste",
+    "mot_prix": "vingt-quatre",
+    "desc_en": "short brown jacket with a funnel neck, ending at the hip, worn open",
+    "nom_fiche": "Veste courte à col cheminée marron"
+   },
+   {
+    "nom": "Pull col montant beige",
+    "enseigne": "Kiabi",
+    "prix": "18 €",
+    "zone": "haut",
+    "url": "https://www.kiabi.com/pull-col-montant-en-rib-beige_P3499922C3499752",
+    "mot": "Pull",
+    "mot_prix": "dix-huit",
+    "desc_en": "beige ribbed knit sweater with a high mock neck, tucked in at the front",
+    "nom_fiche": "Pull col montant en rib beige",
+    "liste_url": "https://www.kiabi.com/pull-gilet-femme_201516"
+   },
+   {
+    "nom": "Jean large L30",
+    "enseigne": "Kiabi",
+    "prix": "22 €",
+    "zone": "bas",
+    "url": "https://www.kiabi.com/jean-wide-leg-l30-bleu_P833382C3071823",
+    "mot": "Jean",
+    "mot_prix": "vingt-deux",
+    "desc_en": "mid-blue wide-leg high-waist jeans, length just grazing the floor over the boots",
+    "nom_fiche": "Jean wide leg L30 bleu",
+    "liste_url": "https://www.kiabi.com/jean-large-femme_413002"
+   },
+   {
+    "nom": "Bottines talon bloc",
+    "enseigne": "H&M",
+    "prix": "39,99 €",
+    "zone": "chaussures",
+    "url": "https://www2.hm.com/fr_fr/productpage.1366863001.html",
+    "mot": "Bottines",
+    "mot_prix": "trente-neuf",
+    "desc_en": "black smooth leather ankle boots with a long pointed toe and a short block heel",
+    "nom_fiche": "Bottines à talon bloc noir",
+    "liste_url": "https://www2.hm.com/fr_fr/femme/catalogue-par-produit/chaussures/bottines.html"
+   }
+  ]
+ },
+ "mention": {
+  "l1": "Prix du 25/11",
+  "l2": "chaussures comprises, hors livraison"
+ },
+ "astuce": {
+  "mot": "La",
+  "titre": {
+   "l1": "L'astuce",
+   "pre": "",
+   "kw": "veste à la hanche",
+   "post": "",
+   "mot_surligne": "hanche"
+  },
+  "sous_titres": [
+   {
+    "mot": "tes",
+    "texte": "Jambes plus longues",
+    "surligne": "plus longues",
+    "mot_surligne": "longues"
+   }
+  ]
+ },
+ "teaser": {
+  "mot": "Demain",
+  "titre": {
+   "l1": "Demain midi",
+   "pre": "",
+   "kw": "Léo par -2 °C",
+   "post": "",
+   "mot_surligne": "Léo"
+  }
+ },
+ "publication": {
+  "date_prevue": "2026-11-27",
+  "heure": "19:00",
+  "plateformes": [
+   "TikTok",
+   "Instagram Reels"
+  ],
+  "script_valide": "Aymane, 25/11/2026 11:08",
+  "legende_source": "lot-2026-11-27/scripts.md (E2)"
+ }
+}

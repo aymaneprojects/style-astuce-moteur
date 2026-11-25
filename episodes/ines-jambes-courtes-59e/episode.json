@@ -1,0 +1,128 @@
+{
+ "id": "ines-jambes-courtes-59e",
+ "format": "look",
+ "titre": "Jambes courtes : 59 €",
+ "mannequin": "ines",
+ "date_releve": "2026-11-25",
+ "logo": {
+  "actif": true,
+  "variante": "creme",
+  "opacite": 0.8,
+  "largeur": 164
+ },
+ "script": "script.txt",
+ "voix": {
+  "fournisseur": "elevenlabs",
+  "voice_name": "Koraly - Promo Video",
+  "voice_id": "rbFGGoDXFHtVghjHuS3E",
+  "model_id": "eleven_v4",
+  "language_code": "fr",
+  "stability": 0.45,
+  "similarity_boost": 0.75,
+  "output_format": "mp3_44100_128"
+ },
+ "accroche": {
+  "l1": "Jambes courtes ?",
+  "pre": "",
+  "kw": "59 €, bottines comprises",
+  "post": "",
+  "mot_surligne": "Cinquante-neuf"
+ },
+ "ouverture": {
+  "type": "rotation",
+  "marque": "ligne",
+  "marque_mot": "centimètres"
+ },
+ "look": {
+  "label": "Tout en noir",
+  "total": "59 €",
+  "image": "media/ines-jambes-courtes-59e-look.jpg",
+  "rotation": "media/rotation-ines-jambes-courtes-59e-look.mp4",
+  "coupe": {},
+  "pieces": [
+   {
+    "nom": "Pull col roulé noir",
+    "enseigne": "Kiabi",
+    "prix": "13 €",
+    "zone": "haut",
+    "url": "https://www.kiabi.com/pull-fine-jauge-col-roule-noir_P3547291C3547294",
+    "mot": "Pull",
+    "mot_prix": "treize",
+    "desc_en": "black fine-gauge turtleneck sweater, tucked in",
+    "nom_fiche": "Pull fine jauge col roulé noir",
+    "liste_url": "https://www.kiabi.com/pull-gilet-femme_201516"
+   },
+   {
+    "nom": "Jean large noir",
+    "enseigne": "Kiabi",
+    "prix": "22 €",
+    "zone": "bas",
+    "url": "https://www.kiabi.com/jean-wide-leg-coupe-large-noir_P3354247C3353076",
+    "mot": "Jean",
+    "mot_prix": "vingt-deux",
+    "desc_en": "black wide-leg high-waist jeans, long enough to cover the top of the boots",
+    "nom_fiche": "Jean wide leg coupe large noir",
+    "liste_url": "https://www.kiabi.com/jean-large-femme_413002"
+   },
+   {
+    "nom": "Bottines à talon",
+    "enseigne": "Primark",
+    "prix": "24 €",
+    "zone": "chaussures",
+    "url": "https://www.primark.com/fr-fr/p/bottines-a-talon-en-simili-cuir-stretch-noir-991191742804",
+    "mot": "Bottines",
+    "mot_prix": "vingt-quatre",
+    "desc_en": "black stretch faux-leather sock ankle boots with a medium block heel and a square toe",
+    "nom_fiche": "Bottines à talon en simili cuir stretch noir"
+   }
+  ]
+ },
+ "mention": {
+  "l1": "Prix du 25/11",
+  "l2": "chaussures comprises, hors livraison"
+ },
+ "astuce": {
+  "mot": "L'astuce",
+  "titre": {
+   "l1": "L'astuce",
+   "pre": "",
+   "kw": "du jean aux chaussures",
+   "post": "",
+   "mot_surligne": "chaussures"
+  },
+  "sous_titres": [
+   {
+    "mot": "L'œil",
+    "texte": "L'œil ne voit plus la coupure",
+    "surligne": "coupure",
+    "mot_surligne": "s'arrête"
+   }
+  ]
+ },
+ "teaser": {
+  "mot": "Dis-moi",
+  "titre": {
+   "l1": "Dis-moi",
+   "pre": "",
+   "kw": "ta morphologie",
+   "post": "",
+   "mot_surligne": "morphologie"
+  },
+  "sous_titre": {
+   "mot": "commentaire",
+   "texte": "En commentaire",
+   "surligne": "commentaire",
+   "mot_surligne": "commentaire"
+  }
+ },
+ "publication": {
+  "date_prevue": "2026-11-29",
+  "heure": "19:00",
+  "plateformes": [
+   "TikTok",
+   "Instagram Reels"
+  ],
+  "script_valide": "Aymane, 25/11/2026 11:08",
+  "legende_source": "lot-2026-11-27/scripts.md (E6)"
+ }
+}

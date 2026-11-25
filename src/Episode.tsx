@@ -53,9 +53,11 @@ const OneTitle: React.FC<{d: TitleDef; f: number; next: number}> = ({d, f, next}
   const chars = d.type ? Math.floor(interpolate(fe, [0, 16], [0, full.length], clamp)) : 999;
   const cut = (s: string, off: number) => s.slice(0, Math.max(0, chars - off));
   const o2 = d.l1.length + 1;
+  // format look : taille réduite pour les lignes longues (environ 24 caractères tiennent à 88 px dans la zone sûre) ; format historique inchangé
+  const fs = T.format === 'look' ? Math.min(88, Math.floor(88 * 24 / Math.max(d.l1.length, (d.pre + d.kw + d.post).length))) : 88;
   return (
     <div style={{position: 'absolute', left: SAFE_L, width: SAFE_W, top: 228, textAlign: 'center', fontFamily: 'Fraunces', fontWeight: 500,
-      fontSize: 88, lineHeight: 1.0, letterSpacing: '-0.02em', color: INK, fontVariationSettings: "'opsz' 144, 'SOFT' 50",
+      fontSize: fs, lineHeight: 1.0, letterSpacing: '-0.02em', color: INK, fontVariationSettings: "'opsz' 144, 'SOFT' 50",
       opacity: pin * (1 - pout), translate: `0 ${(1 - pin) * 34 - pout * 26}px`}}>
       <div style={{whiteSpace: 'nowrap'}}>{cut(d.l1, 0)}</div>
       <div style={{position: 'relative', display: 'inline-block', whiteSpace: 'nowrap'}}>
@@ -344,10 +346,155 @@ const Rotation: React.FC<{f: number; k: number}> = ({f, k}) => {
 
 
 
+// ===================================================================== FORMAT « LOOK » (props.format === 'look')
+// Un seul look de 3 ou 4 pièces, chaussures comprises. Image 0 = l'erreur (marque tracée dès l'image 1) ou la bonne tenue qui tourne.
+// Mêmes règles figées : aucun zoom (la rotation garde la taille et la place exactes de la silhouette, fondu seulement),
+// zone commune TikTok + Reels, logo en bas à droite, prix affichés quand ils sont dits, ombre de contact calée sur les semelles.
+const LOOK_SLOTS: Record<number, number[]> = {3: [580, 800, 1020], 4: [560, 745, 930, 1115]};
+const ZONE_TARGET: Record<string, [number, number]> = {manteau: [150, 820], haut: [70, 600], bas: [60, 1250], chaussures: [60, 1800]};
+
+const LookShadow: React.FC<{k: string}> = ({k}) => {
+  const p = T.pieds?.[k]; const {S: s, top, left} = T.layout;
+  if (!p) return null;
+  const sx = (x: number) => left + x * s, sy = (y: number) => top + (y + 1) * s;
+  const x0 = Math.min(...p.chaussures.map((c: any) => c.x0)), x1 = Math.max(...p.chaussures.map((c: any) => c.x1));
+  const w = (x1 - x0) * s * 1.18, gy = sy(p.y);
+  return (
+    <>
+      <div style={{position: 'absolute', left: sx((x0 + x1) / 2) - w / 2, top: gy - 9, width: w, height: 22, borderRadius: '50%',
+        background: 'radial-gradient(ellipse at center, rgba(80,48,26,.30) 0%, rgba(80,48,26,.16) 45%, rgba(80,48,26,0) 72%)'}} />
+      {p.chaussures.map((c: any, i: number) => {
+        const cw = (c.x1 - c.x0) * s * 1.12, cy = sy(c.y);
+        return <div key={i} style={{position: 'absolute', left: sx((c.x0 + c.x1) / 2) - cw / 2, top: cy - 5, width: cw, height: 11, borderRadius: '50%',
+          background: 'radial-gradient(ellipse at center, rgba(52,30,16,.62) 0%, rgba(52,30,16,.42) 50%, rgba(52,30,16,0) 100%)', filter: 'blur(1.2px)'}} />;
+      })}
+    </>
+  );
+};
+
+// silhouette détourée + son ombre, découpées ensemble (le balayage coupe l'ombre au même endroit que la silhouette)
+const Figure: React.FC<{k: string; clip?: string; op: number}> = ({k, clip, op}) => {
+  const {S: s, top, left} = T.layout;
+  if (op <= 0) return null;
+  return (
+    <div style={{position: 'absolute', left: 0, top: 0, width: 1080, height: 1920, clipPath: clip, opacity: op}}>
+      <LookShadow k={k} />
+      <Img src={staticFile(`leo/cut-${k}.png`)} style={{position: 'absolute', left, top, width: 1080 * s, height: 1920 * s}} />
+    </div>
+  );
+};
+
+const rotOpacity = (f: number) => {
+  const r = T.rot; if (!r) return 0;
+  const a = r.r0 === 0 ? 1 : interpolate(f, [r.r0, r.r0 + 8], [0, 1], clamp);
+  return Math.min(a, interpolate(f, [r.r1 - 8, r.r1], [1, 0], clamp));
+};
+
+const LookFigures: React.FC<{f: number}> = ({f}) => {
+  const {S: s, left, top} = T.layout; const O = T.ouverture;
+  const rop = rotOpacity(f), figOp = 1 - rop;
+  if (O.type !== 'erreur') return <Figure k="1" op={figOp} />;
+  // balayage latéral de l'erreur vers la bonne tenue (gauche vers droite), sans zoom
+  const b = O.bascule, e0 = left + 230 * s, e1 = left + 870 * s;
+  const w = interpolate(f, [b, b + 16], [0, 1], {...clamp, easing: io}), edge = e0 + (e1 - e0) * w;
+  return (
+    <>
+      {w < 1 ? <Figure k="0" op={figOp} clip={w > 0 ? `inset(0 0 0 ${edge}px)` : undefined} /> : null}
+      {w > 0 ? <Figure k="1" op={figOp} clip={w < 1 ? `inset(0 ${1080 - edge}px 0 0)` : undefined} /> : null}
+      {w > 0 && w < 1 ? <div style={{position: 'absolute', left: edge - 3, top: top + 40 * s, width: 6, height: 1800 * s, borderRadius: 3,
+        background: `linear-gradient(180deg, rgba(217,102,43,0), ${ORANGE}, rgba(217,102,43,0))`}} /> : null}
+    </>
+  );
+};
+
+// marque tracée sur l'erreur : croix, trait (silhouette coupée en deux), flèche, cercle, ou ligne verticale col-chaussures
+const Mark: React.FC<{f: number}> = ({f}) => {
+  const m = T.ouverture.marque; if (!m) return null;
+  const {S: s, top, cx} = T.layout;
+  const p = interpolate(f, [m.at, m.at + m.duree], [0, 1], {...clamp, easing: out});
+  const fin = T.ouverture.type === 'erreur' ? T.ouverture.bascule : (T.tags[1]?.at ?? T.total);   // la ligne reste jusqu'à la 2e carte
+  const q = interpolate(f, [fin - 6, fin + 2], [1, 0], clamp);
+  if (p <= 0 || q <= 0) return null;
+  const y = top + m.y * 1920 * s;
+  const paths: string[] = [];
+  if (m.type === 'croix') { paths.push(`M${cx - 150},${top + 330 * s} L${cx + 150},${top + 1150 * s}`, `M${cx + 150},${top + 330 * s} L${cx - 150},${top + 1150 * s}`); }
+  if (m.type === 'trait') paths.push(`M${cx - 210},${y} L${cx + 210},${y}`);
+  if (m.type === 'fleche') paths.push(`M${cx + 330},${y - 150} Q${cx + 250},${y - 10} ${cx + 85},${y}`, `M${cx + 120},${y - 34} L${cx + 85},${y} L${cx + 124},${y + 28}`);
+  if (m.type === 'cercle') paths.push(`M${cx},${y - 115} C${cx + 210},${y - 115} ${cx + 210},${y + 115} ${cx},${y + 115} C${cx - 210},${y + 115} ${cx - 210},${y - 115} ${cx},${y - 112}`);
+  if (m.type === 'ligne') paths.push(`M${cx},${top + 250 * s} L${cx},${top + 1790 * s}`);
+  return (
+    <svg width={1080} height={1920} style={{position: 'absolute', left: 0, top: 0, opacity: q}}>
+      {paths.map((d, i) => <path key={i} d={d} fill="none" stroke={ORANGE} strokeWidth={13} strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={1}
+        strokeDashoffset={1 - interpolate(p, [i * 0.25, Math.min(1, i * 0.25 + 0.75)], [0, 1], clamp)} />)}
+    </svg>
+  );
+};
+
+// rotation : clip à la taille et à la place exactes de la silhouette (aucun agrandissement), fondu d'entrée et de sortie seulement
+const LookRotation: React.FC<{f: number}> = ({f}) => {
+  const r = T.rot; const {S: s, top, left} = T.layout;
+  const w = 1080 * s, h = w * r.ar, op = rotOpacity(f);
+  const rate = Math.max(0.5, r.frames / (r.r1 - r.r0));
+  return (
+    <div style={{position: 'absolute', left, top: top + (1920 * s - h) / 2, width: w, height: h, borderRadius: 34, overflow: 'hidden', opacity: op,
+      boxShadow: '0 24px 60px rgba(120,70,40,.22)', outline: '6px solid #fff'}}>
+      <OffthreadVideo src={staticFile(r.src)} muted playbackRate={rate} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+    </div>
+  );
+};
+
+const LookTagsAll: React.FC<{f: number}> = ({f}) => {
+  const n = T.tags.length; const ys = LOOK_SLOTS[n] ?? LOOK_SLOTS[4]; const {S: s, top, cx} = T.layout;
+  return (
+    <>
+      {T.tags.map((t: any, j: number) => {
+        const [dx, ty] = ZONE_TARGET[t.zone] ?? [60, 900];
+        return <Tag key={j} f={f} at={t.at} priceAt={t.priceAt} wasAt={t.wasAt ?? undefined} brandAt={t.brandAt ?? undefined} end={T.tagsEnd} side="r" y={ys[j]}
+          piece={t} target={[cx + dx, top + ty * s]} />;
+      })}
+    </>
+  );
+};
+
+// date du relevé et « chaussures comprises » : affichées (pas dites), de « Total » à l'astuce, au moins 2,5 s
+const LookMention: React.FC<{f: number}> = ({f}) => {
+  if (f < T.mention - 2 || f >= T.reponds) return null;
+  const p = interpolate(f, [T.mention, T.mention + 8], [0, 1], {...clamp, easing: out});
+  const q = interpolate(f, [T.reponds - 6, T.reponds], [1, 0], clamp);
+  return (
+    <div style={{position: 'absolute', left: SAFE_L + 40, width: SAFE_W - 80, top: 432, textAlign: 'center', opacity: p * q, translate: `0 ${(1 - p) * 20}px`}}>
+      <span style={{display: 'inline-block', background: INK, color: '#fff', borderRadius: 24, padding: '8px 22px', fontFamily: 'Inter', fontWeight: 700, fontSize: 34, lineHeight: 1.2}}>
+        {T.mentionL1}<br /><span style={{fontWeight: 500}}>{T.mentionL2}</span>
+      </span>
+    </div>
+  );
+};
+
+const LookEpisode: React.FC<{f: number; fps: number}> = ({f, fps}) => (
+  <AbsoluteFill style={{fontFamily: 'Inter'}}>
+    <style>{fontCss}</style>
+    <Background f={f} />
+    <LookFigures f={f} />
+    {T.rot ? (
+      <Sequence from={T.rot.r0} durationInFrames={T.rot.r1 - T.rot.r0} premountFor={fps}>
+        <LookRotation f={f} />
+      </Sequence>
+    ) : null}
+    <Mark f={f} />
+    <LookTagsAll f={f} />
+    <Titles f={f} />
+    <Subtitle f={f} />
+    <LookMention f={f} />
+    <Logo />
+    <Audio src={staticFile(T.audio)} />
+  </AbsoluteFill>
+);
+
 export const Episode: React.FC<{data: any}> = ({data}) => {
-  T = data; L = data.looks; LOOKS = data.looksData; TITLES = data.titles;
+  T = data; L = data.looks ?? []; LOOKS = data.looksData ?? []; TITLES = data.titles;
   const f = useCurrentFrame();
   const {fps} = useVideoConfig();
+  if (data.format === 'look') return <LookEpisode f={f} fps={fps} />;
   return (
     <AbsoluteFill style={{fontFamily: 'Inter'}}>
       <style>{fontCss}</style>

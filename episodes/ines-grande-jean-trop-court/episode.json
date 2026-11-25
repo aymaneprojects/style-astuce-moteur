@@ -1,0 +1,141 @@
+{
+ "id": "ines-grande-jean-trop-court",
+ "format": "look",
+ "titre": "Grande ? Ton jean est trop court",
+ "mannequin": "ines",
+ "date_releve": "2026-11-25",
+ "logo": {
+  "actif": true,
+  "variante": "creme",
+  "opacite": 0.8,
+  "largeur": 164
+ },
+ "script": "script.txt",
+ "voix": {
+  "fournisseur": "elevenlabs",
+  "voice_name": "Koraly - Promo Video",
+  "voice_id": "rbFGGoDXFHtVghjHuS3E",
+  "model_id": "eleven_v4",
+  "language_code": "fr",
+  "stability": 0.45,
+  "similarity_boost": 0.75,
+  "output_format": "mp3_44100_128"
+ },
+ "accroche": {
+  "l1": "Grande ?",
+  "pre": "",
+  "kw": "Ton jean est trop court",
+  "post": "",
+  "mot_surligne": "jean"
+ },
+ "ouverture": {
+  "type": "erreur",
+  "marque": "fleche",
+  "marque_y": 0.9,
+  "mot_bascule": "solution",
+  "sous_titre": {
+   "mot": "solution",
+   "texte": "La solution : Kiabi",
+   "surligne": "Kiabi",
+   "mot_surligne": "solution"
+  },
+  "image_erreur": "media/ines-grande-jean-trop-court-erreur.jpg",
+  "erreur_en": "straight blue jeans that are clearly too short, ending well above the ankle bone, bare ankles visible, a plain gray crew-neck sweater, flat white sneakers"
+ },
+ "look": {
+  "label": "Grande",
+  "total": "113,99 €",
+  "image": "media/ines-grande-jean-trop-court-look.jpg",
+  "rotation": "media/rotation-ines-grande-jean-trop-court-look.mp4",
+  "coupe": {},
+  "pieces": [
+   {
+    "nom": "Jean large noir L34",
+    "enseigne": "Kiabi",
+    "prix": "22 €",
+    "zone": "bas",
+    "url": "https://www.kiabi.com/jean-wide-leg-l34-noir_P848310C848209",
+    "mot": "Jean",
+    "mot_prix": "vingt-deux",
+    "desc_en": "black wide-leg high-waist jeans, extra long length touching the top of the sneakers",
+    "nom_fiche": "Jean wide leg L34 noir",
+    "liste_url": "https://www.kiabi.com/jean-large-femme_413002"
+   },
+   {
+    "nom": "Pull oversize crème",
+    "enseigne": "Primark",
+    "prix": "18 €",
+    "zone": "haut",
+    "url": "https://www.primark.com/fr-fr/p/pull-oversize-en-melange-de-laine-a-col-ras-du-cou-creme-991170923116",
+    "mot": "Pull",
+    "mot_prix": "dix-huit",
+    "desc_en": "cream oversized wool-blend crew-neck sweater",
+    "nom_fiche": "Pull oversize en mélange de laine à col ras du cou crème"
+   },
+   {
+    "nom": "Pardessus droit écru",
+    "enseigne": "Primark",
+    "prix": "24 €",
+    "zone": "manteau",
+    "url": "https://www.primark.com/fr-fr/p/pardessus-droit-ecru-991179296114",
+    "mot": "Pardessus",
+    "mot_prix": "vingt-quatre",
+    "desc_en": "straight long single-breasted overcoat in heathered oatmeal taupe wool-look fabric (Primark names the color ecru, follow the product photo), worn open",
+    "nom_fiche": "Pardessus droit écru"
+   },
+   {
+    "nom": "Baskets en cuir",
+    "enseigne": "Decathlon",
+    "prix": "49,99 €",
+    "zone": "chaussures",
+    "url": "https://www.decathlon.fr/p/baskets-femme-en-cuir-player-80-blanc/363390/c183c309m8960403",
+    "mot": "Baskets",
+    "mot_prix": "quarante-neuf",
+    "desc_en": "white leather low-top court sneakers with a flat sole",
+    "nom_fiche": "Baskets femme en cuir Player 80 blanc"
+   }
+  ]
+ },
+ "mention": {
+  "l1": "Prix du 25/11",
+  "l2": "chaussures comprises, hors livraison"
+ },
+ "astuce": {
+  "mot": "Le",
+  "titre": {
+   "l1": "L'astuce",
+   "pre": "",
+   "kw": "jean jusqu'à la basket",
+   "post": "",
+   "mot_surligne": "basket"
+  },
+  "sous_titres": [
+   {
+    "mot": "ta",
+    "texte": "Jambe longue",
+    "surligne": "longue",
+    "mot_surligne": "ta"
+   }
+  ]
+ },
+ "teaser": {
+  "mot": "Demain",
+  "titre": {
+   "l1": "Demain midi",
+   "pre": "",
+   "kw": "Léo et le petit ventre",
+   "post": "",
+   "mot_surligne": "ventre"
+  }
+ },
+ "publication": {
+  "date_prevue": "2026-11-28",
+  "heure": "19:00",
+  "plateformes": [
+   "TikTok",
+   "Instagram Reels"
+  ],
+  "script_valide": "Aymane, 25/11/2026 11:08",
+  "legende_source": "lot-2026-11-27/scripts.md (E4)"
+ }
+}

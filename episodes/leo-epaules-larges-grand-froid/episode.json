@@ -1,0 +1,146 @@
+{
+ "id": "leo-epaules-larges-grand-froid",
+ "format": "look",
+ "titre": "Épaules larges : partie 2",
+ "mannequin": "leo",
+ "date_releve": "2026-11-25",
+ "logo": {
+  "actif": true,
+  "variante": "creme",
+  "opacite": 0.8,
+  "largeur": 164
+ },
+ "script": "script.txt",
+ "voix": {
+  "fournisseur": "elevenlabs",
+  "voice_name": "Benjamin",
+  "voice_id": "F9KUTOne5xOKqAbIU7yg",
+  "model_id": "eleven_v4",
+  "language_code": "fr",
+  "stability": 0.45,
+  "similarity_boost": 0.75,
+  "output_format": "mp3_44100_128"
+ },
+ "accroche": {
+  "l1": "Épaules larges ?",
+  "pre": "",
+  "kw": "Pas cette doudoune",
+  "post": "",
+  "mot_surligne": "doudoune"
+ },
+ "ouverture": {
+  "type": "erreur",
+  "marque": "croix",
+  "mot_bascule": "Partie",
+  "sous_titre": {
+   "mot": "Partie",
+   "texte": "Partie 2 : spécial grand froid",
+   "surligne": "grand froid",
+   "mot_surligne": "grand"
+  },
+  "erreur_en": "a shiny puffer jacket with very wide horizontal quilted bands in light silver gray, zipped up to a round crew neck, worn over a plain gray crew-neck sweatshirt, straight mid-blue jeans, plain white low sneakers",
+  "image_erreur": "media/leo-epaules-larges-grand-froid-erreur.jpg"
+ },
+ "look": {
+  "label": "Grand froid",
+  "total": "119 €",
+  "image": "media/leo-epaules-larges-grand-froid-look.jpg",
+  "rotation": "media/rotation-leo-epaules-larges-grand-froid-look.mp4",
+  "coupe": {},
+  "pieces": [
+   {
+    "nom": "Manteau long gris",
+    "enseigne": "Kiabi",
+    "prix": "60 €",
+    "zone": "manteau",
+    "url": "https://www.kiabi.com/manteau-long-esprit-lainage-gris_P3570285C3570286",
+    "mot": "Manteau",
+    "mot_prix": "soixante",
+    "desc_en": "long single-breasted wool-look overcoat in mid heather gray, knee length, worn open",
+    "nom_fiche": "Manteau long esprit lainage gris",
+    "liste_url": "https://www.kiabi.com/manteau-blouson-homme_200776"
+   },
+   {
+    "nom": "Pull col zippé marine",
+    "enseigne": "Primark",
+    "prix": "20 €",
+    "zone": "haut",
+    "url": "https://www.primark.com/fr-fr/p/pull-en-maille-a-col-zippe-bleu-marine-991181017528",
+    "mot": "Pull",
+    "mot_prix": "vingt",
+    "desc_en": "navy blue knit sweater with a quarter-zip collar, zip slightly open forming a V",
+    "nom_fiche": "Pull en maille à col zippé bleu marine"
+   },
+   {
+    "nom": "Chino large gris foncé",
+    "enseigne": "Jules",
+    "prix": "15 €",
+    "zone": "bas",
+    "url": "https://www.jules.com/fr-fr/p/100648218817.html",
+    "mot": "Chino",
+    "mot_prix": "quinze",
+    "desc_en": "dark gray wide-leg chino trousers with seam details, full length touching the boots",
+    "nom_fiche": "Pantalon chino large avec découpes gris foncé"
+   },
+   {
+    "nom": "Bottines Chelsea noires",
+    "enseigne": "Primark",
+    "prix": "24 €",
+    "zone": "chaussures",
+    "url": "https://www.primark.com/fr-fr/p/bottines-chelsea-noir-991182976804",
+    "mot": "Bottines",
+    "mot_prix": "vingt-quatre",
+    "desc_en": "black Chelsea boots with elastic side panels and a low rubber sole",
+    "nom_fiche": "Bottines Chelsea noir"
+   }
+  ]
+ },
+ "mention": {
+  "l1": "Prix du 25/11",
+  "l2": "chaussures comprises, hors livraison"
+ },
+ "astuce": {
+  "mot": "Le",
+  "titre": {
+   "l1": "L'astuce",
+   "pre": "",
+   "kw": "manteau ouvert",
+   "post": "",
+   "mot_surligne": "ouvert"
+  },
+  "sous_titres": [
+   {
+    "mot": "col",
+    "texte": "Col en V : buste plus long",
+    "surligne": "plus long",
+    "mot_surligne": "allongent"
+   }
+  ]
+ },
+ "teaser": {
+  "mot": "Abonne-toi",
+  "titre": {
+   "l1": "Ce soir",
+   "pre": "",
+   "kw": "Inès et les petites",
+   "post": "",
+   "mot_surligne": "petites"
+  },
+  "sous_titre": {
+   "mot": "Abonne-toi",
+   "texte": "Abonne-toi pour la suite",
+   "surligne": "Abonne-toi",
+   "mot_surligne": "Abonne-toi"
+  }
+ },
+ "publication": {
+  "date_prevue": "2026-11-27",
+  "heure": "12:30",
+  "plateformes": [
+   "TikTok",
+   "Instagram Reels"
+  ],
+  "script_valide": "Aymane, 25/11/2026 11:08",
+  "legende_source": "lot-2026-11-27/scripts.md (E1)"
+ }
+}

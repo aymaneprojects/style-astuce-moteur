@@ -107,10 +107,10 @@ Gabarit 3 tenues : la grille de cartes passe en 1 et 3 à gauche, 2 au milieu à
 - Zone utile commune TikTok et Reels : x 108..940, y 220..1420. La QA compte tout bord net hors zone.
 - Aucun zoom, aucune pulsation, aucun rebond lié à la parole. Léo reste stable et ne bouge qu'aux changements de tenue et aux rotations.
 - Le rythme vient d'éléments informatifs (étiquettes, prix, vignettes, soulignements, titres) : au moins un événement par seconde.
-- Ouverture sur la tenue finale portée (`ouverture`), puis les cartes des tenues entrent une par une sur la voix, toutes posées avant 5 s.
+- Ouverture sur la tenue finale portée (`ouverture`), puis les cartes des tenues entrent une par une sur la voix, toutes posées avant 5 s. (format historique ; le format « look » n'a pas d'intro de cartes, voir plus bas).
 - Aucune mention en bas de l'écran.
 - Polices Fraunces (titres) et Inter (texte). Palette Momwise (crème, encre, orange), sans réutiliser d'image ni de code Momwise.
-- Prix : datés, hors chaussures et livraison, jamais « look complet », jamais un chiffre affiché qui n'est pas dit dans la voix.
+- Prix : datés, hors chaussures et livraison (format historique) ou chaussures comprises, hors livraison (format « look »), jamais « look complet », jamais un chiffre affiché qui n'est pas dit dans la voix. Format « look » : la date du relevé est affichée, pas dite (accord d'Aymane du 25/11/2026).
 - Voix : on ne l'accélère jamais, on raccourcit seulement les silences.
 - Son : -14 à -12 LUFS, musique environ 18 dB sous la voix.
 
@@ -183,3 +183,36 @@ QA : `qa.json` → `ombre_contact` mesure, image par image (10 i/s, hors bascule
 ## Synchronisation des prix (QA)
 
 `qa.json` → `sync_prix` : pour chaque prix affiché, l'écart avec le début du nombre dit, mesuré deux fois. Par l'alignement ElevenLabs de la voix montée (`words.json`, exact) : échec au-delà de 150 ms (le prix arrive normalement environ 100 ms avant le mot). Par whisper sur la vidéo finale (dates à environ 300 ms près) : échec au-delà de 400 ms ; seuls les mots-nombres comptent, un mot fusionné du type « uniclo2990 » est ignoré, et un prix introuvable à moins de 2 s est signalé (`non_entendus`).
+
+## Format « look » (20 à 26 s, depuis le 25/11/2026)
+
+Activé par `"format": "look"` dans `episode.json`. Sans ce champ, rien ne change : les anciens épisodes suivent le format historique (vérifié : `verifier` donne des sorties identiques sur les épisodes existants).
+
+- **Un seul look** de 3 ou 4 pièces, zones `manteau`, `haut`, `bas`, `chaussures`. Les chaussures sont obligatoires, montrées avec leur prix et comptées dans le total. Pas de mocassins.
+- **Pas d'intro de cartes.** `ouverture.type` :
+  - `"erreur"` : l'image de l'erreur (`ouverture.image_erreur`) est là dès l'image 0, une marque orange se trace dès l'image 1 (`marque` : `croix`, `trait`, `fleche`, `cercle`, à la hauteur `marque_y`, 0 = haut de l'image, 1 = bas), puis un balayage latéral (gauche vers droite, avec un trait orange) montre la bonne tenue sur `mot_bascule`. La rotation de la bonne tenue passe pendant l'astuce.
+  - `"rotation"` : la rotation de la bonne tenue démarre à l'image 0 (mouvement dès l'image 1) et se fond dans la silhouette détourée avant la première carte (ou sur `mot_fin_rotation`). Une marque `ligne` (verticale, du col aux chaussures) peut se tracer sur `marque_mot`.
+  - Dans les deux cas, la rotation garde la taille et la place exactes de la silhouette : fondu seulement, aucun zoom.
+- **Cartes** empilées à droite de la silhouette (x 624..934 ; y 560, 745, 930, 1115 pour 4 pièces, 580, 800, 1020 pour 3), chacune sur le nom de la pièce (`mot`), prix sur `mot_prix`, trait vers la zone de la pièce. Vignette : photo produit de l'enseigne détourée (`media/produits/<n>-<zone>.jpg`, téléchargée par `prompts`), sinon la zone découpée sur le mannequin.
+- **Total** en titre sur « Total », puis la mention à l'écran (`mention.l1` avec la date jj/mm, `mention.l2` = « chaussures comprises, hors livraison ») au moins 2,5 s, jusqu'à l'astuce.
+- **Astuce** (`astuce.titre`, `astuce.sous_titres`), puis **teaser** de l'épisode suivant (`teaser.titre`, tapé lettre à lettre, et `teaser.sous_titre`).
+- Titres : 24 caractères par ligne en pleine taille (88 px), réduits automatiquement jusqu'à 30 caractères ; au-delà, `verifier` refuse.
+- `verifier` : durée de voix estimée 20 à 26 s (erreur sinon), 3 ou 4 pièces, chaussures présentes, total = somme, chaque prix dit, aucun « 360 » à l'écran, pas de « hors chaussures », date jj/mm dans `mention.l1`, teaser présent, bascule avant 6 s, timeline simulée.
+- QA : durée de la vidéo 20 à 28 s, ombre de contact mesurée sur les vues où la silhouette est entière et immobile (`qaVues`), prix comparés à l'alignement de la voix (150 ms) même avec `--sans-whisper`.
+- `prix` lit Jules, Uniqlo, Primark, Decathlon, Celio (JSON-LD via curl_cffi), Kiabi et H&M (page catégorie `liste_url`, les fiches répondent 403). Un prix illisible est une erreur.
+- `prompts` télécharge les photos produit (toutes enseignes, chaussures comprises), écrit le prompt de la bonne tenue avec les vraies chaussures, le prompt de l'erreur (`ouverture.erreur_en`, sans produit réel) et le prompt de rotation.
+
+Schéma (format look) :
+
+```
+format "look", id, titre, mannequin (leo|ines), date_releve, script, voix, logo, publication
+accroche   { l1, pre, kw, post, mot_surligne }
+ouverture  { type: erreur|rotation, image_erreur, erreur_en, coupe, marque, marque_y, marque_mot, mot_bascule, mot_fin_rotation, sous_titre{mot,texte,surligne,mot_surligne} }
+look       { label, total, image, rotation, coupe, titre_total?, mot_total?, pieces[ { nom, enseigne, prix, prix_barre?, zone, url, liste_url?, desc_en, mot, mot_prix, mot_enseigne?, mot_barre? } ] }
+mention    { l1: "Prix du 25/11", l2: "chaussures comprises, hors livraison" }
+astuce     { mot, titre{l1,pre,kw,post,mot_surligne}, sous_titres[] }
+teaser     { mot, titre{...}, sous_titre? }
+```
+
+Test hors ligne (aucun crédit) : `python tests/episode_test_look.py <épisode-modèle> <id-test>` crée un épisode de test avec des silhouettes dessinées, une rotation factice et une voix espeak-ng mot par mot (alignement au format ElevenLabs), puis `sa.py tout episodes/<id-test> --sans-prix` va jusqu'à la QA. Whisper ne comprend pas la voix factice : seul le contrôle par alignement compte pour ce test.
+
